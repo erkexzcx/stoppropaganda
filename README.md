@@ -8,7 +8,26 @@ I believe that Russian propaganda websites should be down for their propaganda, 
 
 ### Docker
 
-TODO
+Easiest way is to use Docker:
+```bash
+docker run -d erikmnkl/stoppropaganda
+```
+
+You can also use `docker-compose`:
+```yaml
+services:
+  stoppropaganda:
+    image: erikmnkl/stoppropaganda
+    container_name: stoppropaganda
+    restart: unless-stopped
+    ports:
+      - "8049:8049/tcp"
+    environment:
+      SP_BIND: ":8049"
+      SP_WORKERS: "100"
+      SP_TIMEOUT: "10s"
+      SP_USERAGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
+```
 
 ### Binaries
 
@@ -28,6 +47,23 @@ $ ./stoppropaganda_v0.0.1_linux_x86_64 --help
 ```
 
 Then open in your browser to see the status: http://127.0.0.1:8049/status
+
+You might want to create SystemD script (Linux only) to autostart this on boot. Create `/etc/systemd/system/stoppropaganda.service` with below contents:
+```
+[Unit]
+Description=Stoppropaganda service
+After=network-online.target
+
+[Service]
+ExecStart=/path/to/binary --workers 1000
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Then `systemctl daemon-reload && systemctl enable --now stoppropaganda.service`. To stop, use `systemctl stop stoppropaganda.service`.
 
 ## Building from source
 

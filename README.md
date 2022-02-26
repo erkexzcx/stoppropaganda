@@ -4,7 +4,7 @@ Russia has invaded Ukraine and commited various war crimes. Russian media says t
 
 I believe that Russian propaganda websites should be down for their propaganda, therefore I created a simple DOS application that can be deployed almost anywhere.
 
-**DISCLAIMER**: (D)DOS'ing is **illegal**! Usage of this tool is intended for educational purposes.
+**DISCLAIMER**: (D)DOS'ing is **illegal**! Usage of this tool is intended for educational purposes only.
 
 It will DOS the following sites:
 * https://lenta.ru
@@ -25,6 +25,7 @@ It will DOS the following sites:
 * https://gosuslugi.ru/
 * https://mil.ru/
 * https://iz.ru/
+* https://vz.ru/
 
 # Usage
 
@@ -59,7 +60,7 @@ services:
       SP_USERAGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
 ```
 
-**NOTE**: `SP_WORKERS` means workers per website, not in total. For example, 18 websites * 100 workers = 1800 workers in total.
+**NOTE**: `SP_WORKERS` means workers per website, not in total. For example, 19 websites * 100 workers = 1800 workers in total.
 
 Then you can see status in this URL: `http://<ip>:8049/status`
 

@@ -6,6 +6,26 @@ I believe that Russian propaganda websites should be down for their propaganda, 
 
 **DISCLAIMER**: (D)DOS'ing is **illegal**, use this tool for educational purposes only!
 
+It will DOS the following sites:
+* https://lenta.ru
+* https://ria.ru/
+* https://ria.ru/lenta/
+* https://www.rbc.ru/
+* https://www.rt.com/
+* http://kremlin.ru/
+* http://en.kremlin.ru/
+* https://smotrim.ru/
+* https://tass.ru/
+* https://tvzvezda.ru/
+* https://vsoloviev.ru/
+* https://www.1tv.ru/
+* https://www.vesti.ru/
+* https://online.sberbank.ru/
+* https://sberbank.ru/
+* https://gosuslugi.ru/
+* https://mil.ru/
+* https://iz.ru/
+
 # Usage
 
 ## Docker

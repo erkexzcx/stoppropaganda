@@ -34,7 +34,7 @@ var links = []string{
 	"https://mil.ru/",
 	"https://iz.ru/",
 	"https://vz.ru/",
-	"https://sputniknews.com",
+	"https://sputniknews.ru",
 }
 
 type Website struct {

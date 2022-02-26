@@ -130,7 +130,7 @@ You can also build for other architectures/platforms as well, see `build.sh` fil
 
 # Recommendations
 
-* Increase `workers` count from 100 (default) to e.g. 500 for greater effect, but check the logs if you are not getting `too many open files`. If so, see [this](https://stackoverflow.com/questions/880557/socket-accept-too-many-open-files).
+* Increase `workers` count from 20 (default) to e.g. 100 for greater effect, but check the logs if you are not getting `too many open files`. If so, see [this](https://stackoverflow.com/questions/880557/socket-accept-too-many-open-files).
 * Change `useragent` to yours. See [this](https://www.whatismybrowser.com/detect/what-is-my-user-agent/).
 * General recommendation is to use VPN, but this is not necesarry. Remember - DOS/DDOS is **illegal**.
 

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -37,9 +38,10 @@ var links = []string{
 }
 
 type Website struct {
-	Link     string `json:"url"`
-	Requests uint   `json:"requests"`
-	Errors   uint   `json:"errors"`
+	Link         string `json:"url"`
+	Requests     uint   `json:"requests"`
+	Errors       uint   `json:"errors"`
+	LastErrorMsg string `json:"last_error_msg"`
 
 	Counter_code100 uint `json:"status_100"`
 	Counter_code200 uint `json:"status_200"`
@@ -75,6 +77,7 @@ func main() {
 	}
 
 	http.HandleFunc("/status", status)
+	log.Println("Started!")
 	panic(http.ListenAndServe(*flagBind, nil))
 }
 
@@ -119,6 +122,7 @@ func (ws *Website) Start() {
 				ws.mux.Lock()
 				ws.Requests++
 				ws.Errors++
+				ws.LastErrorMsg = err.Error()
 				ws.mux.Unlock()
 				continue
 			}

@@ -35,7 +35,7 @@ Easiest way is to use Docker:
 docker run -d -p "8049:8049/tcp" erikmnkl/stoppropaganda
 ```
 
-Use environment variables with `--env SP_WORKERS=123` to change configuration. Available environment variables (and their defaults):
+Use environment variables to change settings (for example `--env SP_WORKERS=123`) to change configuration. Available environment variables (and their defaults):
 ```
 SP_BIND=":8049"
 SP_WORKERS="100"

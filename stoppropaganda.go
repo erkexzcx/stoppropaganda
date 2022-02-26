@@ -39,6 +39,14 @@ var links = []string{
 	"https://iz.ru/",
 	"https://vz.ru/",
 	"https://sputniknews.ru",
+	"https://www.gazeta.ru/",
+	"https://www.kp.ru/",
+	"https://riafan.ru/",
+	"https://pikabu.ru/",
+	"https://www.kommersant.ru/",
+	"https://omk.ru",
+	"https://www.yaplakal.com/",
+	"https://bezformata.com/",
 
 	// Business corporations
 	"https://www.gazprom.ru",
@@ -59,7 +67,6 @@ var links = []string{
 	"https://www.polymetalinternational.com/ru",
 	"https://www.uralkali.com/ru",
 	"https://www.eurosib.ru",
-	"https://omk.ru",
 
 	// Banks
 	"https://www.sberbank.ru",

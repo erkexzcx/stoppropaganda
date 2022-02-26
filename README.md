@@ -12,7 +12,7 @@ Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of 
 
 Easiest way is to use Docker:
 ```bash
-docker run -d -p "8049:8049/tcp" erikmnkl/stoppropaganda
+docker run -d --ulimit nofile=128000:128000 -p "8049:8049/tcp" erikmnkl/stoppropaganda
 ```
 
 Use environment variables to change settings (for example `--env SP_WORKERS=50`) to change configuration. Available environment variables (and their defaults):
@@ -37,6 +37,10 @@ services:
       SP_WORKERS: "20"
       SP_TIMEOUT: "10s"
       SP_USERAGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
+    ulimits:
+      nofile:
+        soft: 128000
+        hard: 128000
 ```
 
 **NOTE**: `SP_WORKERS` means workers per website, not in total. For example, 5 websites * 20 workers = 100 workers in total.
@@ -69,6 +73,10 @@ Description=Stoppropaganda service
 After=network-online.target
 
 [Service]
+LimitAS=infinity
+LimitRSS=infinity
+LimitCORE=infinity
+LimitNOFILE=128000
 ExecStart=/path/to/binary --workers 50
 Restart=always
 RestartSec=3
@@ -97,6 +105,9 @@ cd stoppropaganda
 
 Now you have 2 options to run this application:
 ```bash
+# Increase open file limits for current terminal session
+ulimit -n 128000
+
 # Run without compiling to binary
 go run stoppropaganda.go --help
 

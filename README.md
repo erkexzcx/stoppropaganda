@@ -4,7 +4,7 @@ Russia has invaded Ukraine and commited various war crimes. Russian media says t
 
 I believe that Russian propaganda websites should be down for their propaganda, therefore I created a simple DOS application that can be deployed almost anywhere.
 
-**DISCLAIMER**: (D)DOS'ing is **illegal**, use this tool for educational purposes only!
+**DISCLAIMER**: (D)DOS'ing is **illegal**! Usage of this tool is intended for educational purposes.
 
 It will DOS the following sites:
 * https://lenta.ru

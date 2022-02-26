@@ -15,7 +15,7 @@ import (
 )
 
 var links = []string{
-	"https://lenta.ru",
+	"https://lenta.ru/",
 	"https://ria.ru/",
 	"https://ria.ru/lenta/",
 	"https://www.rbc.ru/",
@@ -33,6 +33,7 @@ var links = []string{
 	"https://gosuslugi.ru/",
 	"https://mil.ru/",
 	"https://iz.ru/",
+	"https://vz.ru/",
 }
 
 type Website struct {

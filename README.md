@@ -4,9 +4,11 @@ Russia has invaded Ukraine and commited various war crimes. Russian media says t
 
 I believe that Russian propaganda websites should be down for their propaganda, therefore I created a simple DOS application that can be deployed almost anywhere.
 
-## Usage
+**DISCLAIMER**: (D)DOS'ing is **illegal**, use this tool for educational purposes only!
 
-### Docker
+# Usage
+
+## Docker
 
 Easiest way is to use Docker:
 ```bash
@@ -39,7 +41,7 @@ services:
 
 Then you can see status in this URL: `http://<ip>:8049/status`
 
-### Binaries
+## Binaries
 
 Download binary from [releases](https://github.com/erkexzcx/stoppropaganda/releases/).
 
@@ -75,7 +77,7 @@ WantedBy=multi-user.target
 
 Then `systemctl daemon-reload && systemctl enable --now stoppropaganda.service`. To stop, use `systemctl stop stoppropaganda.service`.
 
-## Building from source
+# Building from source
 
 Uninstall any existing Golang installations if you installed from official Linux repos. They are usually outdated and might not work at all.
 
@@ -103,7 +105,13 @@ go build -o stoppropaganda stoppropaganda.go
 
 You can also build for other architectures/platforms as well, see `build.sh` file.
 
-## Inspiration
+# Recommendations
+
+* Increase `workers` count from 100 (default) to e.g. 500 for greater effect, but check the logs if you are not getting `too many open files`. If so, see [this](https://stackoverflow.com/questions/880557/socket-accept-too-many-open-files).
+* Change `useragent` to yours. See [this](https://www.whatismybrowser.com/detect/what-is-my-user-agent/).
+* General recommendation is to use VPN, but this is not necesarry. Remember - DOS/DDOS is **illegal**.
+
+# Inspiration
 
 This application was inspired by the following projects:
 * https://www.reddit.com/r/hacking/comments/t1a8is/simple_html_dos_script_for_russian_sites/

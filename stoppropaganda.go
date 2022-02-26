@@ -7,8 +7,11 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"sync"
 	"time"
+
+	"github.com/peterbourgon/ff/v3"
 )
 
 var links = []string{
@@ -50,15 +53,16 @@ var websites = []*Website{}
 
 var httpClient http.Client
 
+var fs = flag.NewFlagSet("stoppropaganda", flag.ExitOnError)
 var (
-	flagWorkers   = flag.Int("workers", 100, "workers for each website")
-	flagUserAgent = flag.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
-	flagTimeout   = flag.Duration("timeout", 10*time.Second, "timeout of HTTP request")
-	flagBind      = flag.String("bind", ":8049", "bind on specific host:port")
+	flagWorkers   = fs.Int("workers", 100, "workers for each website")
+	flagUserAgent = fs.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
+	flagTimeout   = fs.Duration("timeout", 10*time.Second, "timeout of HTTP request")
+	flagBind      = fs.String("bind", ":8049", "bind on specific host:port")
 )
 
 func main() {
-	flag.Parse()
+	ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("SP"))
 
 	for _, link := range links {
 		w := &Website{

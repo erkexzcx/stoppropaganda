@@ -4,7 +4,8 @@ VERSION=0.0.1
 BINARY_NAME=stoppropaganda
 
 # Remove old binaries (if any)
-rm -rf ./dist
+mkdir -p ./dist
+rm -rf ./dist/*
 
 env GOOS=linux GOARCH=386 go build -ldflags="-s -w" -o "dist/${BINARY_NAME}_v${VERSION}_linux_i386" ./cmd/funstream/funstream.go             # Linux i386
 env GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o "dist/${BINARY_NAME}_v${VERSION}_linux_x86_64" ./cmd/funstream/funstream.go         # Linux 64bit

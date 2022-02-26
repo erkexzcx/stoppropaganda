@@ -8,9 +8,28 @@ I believe that Russian propaganda websites should be down for their propaganda, 
 
 ### Docker
 
+TODO
+
 ### Binaries
 
-### Building from source
+Download binary from [releases](https://github.com/erkexzcx/stoppropaganda/releases/).
+
+Use from terminal:
+
+```bash
+# Show help
+$ ./stoppropaganda_v0.0.1_linux_x86_64 --help
+
+# Use with defaults
+./stoppropaganda_v0.0.1_linux_x86_64
+
+# Use with increased workers count (you might experience "too many open files" error on some systems)
+./stoppropaganda_v0.0.1_linux_x86_64 --workers 1000
+```
+
+Then open in your browser to see the status: http://127.0.0.1:8049/status
+
+## Building from source
 
 Uninstall any existing Golang installations if you installed from official Linux repos. They are usually outdated and might not work at all.
 

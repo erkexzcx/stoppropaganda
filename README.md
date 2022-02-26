@@ -10,7 +10,15 @@ I believe that Russian propaganda websites should be down for their propaganda, 
 
 Easiest way is to use Docker:
 ```bash
-docker run -d erikmnkl/stoppropaganda
+docker run -d -p "8049:8049/tcp" erikmnkl/stoppropaganda
+```
+
+Use environment variables with `--env SP_WORKERS=123` to change configuration. Available environment variables (and their defaults):
+```
+SP_BIND=":8049"
+SP_WORKERS="100"
+SP_TIMEOUT="10s"
+SP_USERAGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
 ```
 
 You can also use `docker-compose`:
@@ -28,6 +36,8 @@ services:
       SP_TIMEOUT: "10s"
       SP_USERAGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
 ```
+
+Then you can see status in this URL: `http://<ip>:8049/status`
 
 ### Binaries
 

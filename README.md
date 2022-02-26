@@ -36,10 +36,10 @@ Easiest way is to use Docker:
 docker run -d -p "8049:8049/tcp" erikmnkl/stoppropaganda
 ```
 
-Use environment variables to change settings (for example `--env SP_WORKERS=123`) to change configuration. Available environment variables (and their defaults):
+Use environment variables to change settings (for example `--env SP_WORKERS=50`) to change configuration. Available environment variables (and their defaults):
 ```
 SP_BIND=":8049"
-SP_WORKERS="100"
+SP_WORKERS="20"
 SP_TIMEOUT="10s"
 SP_USERAGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
 ```
@@ -55,12 +55,12 @@ services:
       - "8049:8049/tcp"
     environment:
       SP_BIND: ":8049"
-      SP_WORKERS: "100"
+      SP_WORKERS: "20"
       SP_TIMEOUT: "10s"
       SP_USERAGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
 ```
 
-**NOTE**: `SP_WORKERS` means workers per website, not in total. For example, 19 websites * 100 workers = 1800 workers in total.
+**NOTE**: `SP_WORKERS` means workers per website, not in total. For example, 19 websites * 20 workers = 380 workers in total.
 
 Then you can see status in this URL: `http://<ip>:8049/status`
 
@@ -78,7 +78,7 @@ $ ./stoppropaganda_v0.0.1_linux_x86_64 --help
 ./stoppropaganda_v0.0.1_linux_x86_64
 
 # Use with increased workers count (you might experience "too many open files" error on some systems)
-./stoppropaganda_v0.0.1_linux_x86_64 --workers 1000
+./stoppropaganda_v0.0.1_linux_x86_64 --workers 50
 ```
 
 Then open in your browser to see the status: http://127.0.0.1:8049/status
@@ -90,7 +90,7 @@ Description=Stoppropaganda service
 After=network-online.target
 
 [Service]
-ExecStart=/path/to/binary --workers 1000
+ExecStart=/path/to/binary --workers 50
 Restart=always
 RestartSec=3
 

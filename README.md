@@ -2,31 +2,9 @@
 
 Russia has invaded Ukraine and commited various war crimes. Russian media says that Russia has not commited any war crimes, has no casualties and they doing this "special operation" to protect Ukrainians from...Ukraine.
 
-I believe that Russian propaganda websites should be down for their propaganda, therefore I created a simple DOS application that can be deployed almost anywhere.
+Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of Ukraine) has shared [this twitter post](https://twitter.com/FedorovMykhailo/status/1497642156076511233) encouraging cyber attack on given Russian websites.
 
 **DISCLAIMER**: (D)DOS'ing is **illegal**! Usage of this tool is intended for educational purposes only.
-
-It will DOS the following sites:
-* https://lenta.ru
-* https://ria.ru/
-* https://ria.ru/lenta/
-* https://www.rbc.ru/
-* https://www.rt.com/
-* http://kremlin.ru/
-* http://en.kremlin.ru/
-* https://smotrim.ru/
-* https://tass.ru/
-* https://tvzvezda.ru/
-* https://vsoloviev.ru/
-* https://www.1tv.ru/
-* https://www.vesti.ru/
-* https://online.sberbank.ru/
-* https://sberbank.ru/
-* https://gosuslugi.ru/
-* https://mil.ru/
-* https://iz.ru/
-* https://vz.ru/
-* https://sputniknews.ru
 
 # Usage
 

@@ -26,6 +26,7 @@ It will DOS the following sites:
 * https://mil.ru/
 * https://iz.ru/
 * https://vz.ru/
+* https://sputniknews.ru
 
 # Usage
 
@@ -60,7 +61,7 @@ services:
       SP_USERAGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
 ```
 
-**NOTE**: `SP_WORKERS` means workers per website, not in total. For example, 19 websites * 20 workers = 380 workers in total.
+**NOTE**: `SP_WORKERS` means workers per website, not in total. For example, 5 websites * 20 workers = 100 workers in total.
 
 Then you can see status in this URL: `http://<ip>:8049/status`
 

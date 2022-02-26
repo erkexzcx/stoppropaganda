@@ -51,7 +51,7 @@ var websites = []*Website{}
 var httpClient http.Client
 
 var (
-	flagWorkers   = flag.Int("workers", 1000, "workers for each website")
+	flagWorkers   = flag.Int("workers", 100, "workers for each website")
 	flagUserAgent = flag.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
 	flagTimeout   = flag.Duration("timeout", 10*time.Second, "timeout of HTTP request")
 	flagBind      = flag.String("bind", ":8049", "bind on specific host:port")

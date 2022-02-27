@@ -107,7 +107,7 @@ var links = []string{
 	"https://pwd.wto.economy.gov.ru",
 	"https://stroi.gov.ru",
 	"https://proverki.gov.ru",
-	"https://shop-rt.com"
+	"https://shop-rt.com",
 }
 
 type Website struct {

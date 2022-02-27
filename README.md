@@ -23,24 +23,9 @@ SP_TIMEOUT="10s"
 SP_USERAGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
 ```
 
-You can also use `docker-compose`:
-```yaml
-services:
-  stoppropaganda:
-    image: erikmnkl/stoppropaganda
-    container_name: stoppropaganda
-    restart: unless-stopped
-    ports:
-      - "8049:8049/tcp"
-    environment:
-      SP_BIND: ":8049"
-      SP_WORKERS: "20"
-      SP_TIMEOUT: "10s"
-      SP_USERAGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
-    ulimits:
-      nofile:
-        soft: 128000
-        hard: 128000
+You can also use `docker-compose` and build the project before running it:
+```bash
+docker-compose up -d
 ```
 
 **NOTE**: `SP_WORKERS` means workers per website, not in total. For example, 5 websites * 20 workers = 100 workers in total.

@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"sort"
+	"strings"
 	"sync"
 	"time"
 
@@ -16,159 +18,158 @@ import (
 )
 
 // https://twitter.com/FedorovMykhailo/status/1497642156076511233
-var links = []string{
+var links = map[string]struct{}{
 	/* Russia */
 
 	// Propaganda
-	"https://lenta.ru/",
-	"https://ria.ru/",
-	"https://ria.ru/lenta/",
-	"https://www.rbc.ru/",
-	"https://www.rt.com/",
-	"https://smotrim.ru/",
-	"https://tass.ru/",
-	"https://tvzvezda.ru/",
-	"https://vsoloviev.ru/",
-	"https://www.1tv.ru/",
-	"https://www.vesti.ru/",
-	"https://zakupki.gov.ru/",
-	"https://er.ru/",
-	"https://www.rzd.ru/",
-	"https://rzdlog.ru/",
-	"https://vgtrk.ru/",
-	"https://www.interfax.ru/",
-	"https://ugmk.ua/",
-	"https://iz.ru/",
-	"https://vz.ru/",
-	"https://sputniknews.ru",
-	"https://www.gazeta.ru/",
-	"https://www.kp.ru/",
-	"https://riafan.ru/",
-	"https://pikabu.ru/",
-	"https://www.kommersant.ru/",
-	"https://omk.ru",
-	"https://www.yaplakal.com/",
-	"https://bezformata.com/",
-	"https://bukimevieningi.lt/",
-	"https://musutv.lt/",
-	"https://baltnews.lt/",
-	"https://regnum.ru/",
-	"https://iz.ru/",
-	"https://eadaily.com/",
-	"https://www.rubaltic.ru/",
-	"https://lt.rubaltic.ru/",
+	"https://lenta.ru/":          {},
+	"https://ria.ru/":            {},
+	"https://ria.ru/lenta/":      {},
+	"https://www.rbc.ru/":        {},
+	"https://www.rt.com/":        {},
+	"https://smotrim.ru/":        {},
+	"https://tass.ru/":           {},
+	"https://tvzvezda.ru/":       {},
+	"https://vsoloviev.ru/":      {},
+	"https://www.1tv.ru/":        {},
+	"https://www.vesti.ru/":      {},
+	"https://zakupki.gov.ru/":    {},
+	"https://er.ru/":             {},
+	"https://www.rzd.ru/":        {},
+	"https://rzdlog.ru/":         {},
+	"https://vgtrk.ru/":          {},
+	"https://www.interfax.ru/":   {},
+	"https://ugmk.ua/":           {},
+	"https://iz.ru/":             {},
+	"https://vz.ru/":             {},
+	"https://sputniknews.ru":     {},
+	"https://www.gazeta.ru/":     {},
+	"https://www.kp.ru/":         {},
+	"https://riafan.ru/":         {},
+	"https://pikabu.ru/":         {},
+	"https://www.kommersant.ru/": {},
+	"https://omk.ru":             {},
+	"https://www.yaplakal.com/":  {},
+	"https://bezformata.com/":    {},
+	"https://bukimevieningi.lt/": {},
+	"https://musutv.lt/":         {},
+	"https://baltnews.lt/":       {},
+	"https://regnum.ru/":         {},
+	"https://eadaily.com/":       {},
+	"https://www.rubaltic.ru/":   {},
+	"https://lt.rubaltic.ru/":    {},
 
 	// Business corporations
-	"https://www.gazprom.ru",
-	"https://lukoil.ru",
-	"https://magnit.ru",
-	"https://www.nornickel.com",
-	"https://www.surgutneftegas.ru",
-	"https://www.tatneft.ru",
-	"https://www.evraz.com/ru",
-	"https://nlmk.com",
-	"https://www.sibur.ru",
-	"https://www.severstal.com",
-	"https://www.metalloinvest.com",
-	"https://nangs.org",
-	"https://rmk-group.ru/ru",
-	"https://www.tmk-group.ru",
-	"https://ya.ru",
-	"https://www.polymetalinternational.com/ru",
-	"https://www.uralkali.com/ru",
-	"https://www.eurosib.ru",
+	"https://www.gazprom.ru":                    {},
+	"https://lukoil.ru":                         {},
+	"https://magnit.ru":                         {},
+	"https://www.nornickel.com":                 {},
+	"https://www.surgutneftegas.ru":             {},
+	"https://www.tatneft.ru":                    {},
+	"https://www.evraz.com/ru":                  {},
+	"https://nlmk.com":                          {},
+	"https://www.sibur.ru":                      {},
+	"https://www.severstal.com":                 {},
+	"https://www.metalloinvest.com":             {},
+	"https://nangs.org":                         {},
+	"https://rmk-group.ru/ru":                   {},
+	"https://www.tmk-group.ru":                  {},
+	"https://ya.ru":                             {},
+	"https://www.polymetalinternational.com/ru": {},
+	"https://www.uralkali.com/ru":               {},
+	"https://www.eurosib.ru":                    {},
 
 	// Banks
-	"https://www.sberbank.ru",
-	"https://online.sberbank.ru/",
-	"https://www.vtb.ru",
-	"https://www.gazprombank.ru",
-	"https://api.developer.sber.ru/product/SberbankID",
-	"https://api.sberbank.ru/prod/tokens/v2",
-	"https://api.sberbank.ru/prod/tokens/v2/oauth",
-	"https://api.sberbank.ru/prod/tokens/v2/oidc",
-	"https://tinkoff.ru",
-	"https://сdn-tinkoff.ru",
-	"https://dp.tinkoff.ru",
-	"https://acdn.tinkoff.ru",
-	"https://id.tinkoff.ru",
+	"https://www.sberbank.ru":                          {},
+	"https://online.sberbank.ru/":                      {},
+	"https://www.vtb.ru":                               {},
+	"https://www.gazprombank.ru":                       {},
+	"https://api.developer.sber.ru/product/SberbankID": {},
+	"https://api.sberbank.ru/prod/tokens/v2":           {},
+	"https://api.sberbank.ru/prod/tokens/v2/oauth":     {},
+	"https://api.sberbank.ru/prod/tokens/v2/oidc":      {},
+  "https://tinkoff.ru":                               {},
+  "https://сdn-tinkoff.ru":                           {},
+  "https://dp.tinkoff.ru":                            {},
+  "https://acdn.tinkoff.ru":                          {},
+  "https://id.tinkoff.ru":                            {},
 
 	//The state
-	"https://gosuslugi.ru",
-	"https://www.mos.ru/uslugi",
-	"http://kremlin.ru",
-	"http://en.kremlin.ru/",
-	"http://government.ru",
-	"https://mil.ru",
-	"https://www.nalog.gov.ru/",
-	"https://customs.gov.ru/",
-	"https://pfr.gov.ru/",
-	"https://rkn.gov.ru/",
+	"https://gosuslugi.ru":      {},
+	"https://www.mos.ru/uslugi": {},
+	"http://kremlin.ru":         {},
+	"http://en.kremlin.ru/":     {},
+	"http://government.ru":      {},
+	"https://mil.ru":            {},
+	"https://www.nalog.gov.ru/": {},
+	"https://customs.gov.ru/":   {},
+	"https://pfr.gov.ru/":       {},
+	"https://rkn.gov.ru/":       {},
 
 	// Others
-	"https://109.207.1.118/",
-	"https://109.207.1.97/",
-	"https://mail.rkn.gov.ru",
-	"https://cloud.rkn.gov.ru",
-	"https://mvd.gov.ru",
-	"https://pwd.wto.economy.gov.ru",
-	"https://stroi.gov.ru",
-	"https://proverki.gov.ru",
-	"https://shop-rt.com",
+	"https://109.207.1.118/":         {},
+	"https://109.207.1.97/":          {},
+	"https://mail.rkn.gov.ru":        {},
+	"https://cloud.rkn.gov.ru":       {},
+	"https://mvd.gov.ru":             {},
+	"https://pwd.wto.economy.gov.ru": {},
+	"https://stroi.gov.ru":           {},
+	"https://proverki.gov.ru":        {},
+	"https://shop-rt.com":            {},
 
 	/* BELARUS */
 
 	// by gov
-	"https://mininform.gov.by",
-	"https://rec.gov.by/ru",
-	"https://www.mil.by",
-	"https://www.government.by",
-	"https://president.gov.by/ru",
-	"https://www.mvd.gov.by/ru",
-	"http://www.kgb.by/ru/",
-	"https://www.prokuratura.gov.by",
+	"https://mininform.gov.by":       {},
+	"https://rec.gov.by/ru":          {},
+	"https://www.mil.by":             {},
+	"https://www.government.by":      {},
+	"https://president.gov.by/ru":    {},
+	"https://www.mvd.gov.by/ru":      {},
+	"http://www.kgb.by/ru/":          {},
+	"https://www.prokuratura.gov.by": {},
 
 	// by banks
-	"https://www.nbrb.by",
-	"https://belarusbank.by/",
-	"https://brrb.by/",
-	"https://www.belapb.by/",
-	"https://bankdabrabyt.by/",
-	"https://belinvestbank.by/individual",
+	"https://www.nbrb.by":                 {},
+	"https://belarusbank.by/":             {},
+	"https://brrb.by/":                    {},
+	"https://www.belapb.by/":              {},
+	"https://bankdabrabyt.by/":            {},
+	"https://belinvestbank.by/individual": {},
 
 	// by business
-	"https://bgp.by/ru/",
-	"https://www.belneftekhim.by",
-	"http://www.bellegprom.by",
-	"https://www.energo.by",
-	"http://belres.by/ru/",
+	"https://bgp.by/ru/":          {},
+	"https://www.belneftekhim.by": {},
+	"http://www.bellegprom.by":    {},
+	"https://www.energo.by":       {},
+	"http://belres.by/ru/":        {},
 
 	// by media
-	"http://belta.by/",
-	"https://sputnik.by/",
-	"https://www.tvr.by/",
-	"https://www.sb.by/",
-	"https://belmarket.by/",
-	"https://www.belarus.by/",
-	"https://belarus24.by/",
-	"https://ont.by/",
-	"https://www.024.by/",
-	"https://www.belnovosti.by/",
-	"https://mogilevnews.by/",
-	"https://www.mil.by/",
-	"https://yandex.by/",
-	"https://www.slonves.by/",
-	"http://www.ctv.by/",
-	"https://radiobelarus.by/",
-	"https://radiusfm.by/",
-	"https://alfaradio.by/",
-	"https://radiomir.by/",
-	"https://radiostalica.by/",
-	"https://radiobrestfm.by/",
-	"https://www.tvrmogilev.by/",
-	"https://minsknews.by/",
-	"https://zarya.by/",
-	"https://grodnonews.by/",
+	"http://belta.by/":           {},
+	"https://sputnik.by/":        {},
+	"https://www.tvr.by/":        {},
+	"https://www.sb.by/":         {},
+	"https://belmarket.by/":      {},
+	"https://www.belarus.by/":    {},
+	"https://belarus24.by/":      {},
+	"https://ont.by/":            {},
+	"https://www.024.by/":        {},
+	"https://www.belnovosti.by/": {},
+	"https://mogilevnews.by/":    {},
+	"https://www.mil.by/":        {},
+	"https://yandex.by/":         {},
+	"https://www.slonves.by/":    {},
+	"http://www.ctv.by/":         {},
+	"https://radiobelarus.by/":   {},
+	"https://radiusfm.by/":       {},
+	"https://alfaradio.by/":      {},
+	"https://radiomir.by/":       {},
+	"https://radiostalica.by/":   {},
+	"https://radiobrestfm.by/":   {},
+	"https://www.tvrmogilev.by/": {},
+	"https://minsknews.by/":      {},
+	"https://zarya.by/":          {},
+	"https://grodnonews.by/":     {},
 }
 
 type Website struct {
@@ -183,7 +184,7 @@ type Website struct {
 	Counter_code400 uint `json:"status_400"`
 	Counter_code500 uint `json:"status_500"`
 
-	mux *sync.RWMutex
+	mux *sync.Mutex
 }
 
 var websites = []*Website{}
@@ -201,13 +202,13 @@ var (
 func main() {
 	ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("SP"))
 
-	for _, link := range links {
+	for link := range links {
 		w := &Website{
 			Link: link,
-			mux:  &sync.RWMutex{},
+			mux:  &sync.Mutex{},
 		}
 		websites = append(websites, w)
-		go w.Start()
+		w.Start()
 	}
 
 	http.HandleFunc("/status", status)
@@ -217,11 +218,29 @@ func main() {
 
 func status(w http.ResponseWriter, req *http.Request) {
 	tmpWebsites := []Website{}
+	tmpWebsitesMux := sync.Mutex{}
+
+	wg := sync.WaitGroup{}
+	wg.Add(len(websites))
 	for _, ws := range websites {
-		ws.mux.RLock()
-		tmpWebsites = append(tmpWebsites, *ws)
-		ws.mux.RUnlock()
+		go func(ws *Website) {
+			ws.mux.Lock()
+			tmpWebsite := *ws
+			ws.mux.Unlock()
+
+			tmpWebsitesMux.Lock()
+			tmpWebsites = append(tmpWebsites, tmpWebsite)
+			tmpWebsitesMux.Unlock()
+
+			wg.Done()
+		}(ws)
 	}
+	wg.Wait()
+
+	sort.Slice(tmpWebsites, func(i, j int) bool {
+		return strings.Compare(tmpWebsites[i].Link, tmpWebsites[j].Link) <= 0
+	})
+
 	content, err := json.MarshalIndent(tmpWebsites, "", "    ")
 	if err != nil {
 		http.Error(w, "failed to marshal data", http.StatusInternalServerError)

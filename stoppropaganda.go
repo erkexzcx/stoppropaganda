@@ -88,11 +88,11 @@ var links = map[string]struct{}{
 	"https://api.sberbank.ru/prod/tokens/v2":           {},
 	"https://api.sberbank.ru/prod/tokens/v2/oauth":     {},
 	"https://api.sberbank.ru/prod/tokens/v2/oidc":      {},
-  "https://tinkoff.ru":                               {},
-  "https://сdn-tinkoff.ru":                           {},
-  "https://dp.tinkoff.ru":                            {},
-  "https://acdn.tinkoff.ru":                          {},
-  "https://id.tinkoff.ru":                            {},
+	"https://tinkoff.ru":                               {},
+	"https://сdn-tinkoff.ru":                           {},
+	"https://dp.tinkoff.ru":                            {},
+	"https://acdn.tinkoff.ru":                          {},
+	"https://id.tinkoff.ru":                            {},
 
 	//The state
 	"https://gosuslugi.ru":      {},

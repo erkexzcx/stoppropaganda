@@ -2,9 +2,9 @@
 
 Russia has invaded Ukraine and commited various war crimes. Russian media denies any of its attacks on civilian as well as denies any Russian troops casualties. According to them, they are doing this "special operation" to protect Ukrainians from...Ukraine.
 
-Some foreign media and even countries (e.g. Belarus) publicitly support Russian aggression towards Ukraine, therefore I created this simple DOS application that targets mentioned websites/endpoints in order to take them down or significantly distrupt their services.
+Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of Ukraine) has shared [this twitter post](https://twitter.com/FedorovMykhailo/status/1497642156076511233) encouraging cyber attack on certain targets via Telegram group. This will be primary source of the target websites for this application.
 
-Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of Ukraine) has shared [this twitter post](https://twitter.com/FedorovMykhailo/status/1497642156076511233) encouraging cyber attack on given targets via mentioned Telegram group. This will be primary source of targets.
+Some foreign media and even countries (e.g. Belarus) publicitly support Russian aggression towards Ukraine, therefore I created this simple DOS application that targets certain websites/endpoints in order to take them down or significantly distrupt their services.
 
 **DISCLAIMER**: (D)DOS'ing is **illegal**! Usage of this tool is intended for educational purposes only.
 

@@ -14,7 +14,17 @@ Some foreign media and even countries (e.g. Belarus) publicitly support Russian 
 
 Easiest way is to use Docker:
 ```bash
-docker run -d --ulimit nofile=128000:128000 -p "8049:8049/tcp" erikmnkl/stoppropaganda
+docker run --name stoppropaganda -d --ulimit nofile=128000:128000 -p "8049:8049/tcp" erikmnkl/stoppropaganda
+```
+
+Update to latest version
+```bash
+docker kill stoppropaganda
+docker rm stoppropaganda
+docker pull erikmnkl/stoppropaganda
+
+# run it again
+docker run --name stoppropaganda -d --ulimit nofile=128000:128000 -p "8049:8049/tcp" erikmnkl/stoppropaganda
 ```
 
 Use environment variables to change settings (for example `--env SP_WORKERS=50`) to change configuration. Available environment variables (and their defaults):

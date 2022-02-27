@@ -47,6 +47,8 @@ var links = []string{
 	"https://omk.ru",
 	"https://www.yaplakal.com/",
 	"https://bezformata.com/",
+	"https://bukimevieningi.lt/",
+	"https://musutv.lt/",
 
 	// Business corporations
 	"https://www.gazprom.ru",

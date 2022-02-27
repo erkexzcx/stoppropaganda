@@ -3,11 +3,11 @@
 [![Github All Releases](https://img.shields.io/github/downloads/erkexzcx/stoppropaganda/total.svg)]()
 [![Docker Hub Pulls](https://img.shields.io/docker/pulls/erikmnkl/stoppropaganda)]()
 
-Russia has invaded Ukraine and commited various war crimes. Russian media denies any of its attacks on civilian as well as denies any Russian troops casualties. According to them, they are doing this "special operation" to protect Ukrainians from...Ukraine.
+Russia has invaded Ukraine and committed various war crimes. Russian media denies any of its attacks on civilian as well as denies any Russian troops casualties. According to them, they are doing this "special operation" to protect Ukrainians from...Ukraine.
 
 Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of Ukraine) has shared [this twitter post](https://twitter.com/FedorovMykhailo/status/1497642156076511233) encouraging cyber attack on certain targets via Telegram group. This will be primary source of the target websites for this application.
 
-Some foreign media and even countries (e.g. Belarus) publicitly support Russian aggression towards Ukraine, therefore I created this simple DOS application that targets certain websites/endpoints in order to take them down or significantly distrupt their services.
+Some foreign media and even countries (e.g. Belarus) publicly support Russian aggression towards Ukraine, therefore I created this simple DOS application that targets certain websites/endpoints in order to take them down or significantly distrupt their services.
 
 **DISCLAIMER**: (D)DOS'ing is **illegal**! Usage of this tool is intended for educational purposes only.
 
@@ -137,7 +137,7 @@ You can also build for other architectures/platforms as well, see `build.sh` fil
 
 * Increase `workers` count from 20 (default) to e.g. 100 for greater effect, but check the logs if you are not getting `too many open files`. If so, see [this](https://stackoverflow.com/questions/880557/socket-accept-too-many-open-files).
 * Change `useragent` to yours. See [this](https://www.whatismybrowser.com/detect/what-is-my-user-agent/).
-* General recommendation is to use VPN, but this is not necesarry. Remember - DOS/DDOS is **illegal**.
+* General recommendation is to use VPN, but this is not necessary. Remember - DOS/DDOS is **illegal**.
 
 # Inspiration
 

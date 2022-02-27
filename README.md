@@ -1,8 +1,10 @@
 # StopPropaganda
 
-Russia has invaded Ukraine and commited various war crimes. Russian media says that Russia has not commited any war crimes, has no casualties and they doing this "special operation" to protect Ukrainians from...Ukraine.
+Russia has invaded Ukraine and commited various war crimes. Russian media denies any of its attacks on civilian as well as denies any Russian troops casualties. According to them, they are doing this "special operation" to protect Ukrainians from...Ukraine.
 
-Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of Ukraine) has shared [this twitter post](https://twitter.com/FedorovMykhailo/status/1497642156076511233) encouraging cyber attack on given Russian websites.
+Some foreign media and even countries (e.g. Belarus) publicitly support Russian aggression towards Ukraine, therefore I created this simple DOS application that targets mentioned websites/endpoints in order to take them down or significantly distrupt their services.
+
+Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of Ukraine) has shared [this twitter post](https://twitter.com/FedorovMykhailo/status/1497642156076511233) encouraging cyber attack on given targets via mentioned Telegram group. This will be primary source of targets.
 
 **DISCLAIMER**: (D)DOS'ing is **illegal**! Usage of this tool is intended for educational purposes only.
 
@@ -130,3 +132,4 @@ This application was inspired by the following projects:
 * https://www.reddit.com/r/hacking/comments/t1a8is/simple_html_dos_script_for_russian_sites/
 * https://norussian.tk/
 * https://stop-russian-desinformation.near.page/
+* https://russianwarshipgofuckyourself.club/

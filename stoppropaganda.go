@@ -49,6 +49,12 @@ var links = []string{
 	"https://bezformata.com/",
 	"https://bukimevieningi.lt/",
 	"https://musutv.lt/",
+	"https://baltnews.lt/",
+	"https://regnum.ru/",
+	"https://iz.ru/",
+	"https://eadaily.com/",
+	"https://www.rubaltic.ru/",
+	"https://lt.rubaltic.ru/",
 
 	// Business corporations
 	"https://www.gazprom.ru",

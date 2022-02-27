@@ -1,0 +1,63 @@
+# INSTRUCTIONS
+# Add wg0.conf to wireguard volume and edit PostUp/PreDown rules to allow LAN access to status link
+
+# STATUS LINK: http://ServerIP:8049/status
+
+# Rules in wg0.conf at the bottom of [Interface] section
+# PostUp = DROUTE=$(ip route | grep default | awk '{print $3}') && LAN=192.168.1.0/24; ip route add $LAN via $DROUTE;iptables -I OUTPUT -d $LAN -j ACCEPT && DockerSubnet=192.168.129.0/24; iptables -A OUTPUT -d $DockerSubnet -j ACCEPT && iptables -A OUTPUT ! -o %i -m mark ! --mark $(wg show %i fwmark) -m addrtype ! --dst-type LOCAL -j REJECT
+# PreDown = LAN=192.168.1.0/24; ip route del $LAN via $DROUTE && DockerSubnet=192.168.129.0/24; ip route del $DockerSubnet via $DROUTE && iptables -D OUTPUT ! -o %i -m mark ! --mark $(wg show %i fwmark) -m addrtype ! --dst-type LOCAL -j REJECT; iptables -D OUTPUT -d $LAN -j ACCEPT; iptables -D OUTPUT -d $DockerSubnet -j ACCEPT
+
+services:
+
+  stoppropaganda:
+    image: erikmnkl/stoppropaganda
+    container_name: stoppropaganda
+    # cpus: 2.0
+    # mem_limit: 4096m
+    environment:
+      SP_BIND: ":8049"
+      SP_WORKERS: "30"
+      SP_TIMEOUT: "10s"
+      SP_USERAGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0"
+    ulimits:
+      nofile:
+        soft: 128000
+        hard: 128000
+    depends_on:
+      - "wireguard-propaganda"
+    network_mode: "service:wireguard-propaganda"
+    restart: unless-stopped
+
+  wireguard-propaganda:
+    image: linuxserver/wireguard
+    container_name: wireguard-propaganda
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/London
+    volumes:
+      - wireguard-propaganda:/config
+      - /lib/modules:/lib/modules
+    networks:
+      propaganda:
+    ports:
+      - "8049:8049/tcp"
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=0
+    restart: unless-stopped
+
+volumes:
+  wireguard-propaganda:
+    name: "wireguard-propaganda"
+
+networks:
+  propaganda:
+    name: "propaganda"
+    ipam:
+      config:
+        - subnet: "192.168.129.0/24"
+          gateway: "192.168.129.1"

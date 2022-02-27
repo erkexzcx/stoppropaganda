@@ -83,6 +83,8 @@ var links = []string{
 	"https://www.gazprombank.ru",
 	"https://api.developer.sber.ru/product/SberbankID",
 	"https://api.sberbank.ru/prod/tokens/v2",
+	"https://api.sberbank.ru/prod/tokens/v2/oauth",
+	"https://api.sberbank.ru/prod/tokens/v2/oidc",
 
 	//The state
 	"https://gosuslugi.ru",
@@ -105,6 +107,7 @@ var links = []string{
 	"https://pwd.wto.economy.gov.ru",
 	"https://stroi.gov.ru",
 	"https://proverki.gov.ru",
+	"https://shop-rt.com"
 }
 
 type Website struct {

@@ -27,6 +27,7 @@ var links = map[string]struct{}{
 	"https://baltnews.lt/":       {},
 	"https://lt.rubaltic.ru/":    {},
 	"http://sputniknews.lt/":     {},
+	"https://lv.sputniknews.ru/": {},
 
 	/* Russia */
 

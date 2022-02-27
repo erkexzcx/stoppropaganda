@@ -17,6 +17,8 @@ import (
 
 // https://twitter.com/FedorovMykhailo/status/1497642156076511233
 var links = []string{
+	/* Russia */
+
 	// Propaganda
 	"https://lenta.ru/",
 	"https://ria.ru/",
@@ -109,6 +111,8 @@ var links = []string{
 	"https://proverki.gov.ru",
 	"https://shop-rt.com",
 
+	/* BELARUS */
+
 	// by gov
 	"https://mininform.gov.by",
 	"https://rec.gov.by/ru",
@@ -159,7 +163,7 @@ var links = []string{
 	"https://www.tvrmogilev.by/",
 	"https://minsknews.by/",
 	"https://zarya.by/",
-	"https://grodnonews.by/"
+	"https://grodnonews.by/",
 }
 
 type Website struct {

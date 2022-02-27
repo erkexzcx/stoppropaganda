@@ -74,6 +74,7 @@ var links = []string{
 	"https://www.vtb.ru",
 	"https://www.gazprombank.ru",
 	"https://api.developer.sber.ru/product/SberbankID",
+	"https://api.sberbank.ru/prod/tokens/v2",
 
 	//The state
 	"https://gosuslugi.ru",

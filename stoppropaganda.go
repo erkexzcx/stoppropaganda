@@ -222,8 +222,15 @@ func (ws *Website) Start() {
 }
 
 func init() {
+	fIgnoreRedirects := func(req *http.Request, via []*http.Request) error {
+		return http.ErrUseLastResponse
+	}
+	tr := &http.Transport{
+		DisableCompression: true,
+	}
 	httpClient = http.Client{
-		Timeout:       *flagTimeout,
-		CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
+		Timeout:       *flagTimeout,     // Enable timeout
+		CheckRedirect: fIgnoreRedirects, // Disable auto redirects
+		Transport:     tr,               // Disable automatic decompression
 	}
 }

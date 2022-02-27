@@ -20,6 +20,14 @@ import (
 
 // https://twitter.com/FedorovMykhailo/status/1497642156076511233
 var links = map[string]struct{}{
+	/* Other countries */
+
+	"https://bukimevieningi.lt/": {},
+	"https://musutv.lt/":         {},
+	"https://baltnews.lt/":       {},
+	"https://lt.rubaltic.ru/":    {},
+	"http://sputniknews.lt/":     {},
+
 	/* Russia */
 
 	// Propaganda
@@ -52,13 +60,9 @@ var links = map[string]struct{}{
 	"https://omk.ru":             {},
 	"https://www.yaplakal.com/":  {},
 	"https://bezformata.com/":    {},
-	"https://bukimevieningi.lt/": {},
-	"https://musutv.lt/":         {},
-	"https://baltnews.lt/":       {},
 	"https://regnum.ru/":         {},
 	"https://eadaily.com/":       {},
 	"https://www.rubaltic.ru/":   {},
-	"https://lt.rubaltic.ru/":    {},
 
 	// Business corporations
 	"https://www.gazprom.ru":                    {},

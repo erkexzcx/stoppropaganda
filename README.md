@@ -1,5 +1,8 @@
 # StopPropaganda
 
+[![Github All Releases](https://img.shields.io/github/downloads/erkexzcx/stoppropaganda/total.svg)]()
+[![Docker Hub Pulls](https://img.shields.io/docker/pulls/erikmnkl/stoppropaganda)]()
+
 Russia has invaded Ukraine and commited various war crimes. Russian media denies any of its attacks on civilian as well as denies any Russian troops casualties. According to them, they are doing this "special operation" to protect Ukrainians from...Ukraine.
 
 Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of Ukraine) has shared [this twitter post](https://twitter.com/FedorovMykhailo/status/1497642156076511233) encouraging cyber attack on certain targets via Telegram group. This will be primary source of the target websites for this application.

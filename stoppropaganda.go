@@ -109,7 +109,8 @@ var links = []string{
 	"https://proverki.gov.ru",
 	"https://shop-rt.com",
 
-	// by cvk
+	// by gov
+	"https://mininform.gov.by",
 	"https://rec.gov.by/ru",
 	"https://www.mil.by",
 	"https://www.government.by",

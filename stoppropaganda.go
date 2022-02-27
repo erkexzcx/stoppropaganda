@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"flag"
 	"io"
@@ -317,11 +318,12 @@ func init() {
 		return http.ErrUseLastResponse
 	}
 	tr := &http.Transport{
-		DisableCompression: true,
+		DisableCompression: true,                                  // Disable automatic decompression
+		TLSClientConfig:    &tls.Config{InsecureSkipVerify: true}, // Disable TLS verification
 	}
 	httpClient = http.Client{
 		Timeout:       *flagTimeout,     // Enable timeout
 		CheckRedirect: fIgnoreRedirects, // Disable auto redirects
-		Transport:     tr,               // Disable automatic decompression
+		Transport:     tr,
 	}
 }

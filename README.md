@@ -42,7 +42,7 @@ Then you can see status in this URL: `http://<ip>:8049/status`
 
 ## docker-compose
 
-[Docker-compose file](https://github.com/erkexzcx/stoppropaganda/blob/main/docker-compose.yaml) is available.
+`docker-compose.yaml` and other examples are available.
 
 Usage:
 ```bash

@@ -52,6 +52,7 @@ func init() {
 	tr := &http.Transport{
 		DisableCompression: true,                                  // Disable automatic decompression
 		TLSClientConfig:    &tls.Config{InsecureSkipVerify: true}, // Disable TLS verification
+		Proxy:              http.ProxyFromEnvironment,             // Enable proxy functionality
 	}
 	httpClient = http.Client{
 		Timeout:       *flagTimeout,     // Enable timeout

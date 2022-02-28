@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: stoppropaganda
+  name: stoppropaganda
+  namespace: stoppropaganda 
+spec:
+  replicas: 3
+# set required number of pod replicas, affinity rule place only single intance on k8s worker. Preferably put number of workers here.
+  selector:
+    matchLabels:
+      app: stoppropaganda
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: stoppropaganda
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - stoppropaganda
+            topologyKey: "kubernetes.io/hostname"
+      containers:
+      - image: erikmnkl/stoppropaganda
+        name: stoppropaganda
+        env:
+        - name: SP_BIND
+          value: ":8049"
+        - name: SP_WORKERS
+          value: "20"
+        - name: SP_TIMEOUT
+          value: "10s"
+        - name: SP_USERAGENT
+          value: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"

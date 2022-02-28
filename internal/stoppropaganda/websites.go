@@ -229,6 +229,11 @@ func (ws *Website) Start(endpoint string) {
 			// Set headers
 			req.Header.Set("Host", websiteURL.Host)
 			req.Header.Set("User-Agent", *flagUserAgent)
+			req.Header.Set("Pragma", "no-cache")
+			req.Header.Set("Cache-Control", "no-transform,no-store")
+			req.Header.Set("Keep-Alive", "timeout=1000")
+			req.Header.Set("Connection", "keep-alive")
+			req.Header.Set("Accept-Encoding", "gzip,deflate")
 			req.Header.Set("Accept", "*/*")
 
 			// Perform request
@@ -244,17 +249,18 @@ func (ws *Website) Start(endpoint string) {
 
 			// Increase counters
 			ws.mux.Lock()
+
 			ws.Requests++
-			if resp.StatusCode >= 100 && resp.StatusCode < 200 {
-				ws.Counter_code100++
-			} else if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-				ws.Counter_code200++
-			} else if resp.StatusCode >= 300 && resp.StatusCode < 400 {
-				ws.Counter_code300++
-			} else if resp.StatusCode >= 400 && resp.StatusCode < 500 {
-				ws.Counter_code400++
-			} else if resp.StatusCode >= 500 && resp.StatusCode < 600 {
+			if resp.StatusCode >= 500 {
 				ws.Counter_code500++
+			} else if resp.StatusCode >= 400 {
+				ws.Counter_code400++
+			} else if resp.StatusCode >= 300 {
+				ws.Counter_code300++
+			} else if resp.StatusCode >= 200 {
+				ws.Counter_code200++
+			} else if resp.StatusCode >= 100 && resp.StatusCode < 200 {
+				ws.Counter_code100++
 			}
 			ws.mux.Unlock()
 

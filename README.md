@@ -62,6 +62,15 @@ services:
 
 Then you can see status in this URL: `http://<ip>:8049/status`
 
+## Kubernetes
+
+You can also use `kubectl`:
+```bash
+kubectl create ns stoppropaganda
+kubectl apply -f stoppropaganda.yaml
+```
+**NOTE**: edit stoppropaganda.yaml with required number of replicas 
+
 ## Binaries
 
 Download binary from [releases](https://github.com/erkexzcx/stoppropaganda/releases/).

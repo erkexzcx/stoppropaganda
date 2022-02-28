@@ -69,6 +69,9 @@ Download binary from [releases](https://github.com/erkexzcx/stoppropaganda/relea
 Use from terminal:
 
 ```bash
+# (Linux only) Increase open files limit for current terminal session
+ulimit -n 128000
+
 # Show help
 $ ./stoppropaganda_v0.0.1_linux_x86_64 --help
 
@@ -120,7 +123,7 @@ cd stoppropaganda
 
 Now you have 2 options to run this application:
 ```bash
-# Increase open file limits for current terminal session
+# (Linux only) Increase open files limit for current terminal session
 ulimit -n 128000
 
 # Run without compiling to binary

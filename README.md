@@ -17,16 +17,13 @@ Some foreign media and even countries (e.g. Belarus) publicly support Russian ag
 
 Easiest way is to use Docker:
 ```bash
-docker run --name stoppropaganda -d --ulimit nofile=128000:128000 -p "8049:8049/tcp" erikmnkl/stoppropaganda
-```
-
-Update to latest version
-```bash
-docker kill stoppropaganda
-docker rm stoppropaganda
+# Download latest docker image
 docker pull erikmnkl/stoppropaganda
 
-# run it again
+# If exists, remove running container
+docker rm -f stoppropaganda
+
+# Create new container
 docker run --name stoppropaganda -d --ulimit nofile=128000:128000 -p "8049:8049/tcp" erikmnkl/stoppropaganda
 ```
 
@@ -39,31 +36,24 @@ SP_TIMEOUT="10s"
 SP_USERAGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
 ```
 
-You can also use `docker-compose`:
-```yaml
-version: '3'
-services:
-  stoppropaganda:
-    image: erikmnkl/stoppropaganda
-    container_name: stoppropaganda
-    restart: unless-stopped
-    ports:
-      - "8049:8049/tcp"
-    environment:
-      SP_BIND: ":8049"
-      SP_WORKERS: "20"
-      SP_DNSWORKERS: "100"
-      SP_TIMEOUT: "10s"
-      SP_USERAGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
-    ulimits:
-      nofile:
-        soft: 128000
-        hard: 128000
-```
-
 **NOTE**: `SP_WORKERS` means workers per website, not in total. Same with `SP_DNSWORKERS`. For example, 5 websites * 20 workers = 100 workers in total.
 
 Then you can see status in this URL: `http://<ip>:8049/status`
+
+## docker-compose
+
+[Docker-compose file](https://github.com/erkexzcx/stoppropaganda/blob/main/docker-compose.yaml) is available.
+
+Usage:
+```bash
+# Pull latest image
+docker-compose pull
+
+# Create/recreate container
+docker-compose up -d
+```
+
+Also see [Docker](#docker) for additional information.
 
 ## Kubernetes
 
@@ -72,7 +62,9 @@ You can also use `kubectl`:
 kubectl create ns stoppropaganda
 kubectl apply -f stoppropaganda.yaml
 ```
-**NOTE**: edit stoppropaganda.yaml with required number of replicas 
+**NOTE**: edit `stoppropaganda.yaml` with required number of replicas.
+
+Also see [Docker](#docker) for additional information.
 
 ## Binaries
 

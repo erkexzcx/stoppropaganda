@@ -1,0 +1,29 @@
+version: '3'
+services:
+  stoppropaganda-tor:
+    image: erikmnkl/stoppropaganda
+    container_name: stoppropaganda
+    restart: unless-stopped
+    ports:
+      - "8049:8049/tcp"
+    environment:
+      SP_BIND: ":8049"
+      SP_WORKERS: "20"
+      SP_DNSWORKERS: "100"
+      SP_TIMEOUT: "10s"
+      SP_USERAGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
+      HTTPS_PROXY: http://tor:8118
+    ulimits:
+      nofile:
+        soft: 128000
+        hard: 128000
+
+  tor:
+    container_name: tor
+    ports:
+      - 8118:8118
+      - 9050:9050
+    image: avpnusr/torprivoxy
+
+
+

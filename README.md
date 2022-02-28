@@ -51,6 +51,9 @@ docker-compose pull
 
 # Create/recreate container
 docker-compose up -d
+
+# Using tor
+docker-compose -f docker-compose-tor.yaml up -d
 ```
 
 Also see [Docker](#docker) for additional information.

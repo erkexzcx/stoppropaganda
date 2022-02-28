@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/erkexzcx/stoppropaganda"
+	"github.com/erkexzcx/stoppropaganda/stoppropaganda"
 )
 
 func main() {

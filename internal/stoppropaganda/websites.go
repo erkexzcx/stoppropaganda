@@ -19,7 +19,6 @@ func LoadSites() TargetWebsites {
     // Let's first read the `config.json` file
 	fmt.Println("Loading sites")
     content, _ := ioutil.ReadFile("./data/sites.json")
-	fmt.Println(content)
  
     // Now let's unmarshall the data into `payload`
     var payload TargetWebsites

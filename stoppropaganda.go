@@ -108,6 +108,7 @@ var links = map[string]struct{}{
 	"https://api.sberbank.ru/prod/tokens/v2/oauth":     {},
 	"https://api.sberbank.ru/prod/tokens/v2/oidc":      {},
 	"https://www.moex.com":                             {},
+	"http://www.fsb.ru/":                               {},
 
 	//The state
 	"https://gosuslugi.ru":      {},

@@ -41,7 +41,7 @@ var links = map[string]struct{}{
 	"https://lt.rubaltic.ru":    {},
 	"http://sputniknews.lt":     {},
 	"https://lv.sputniknews.ru": {},
-        "https://viada.lt":          {},
+	"https://viada.lt":          {},
 
 	/* Russia */
 
@@ -112,16 +112,21 @@ var links = map[string]struct{}{
 	"http://www.fsb.ru":                                {},
 
 	//The state
-	"https://gosuslugi.ru":      {},
-	"https://www.mos.ru/uslugi": {},
-	"http://kremlin.ru":         {},
-	"http://en.kremlin.ru":      {},
-	"http://government.ru":      {},
-	"https://mil.ru":            {},
-	"https://www.nalog.gov.ru":  {},
-	"https://customs.gov.ru":    {},
-	"https://pfr.gov.ru":        {},
-	"https://rkn.gov.ru":        {},
+	"https://gosuslugi.ru":         {},
+	"https://www.mos.ru/uslugi":    {},
+	"http://kremlin.ru":            {},
+	"http://en.kremlin.ru":         {},
+	"http://government.ru":         {},
+	"https://mil.ru":               {},
+	"https://www.nalog.gov.ru":     {},
+	"https://customs.gov.ru":       {},
+	"https://pfr.gov.ru":           {},
+	"https://rkn.gov.ru":           {},
+	"https://www.gosuslugi.ru":     {},
+	"https://gosuslugi41.ru":       {},
+	"https://uslugi27.ru":          {},
+	"https://gosuslugi29.ru":       {},
+	"https://gosuslugi.astrobl.ru": {},
 
 	// Others
 	"https://109.207.1.118":          {},

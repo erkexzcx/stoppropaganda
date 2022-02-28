@@ -131,10 +131,10 @@ Now you have 2 options to run this application:
 ulimit -n 128000
 
 # Run without compiling to binary
-go run stoppropaganda.go --help
+go run cmd/stoppropaganda/main.go --help
 
 # Build binary and run it
-go build -o stoppropaganda stoppropaganda.go
+go build -o stoppropaganda cmd/stoppropaganda/main.go
 ./stoppropaganda --help
 ```
 

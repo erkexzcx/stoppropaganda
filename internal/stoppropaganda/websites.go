@@ -8,6 +8,7 @@ import (
 	"sync"
 	"encoding/json"
 	"fmt"
+	"os"
 )
 
 // Source: https://twitter.com/FedorovMykhailo/status/1497642156076511233
@@ -18,13 +19,24 @@ type TargetWebsites map[string]struct{}
 func LoadSites() TargetWebsites {
     // Let's first read the `config.json` file
 	fmt.Println("Loading sites")
-    content, _ := ioutil.ReadFile("./data/sites.json")
- 
-    // Now let's unmarshall the data into `payload`
-    var payload TargetWebsites
-    json.Unmarshal(content, &payload)
- 
-	return payload
+	sitesDirRead, _ := os.Open(*flagSitesDir)
+	sitesFiles, _ := sitesDirRead.Readdir(0)
+	allSites := make(TargetWebsites)
+	for fileindex := range(sitesFiles) {
+		filename := sitesFiles[fileindex].Name()
+
+		fmt.Println(filename)
+		content, _ := ioutil.ReadFile(*flagSitesDir + "/" + filename)
+	
+		// Now let's unmarshall the data into `payload`
+		var payload TargetWebsites
+		json.Unmarshal(content, &payload)
+		for k,v := range(payload) {
+			fmt.Println(k)
+			allSites[k]=v
+		}
+	}
+	return allSites
 }
 
 var targetWebsites = LoadSites()

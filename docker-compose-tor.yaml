@@ -2,7 +2,7 @@ version: '3'
 services:
   stoppropaganda-tor:
     image: erikmnkl/stoppropaganda
-    container_name: stoppropaganda
+    container_name: stoppropaganda-tor
     restart: unless-stopped
     ports:
       - "8049:8049/tcp"

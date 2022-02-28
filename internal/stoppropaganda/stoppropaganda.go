@@ -10,6 +10,9 @@ import (
 	"sync"
 	"time"
 
+	"encoding/json"
+	"fmt"
+
 	"github.com/peterbourgon/ff/v3"
 )
 
@@ -20,10 +23,19 @@ var (
 	flagUserAgent  = fs.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
 	flagTimeout    = fs.Duration("timeout", 10*time.Second, "timeout of HTTP request")
 	flagBind       = fs.String("bind", ":8049", "bind on specific host:port")
+	flagDump       = fs.Bool("dump", false, "")
 )
 
 func Start() {
 	ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("SP"))
+
+	if *flagDump {
+		jsonstr, err := json.Marshal(targetWebsites)
+		if err != nil {
+			fmt.Println(err)
+		}
+		fmt.Println(string(jsonstr))
+	}
 
 	for dnsServer := range targetDNS {
 		dnsServers[dnsServer] = &DNSServer{mux: &sync.Mutex{}}

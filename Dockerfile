@@ -7,4 +7,5 @@ RUN env CGO_ENABLED=0 go build -ldflags="-s -w" -o stoppropaganda ./cmd/stopprop
 ## Create image
 FROM scratch
 COPY --from=build-env /app/stoppropaganda /
+COPY data /data
 ENTRYPOINT ["/stoppropaganda"]

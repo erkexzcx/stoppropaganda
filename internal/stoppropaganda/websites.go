@@ -6,12 +6,33 @@ import (
 	"net/http"
 	"net/url"
 	"sync"
+	"encoding/json"
+	"fmt"
 )
 
 // Source: https://twitter.com/FedorovMykhailo/status/1497642156076511233
 
+
+type TargetWebsites map[string]struct{}
+
+func LoadSites() TargetWebsites {
+    // Let's first read the `config.json` file
+	fmt.Println("Loading sites")
+    content, _ := ioutil.ReadFile("./data/sites.json")
+	fmt.Println(content)
+ 
+    // Now let's unmarshall the data into `payload`
+    var payload TargetWebsites
+    json.Unmarshal(content, &payload)
+ 
+	return payload
+}
+
+var targetWebsites = LoadSites()
+
+/*
+
 var targetWebsites = map[string]struct{}{
-	/* Other countries */
 
 	"https://bukimevieningi.lt": {},
 	"https://musutv.lt":         {},
@@ -21,9 +42,7 @@ var targetWebsites = map[string]struct{}{
 	"https://lv.sputniknews.ru": {},
 	"https://viada.lt":          {},
 
-	/* Russia */
 
-	// Propaganda
 	"https://lenta.ru":          {},
 	"https://ria.ru":            {},
 	"https://ria.ru/lenta":      {},
@@ -57,7 +76,6 @@ var targetWebsites = map[string]struct{}{
 	"https://eadaily.com":       {},
 	"https://www.rubaltic.ru":   {},
 
-	// Business corporations
 	"https://www.gazprom.ru":                    {},
 	"https://lukoil.ru":                         {},
 	"https://magnit.ru":                         {},
@@ -77,7 +95,6 @@ var targetWebsites = map[string]struct{}{
 	"https://www.uralkali.com/ru":               {},
 	"https://www.eurosib.ru":                    {},
 
-	// Banks
 	"https://www.sberbank.ru":                          {},
 	"https://online.sberbank.ru":                       {},
 	"https://www.vtb.ru":                               {},
@@ -89,7 +106,6 @@ var targetWebsites = map[string]struct{}{
 	"https://www.moex.com":                             {},
 	"http://www.fsb.ru":                                {},
 
-	//The state
 	"https://gosuslugi.ru":         {},
 	"https://www.mos.ru/uslugi":    {},
 	"http://kremlin.ru":            {},
@@ -106,7 +122,6 @@ var targetWebsites = map[string]struct{}{
 	"https://gosuslugi29.ru":       {},
 	"https://gosuslugi.astrobl.ru": {},
 
-	// Others
 	"https://109.207.1.118":          {},
 	"https://109.207.1.97":           {},
 	"https://mail.rkn.gov.ru":        {},
@@ -117,7 +132,6 @@ var targetWebsites = map[string]struct{}{
 	"https://proverki.gov.ru":        {},
 	"https://shop-rt.com":            {},
 
-	// Exchanges connected to russian banks
 	"https://cleanbtc.ru":       {},
 	"https://bonkypay.com":      {},
 	"https://changer.club":      {},
@@ -142,9 +156,7 @@ var targetWebsites = map[string]struct{}{
 	"https://baksman.org":       {},
 	"https://kupibit.me":        {},
 
-	/* BELARUS */
 
-	// by gov
 	"https://mininform.gov.by":       {},
 	"https://rec.gov.by/ru":          {},
 	"https://www.mil.by":             {},
@@ -154,7 +166,6 @@ var targetWebsites = map[string]struct{}{
 	"http://www.kgb.by/ru":           {},
 	"https://www.prokuratura.gov.by": {},
 
-	// by banks
 	"https://www.nbrb.by":                 {},
 	"https://belarusbank.by":              {},
 	"https://brrb.by":                     {},
@@ -162,14 +173,12 @@ var targetWebsites = map[string]struct{}{
 	"https://bankdabrabyt.by":             {},
 	"https://belinvestbank.by/individual": {},
 
-	// by business
 	"https://bgp.by/ru":           {},
 	"https://www.belneftekhim.by": {},
 	"http://www.bellegprom.by":    {},
 	"https://www.energo.by":       {},
 	"http://belres.by/ru":         {},
 
-	// by media
 	"http://belta.by":           {},
 	"https://sputnik.by":        {},
 	"https://www.tvr.by":        {},
@@ -195,6 +204,7 @@ var targetWebsites = map[string]struct{}{
 	"https://zarya.by":          {},
 	"https://grodnonews.by":     {},
 }
+*/
 
 var websites = map[string]*Website{}
 

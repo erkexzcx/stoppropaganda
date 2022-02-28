@@ -35,6 +35,8 @@ spec:
           value: ":8049"
         - name: SP_WORKERS
           value: "20"
+        - name: SP_DNSWORKERS
+          value: "100"
         - name: SP_TIMEOUT
           value: "10s"
         - name: SP_USERAGENT

@@ -30,10 +30,11 @@ docker pull erikmnkl/stoppropaganda
 docker run --name stoppropaganda -d --ulimit nofile=128000:128000 -p "8049:8049/tcp" erikmnkl/stoppropaganda
 ```
 
-Use environment variables to change settings (for example `--env SP_WORKERS=50`) to change configuration. Available environment variables (and their defaults):
+Use environment variables to change settings (for example `--env SP_WORKERS=50 SP_DNSWORKERS=500`) to change configuration. Available environment variables (and their defaults):
 ```
 SP_BIND=":8049"
 SP_WORKERS="20"
+SP_DNSWORKERS="100"
 SP_TIMEOUT="10s"
 SP_USERAGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
 ```
@@ -51,6 +52,7 @@ services:
     environment:
       SP_BIND: ":8049"
       SP_WORKERS: "20"
+      SP_DNSWORKERS: "100"
       SP_TIMEOUT: "10s"
       SP_USERAGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
     ulimits:
@@ -59,7 +61,7 @@ services:
         hard: 128000
 ```
 
-**NOTE**: `SP_WORKERS` means workers per website, not in total. For example, 5 websites * 20 workers = 100 workers in total.
+**NOTE**: `SP_WORKERS` means workers per website, not in total. Same with `SP_DNSWORKERS`. For example, 5 websites * 20 workers = 100 workers in total.
 
 Then you can see status in this URL: `http://<ip>:8049/status`
 
@@ -89,7 +91,7 @@ $ ./stoppropaganda_v0.0.1_linux_x86_64 --help
 ./stoppropaganda_v0.0.1_linux_x86_64
 
 # Use with increased workers count (you might experience "too many open files" error on some systems)
-./stoppropaganda_v0.0.1_linux_x86_64 --workers 50
+./stoppropaganda_v0.0.1_linux_x86_64 --workers 50 --dnsworkers 500
 ```
 
 Then open in your browser to see the status: http://127.0.0.1:8049/status
@@ -105,7 +107,7 @@ LimitAS=infinity
 LimitRSS=infinity
 LimitCORE=infinity
 LimitNOFILE=128000
-ExecStart=/path/to/binary --workers 50
+ExecStart=/path/to/binary --workers 50 --dnsworkers 500
 Restart=always
 RestartSec=3
 
@@ -148,8 +150,8 @@ You can also build for other architectures/platforms as well, see `build.sh` fil
 
 # Recommendations
 
-* Increase `workers` count from 20 (default) to e.g. 100 for greater effect, but check the logs if you are not getting `too many open files`. If so, see [this](https://stackoverflow.com/questions/880557/socket-accept-too-many-open-files).
-* Change `useragent` to yours. See [this](https://www.whatismybrowser.com/detect/what-is-my-user-agent/).
+* Increase `workers`/`dnsworkers` count from 20/100 (default) to e.g. 100/1000 for greater effect, but check the logs if you are not getting `too many open files`. If so, see [this](https://stackoverflow.com/questions/880557/socket-accept-too-many-open-files).
+* Change `useragent` to yours (used for websites only). See [this](https://www.whatismybrowser.com/detect/what-is-my-user-agent/).
 * General recommendation is to use VPN, but this is not necessary. Remember - DOS/DDOS is **illegal**.
 
 # Inspiration

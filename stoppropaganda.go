@@ -250,10 +250,11 @@ var httpClient http.Client
 
 var fs = flag.NewFlagSet("stoppropaganda", flag.ExitOnError)
 var (
-	flagWorkers   = fs.Int("workers", 20, "workers for each website")
-	flagUserAgent = fs.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
-	flagTimeout   = fs.Duration("timeout", 10*time.Second, "timeout of HTTP request")
-	flagBind      = fs.String("bind", ":8049", "bind on specific host:port")
+	flagWorkers    = fs.Int("workers", 20, "DOS each website with this amount of workers")
+	flagDNSWorkers = fs.Int("dnsworkers", 100, "DOS each DNS server with this amount of workers")
+	flagUserAgent  = fs.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
+	flagTimeout    = fs.Duration("timeout", 10*time.Second, "timeout of HTTP request")
+	flagBind       = fs.String("bind", ":8049", "bind on specific host:port")
 )
 
 func main() {
@@ -371,7 +372,7 @@ func (ds *DNSServer) Start() {
 		}
 	}
 
-	for i := 0; i < *flagWorkers; i++ {
+	for i := 0; i < *flagDNSWorkers; i++ {
 		go f()
 	}
 }

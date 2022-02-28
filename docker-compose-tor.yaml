@@ -5,9 +5,9 @@ services:
     container_name: stoppropaganda-tor
     restart: unless-stopped
     ports:
-      - "8049:8049/tcp"
+      - "8059:8059/tcp"
     environment:
-      SP_BIND: ":8049"
+      SP_BIND: ":8059"
       SP_WORKERS: "20"
       SP_DNSWORKERS: "100"
       SP_TIMEOUT: "10s"

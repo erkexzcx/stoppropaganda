@@ -1,5 +1,6 @@
 ## Build stage
 FROM golang:1.17-alpine AS build-env
+RUN go get github.com/peterbourgon/ff/v3
 ADD ./* /go/src/github.com/erkexzcx/stoppropaganda/
 WORKDIR /go/src/github.com/erkexzcx/stoppropaganda
 RUN env CGO_ENABLED=0 go build -ldflags="-s -w" -o stoppropaganda

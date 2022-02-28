@@ -120,7 +120,12 @@ var links = map[string]struct{}{
 	"https://customs.gov.ru/":   {},
 	"https://pfr.gov.ru/":       {},
 	"https://rkn.gov.ru/":       {},
-
+	
+	// Education
+	"https://school.mos.ru/":       {},
+	"https://uchi.ru/":             {},
+	"https://resh.edu.ru/":         {},
+	
 	// Others
 	"https://109.207.1.118/":         {},
 	"https://109.207.1.97/":          {},

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"crypto/tls"
 	"encoding/json"
 	"flag"
@@ -18,6 +17,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/miekg/dns"
 	"github.com/peterbourgon/ff/v3"
 )
 
@@ -188,9 +188,11 @@ var links = map[string]struct{}{
 }
 
 type DNSServer struct {
-	Server   string `json:"server"`
-	Requests uint   `json:"requests"`
-	Errors   uint   `json:"errors"`
+	Server       string `json:"server"`
+	Requests     uint   `json:"requests"`
+	Success      uint   `json:"success"`
+	Errors       uint   `json:"errors"`
+	LastErrorMsg string `json:"last_error_msg"`
 
 	mux *sync.Mutex
 }
@@ -314,24 +316,25 @@ func status(w http.ResponseWriter, req *http.Request) {
 }
 
 func (ds *DNSServer) Start() {
-	r := &net.Resolver{
-		PreferGo: true,
-		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
-			d := net.Dialer{
-				Timeout: *flagTimeout,
-			}
-			return d.DialContext(ctx, network, ds.Server)
-		},
+	c := new(dns.Client)
+	c.Dialer = &net.Dialer{
+		Timeout: *flagTimeout,
 	}
 
 	f := func() {
 		for {
 			domain := getRandomDomain()
-			_, err := r.LookupHost(context.Background(), domain)
+			m := new(dns.Msg)
+			m.SetQuestion(domain+".", dns.TypeAAAA)
+			_, _, err := c.Exchange(m, ds.Server)
+
 			ds.mux.Lock()
 			ds.Requests++
-			if err != nil {
+			if err != nil && !strings.HasSuffix(err.Error(), "no such host") {
 				ds.Errors++
+				ds.LastErrorMsg = err.Error()
+			} else {
+				ds.Success++
 			}
 			ds.mux.Unlock()
 		}
@@ -421,7 +424,7 @@ func init() {
 	}
 }
 
-var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyz")
 
 func getRandomDomain() string {
 	randomLength := rand.Intn(20-6) + 6 // from 6 to 20 characters length + ".ru"

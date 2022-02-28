@@ -40,6 +40,7 @@ SP_USERAGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 
 You can also use `docker-compose`:
 ```yaml
+version: '3'
 services:
   stoppropaganda:
     image: erikmnkl/stoppropaganda

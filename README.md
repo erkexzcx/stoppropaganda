@@ -73,6 +73,9 @@ Download binary from [releases](https://github.com/erkexzcx/stoppropaganda/relea
 Use from terminal:
 
 ```bash
+# (Linux only) make the binary executable
+chmod +x stoppropaganda_v0.0.1_linux_x86_64
+
 # (Linux only) Increase open files limit for current terminal session
 ulimit -n 128000
 

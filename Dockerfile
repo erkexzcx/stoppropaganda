@@ -15,8 +15,8 @@ RUN set -x \
 ## Create image
 FROM scratch
 
+# Docs: <https://github.com/opencontainers/image-spec/blob/master/annotations.md>
 LABEL \
-    # Docs: <https://github.com/opencontainers/image-spec/blob/master/annotations.md>
     org.opencontainers.image.title="stoppropaganda" \
     org.opencontainers.image.url="https://github.com/erkexzcx/stoppropaganda" \
     org.opencontainers.image.source="https://github.com/erkexzcx/stoppropaganda" \

@@ -74,7 +74,8 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/ppc64le,linux/386,linux/arm/v7,linux/arm/v6
           build-args: "APP_VERSION=${{ steps.slug.outputs.version }}"
           tags: |
-#            erkexzcx/stoppropaganda:${{ steps.slug.outputs.version }}
-#            erkexzcx/stoppropaganda:latest
             ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:${{ steps.slug.outputs.version }}
             ghcr.io/${{ github.actor }}/${{ github.event.repository.name }}:latest
+
+#            erkexzcx/stoppropaganda:${{ steps.slug.outputs.version }}
+#            erkexzcx/stoppropaganda:latest

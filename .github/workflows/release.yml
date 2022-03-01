@@ -29,7 +29,7 @@ jobs:
 
       - name: Generate builder values
         id: values
-        run: echo "::set-output name=binary-name::stoppropaganda_v${{ steps.slug.outputs.version }}_${{ matrix.os }}_${{ matrix.arch }}"
+        run: echo "::set-output name=binary-name::stoppropaganda_v${{ steps.slug.outputs.version }}_${{ matrix.os }}_${{ matrix.arch }}`[ ${{ matrix.os }} = 'windows' ] && echo '.exe'`"
 
       - name: Build application
         env:

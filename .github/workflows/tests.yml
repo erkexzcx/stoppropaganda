@@ -1,0 +1,61 @@
+name: tests
+
+on:
+  push:
+    branches: [master, main]
+    tags-ignore: ['**']
+    paths-ignore: ['**.md']
+  pull_request:
+    paths-ignore: ['**.md']
+
+jobs: # Docs: <https://git.io/JvxXE>
+  gitleaks:
+    name: Gitleaks
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with: {fetch-depth: 0}
+
+      - uses: zricethezav/gitleaks-action@v1 # Action page: <https://github.com/zricethezav/gitleaks-action>
+
+  build:
+    name: Build for ${{ matrix.os }} (${{ matrix.arch }})
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [linux, darwin] # linux, freebsd, darwin, windows
+        arch: [amd64]  # amd64, 386
+    steps:
+      - uses: actions/setup-go@v2
+        with: {go-version: 1.17}
+
+      - uses: actions/checkout@v2
+
+      - name: Build application
+        env:
+          GOOS: ${{ matrix.os }}
+          GOARCH: ${{ matrix.arch }}
+          CGO_ENABLED: 0
+          LDFLAGS: -s -w
+        run: go build -trimpath -ldflags "$LDFLAGS" -o ./stoppropaganda ./cmd/stoppropaganda/
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: stoppropaganda-${{ matrix.os }}-${{ matrix.arch }}
+          path: stoppropaganda
+          if-no-files-found: error
+          retention-days: 1
+
+  docker-image:
+    name: Build docker image
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: docker/build-push-action@v2 # Action page: <https://github.com/docker/build-push-action>
+        with:
+          context: .
+          file: Dockerfile
+          push: false
+          tags: app:ci

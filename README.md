@@ -38,7 +38,8 @@ SP_USERAGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTM
 
 **NOTE**: `SP_WORKERS` means workers per website, not in total. Same with `SP_DNSWORKERS`. For example, 5 websites * 20 workers = 100 workers in total.
 
-Then you can see status in this URL: `http://<ip>:8049/status`
+Then you can see status in this URL: `http://<ip>:8049/status`  
+or without browser (Linux only): `curl http://<ip>:8049/status | less`
 
 ## docker-compose
 

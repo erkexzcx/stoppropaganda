@@ -245,15 +245,15 @@ func (ws *Website) Start(endpoint string) {
 			// Increase counters
 			ws.mux.Lock()
 			ws.Requests++
-			if resp.StatusCode >= 100 && resp.StatusCode < 200 {
+			if resp.StatusCode < 200 {
 				ws.Counter_code100++
-			} else if resp.StatusCode >= 200 && resp.StatusCode < 300 {
+			} else if resp.StatusCode < 300 {
 				ws.Counter_code200++
-			} else if resp.StatusCode >= 300 && resp.StatusCode < 400 {
+			} else if resp.StatusCode < 400 {
 				ws.Counter_code300++
-			} else if resp.StatusCode >= 400 && resp.StatusCode < 500 {
+			} else if resp.StatusCode < 500 {
 				ws.Counter_code400++
-			} else if resp.StatusCode >= 500 && resp.StatusCode < 600 {
+			} else {
 				ws.Counter_code500++
 			}
 			ws.mux.Unlock()

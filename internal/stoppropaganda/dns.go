@@ -32,7 +32,7 @@ func (ds *DNSServer) Start(endpoint string) {
 	c.Dialer = &net.Dialer{
 		Timeout: *flagTimeout,
 	}
-	questionDomain := getRandomDomain()+"."
+	questionDomain := getRandomDomain() + "."
 	m := new(dns.Msg)
 	m.SetQuestion(questionDomain, dns.TypeAAAA)
 
@@ -42,7 +42,7 @@ func (ds *DNSServer) Start(endpoint string) {
 
 			ds.mux.Lock()
 			ds.Requests++
-			if err != nil{
+			if err != nil {
 				ds.Errors++
 				ds.LastErrorMsg = err.Error()
 			} else {

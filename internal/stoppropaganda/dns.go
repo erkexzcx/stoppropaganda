@@ -2,7 +2,6 @@ package stoppropaganda
 
 import (
 	"net"
-	"strings"
 	"sync"
 
 	"github.com/miekg/dns"
@@ -43,7 +42,7 @@ func (ds *DNSServer) Start(endpoint string) {
 
 			ds.mux.Lock()
 			ds.Requests++
-			if err != nil && !strings.HasSuffix(err.Error(), "no such host") {
+			if err != nil{
 				ds.Errors++
 				ds.LastErrorMsg = err.Error()
 			} else {

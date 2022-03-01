@@ -33,12 +33,12 @@ func (ds *DNSServer) Start(endpoint string) {
 	c.Dialer = &net.Dialer{
 		Timeout: *flagTimeout,
 	}
+	questionDomain := getRandomDomain()+"."
+	m := new(dns.Msg)
+	m.SetQuestion(questionDomain, dns.TypeAAAA)
 
 	f := func() {
 		for {
-			domain := getRandomDomain()
-			m := new(dns.Msg)
-			m.SetQuestion(domain+".", dns.TypeAAAA)
 			_, _, err := c.Exchange(m, endpoint)
 
 			ds.mux.Lock()

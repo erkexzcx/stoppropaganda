@@ -19,6 +19,7 @@ var (
 	flagDNSWorkers = fs.Int("dnsworkers", 100, "DOS each DNS server with this amount of workers")
 	flagUserAgent  = fs.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
 	flagTimeout    = fs.Duration("timeout", 10*time.Second, "timeout of HTTP request")
+	flagDNSTimeout = fs.Duration("dnstimeout", 10*time.Second, "timeout of DNS request")
 	flagBind       = fs.String("bind", ":8049", "bind on specific host:port")
 )
 

@@ -30,7 +30,7 @@ type DNSServer struct {
 func (ds *DNSServer) Start(endpoint string) {
 	c := new(dns.Client)
 	c.Dialer = &net.Dialer{
-		Timeout: *flagTimeout,
+		Timeout: *flagDNSTimeout,
 	}
 	questionDomain := getRandomDomain() + "."
 	m := new(dns.Msg)

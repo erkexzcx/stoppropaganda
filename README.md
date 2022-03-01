@@ -31,8 +31,9 @@ docker run --name stoppropaganda -d --ulimit nofile=128000:128000 -p "8049:8049/
 Use environment variables to change settings (for example `--env SP_WORKERS=50 SP_DNSWORKERS=500`) to change configuration. Available environment variables (and their defaults):
 ```
 SP_WORKERS="20"
-SP_DNSWORKERS="100"
 SP_TIMEOUT="10s"
+SP_DNSWORKERS="100"
+SP_DNSTIMEOUT="125ms"
 SP_USERAGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
 ```
 
@@ -146,6 +147,7 @@ You can also build for other architectures/platforms as well, see `build.sh` fil
 # Recommendations
 
 * Increase `workers`/`dnsworkers` count from 20/100 (default) to e.g. 100/1000 for greater effect, but check the logs if you are not getting `too many open files`. If so, see [this](https://stackoverflow.com/questions/880557/socket-accept-too-many-open-files).
+* Adjust dnstimeout based on your location.  Eastern America ~125-150ms and in Europe this is likely much lower.  To properly adjust this value, check the /status page and if all queries are "successful", lower this value ~20ms and try again until "success" queries are low and thus "timeout errors" increase.
 * Change `useragent` to yours (used for websites only). See [this](https://www.whatismybrowser.com/detect/what-is-my-user-agent/).
 * General recommendation is to use VPN, but this is not necessary. Remember - DOS/DDOS is **illegal**.
 

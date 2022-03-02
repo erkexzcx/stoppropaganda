@@ -202,7 +202,6 @@ var targetWebsites = map[string]struct{}{
 	"https://www.mvd.gov.by/ru":      {},
 	"http://www.kgb.by/ru":           {},
 	"https://www.prokuratura.gov.by": {},
-	
 
 	// by banks
 	"https://www.nbrb.by":                 {},
@@ -212,7 +211,7 @@ var targetWebsites = map[string]struct{}{
 	"https://bankdabrabyt.by":             {},
 	"https://belinvestbank.by/individual": {},
 	"https://belpost.by":                  {},
-	
+
 	// by business
 	"https://bgp.by/ru":           {},
 	"https://www.belneftekhim.by": {},

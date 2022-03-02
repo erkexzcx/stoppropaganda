@@ -60,6 +60,8 @@ var targetWebsites = map[string]struct{}{
 	"https://regnum.ru":         {},
 	"https://eadaily.com":       {},
 	"https://www.rubaltic.ru":   {},
+	"https://www.rambler.ru":    {},
+	"https://mail.ru":           {},
 
 	// Business corporations
 	"https://www.gazprom.ru":                    {},

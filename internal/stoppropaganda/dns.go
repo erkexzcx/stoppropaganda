@@ -2,6 +2,7 @@ package stoppropaganda
 
 import (
 	"net"
+	"strings"
 	"sync"
 
 	"github.com/miekg/dns"
@@ -46,7 +47,16 @@ func (ds *DNSServer) Start(endpoint string) {
 			ds.Requests++
 			if err != nil {
 				ds.Errors++
-				ds.LastErrorMsg = err.Error()
+				switch {
+				case strings.HasSuffix(err.Error(), "no such host"):
+					ds.LastErrorMsg = "Host does not exist"
+				case strings.HasSuffix(err.Error(), "connection refused"):
+					ds.LastErrorMsg = "Connection refused"
+				case strings.HasSuffix(err.Error(), "i/o timeout"):
+					ds.LastErrorMsg = "Query timeout"
+				default:
+					ds.LastErrorMsg = err.Error()
+				}
 			} else {
 				ds.Success++
 			}

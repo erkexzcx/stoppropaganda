@@ -24,6 +24,8 @@ var targetWebsites = map[string]struct{}{
 	"http://sputniknews.lt":     {},
 	"https://lv.sputniknews.ru": {},
 	"https://viada.lt":          {},
+	"https://www.sber.kz":       {},
+	"https://www.sberbank.kz":   {},
 
 	/* Russia */
 

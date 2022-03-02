@@ -109,6 +109,8 @@ var targetWebsites = map[string]struct{}{
 	"https://uslugi27.ru":          {},
 	"https://gosuslugi29.ru":       {},
 	"https://gosuslugi.astrobl.ru": {},
+	"http://pochta.ru":             {},
+	"http://crimea-post.ru":        {},
 
 	// Others
 	"https://109.207.1.118":          {},
@@ -200,6 +202,7 @@ var targetWebsites = map[string]struct{}{
 	"https://www.mvd.gov.by/ru":      {},
 	"http://www.kgb.by/ru":           {},
 	"https://www.prokuratura.gov.by": {},
+	
 
 	// by banks
 	"https://www.nbrb.by":                 {},
@@ -208,7 +211,8 @@ var targetWebsites = map[string]struct{}{
 	"https://www.belapb.by":               {},
 	"https://bankdabrabyt.by":             {},
 	"https://belinvestbank.by/individual": {},
-
+	"https://belpost.by":                  {},
+	
 	// by business
 	"https://bgp.by/ru":           {},
 	"https://www.belneftekhim.by": {},

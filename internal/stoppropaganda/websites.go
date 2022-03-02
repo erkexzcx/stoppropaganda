@@ -2,7 +2,6 @@ package stoppropaganda
 
 import (
 	"io/ioutil"
-	"net"
 	"net/url"
 	"strings"
 	"sync"
@@ -286,33 +285,15 @@ func (ws *Website) Start(endpoint string) {
 	ws.paused = false
 	ws.dnsLastChecked = time.Now().Add(-1 * VALIDATE_DNS_EVERY) // this forces to validate on first run
 
+	// Create request
+	req := fasthttp.AcquireRequest()
+	req.SetRequestURI(endpoint)
+	req.Header.SetMethod(fasthttp.MethodGet)
+	req.Header.Set("Host", websiteURL.Host)
+	req.Header.Set("User-Agent", *flagUserAgent)
+	req.Header.Set("Accept", "*/*")
+
 	f := func() {
-		// Create HTTP client
-		httpClient := &fasthttp.Client{
-			ReadTimeout:                   *flagTimeout,
-			WriteTimeout:                  *flagTimeout,
-			MaxIdleConnDuration:           time.Hour,
-			NoDefaultUserAgentHeader:      true,
-			DisableHeaderNamesNormalizing: true,
-			DisablePathNormalizing:        true,
-			Dial: func(addr string) (net.Conn, error) {
-				return (&fasthttp.TCPDialer{
-					Concurrency:      4096,
-					DNSCacheDuration: 5 * time.Minute,
-				}).DialTimeout(addr, *flagTimeout)
-			},
-		}
-
-		// Create request
-		req := fasthttp.AcquireRequest()
-		req.SetRequestURI(endpoint)
-		req.Header.SetMethod(fasthttp.MethodGet)
-
-		// Set request headers
-		req.Header.Set("Host", websiteURL.Host)
-		req.Header.Set("User-Agent", *flagUserAgent)
-		req.Header.Set("Accept", "*/*")
-
 		for {
 			ws.pauseMux.Lock()
 			if time.Since(ws.dnsLastChecked) >= VALIDATE_DNS_EVERY {
@@ -366,7 +347,7 @@ func (ws *Website) Start(endpoint string) {
 				ws.mux.Lock()
 				ws.Requests++
 				ws.Errors++
-				ws.WorkersStatus = err.Error()
+				ws.LastErrorMsg = err.Error()
 				ws.mux.Unlock()
 				continue
 			}
@@ -394,7 +375,7 @@ func (ws *Website) Start(endpoint string) {
 			if err != nil {
 				ws.mux.Lock()
 				ws.Errors++
-				ws.WorkersStatus = err.Error()
+				ws.LastErrorMsg = err.Error()
 				ws.mux.Unlock()
 			}
 

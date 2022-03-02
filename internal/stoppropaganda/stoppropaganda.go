@@ -3,13 +3,16 @@ package stoppropaganda
 import (
 	"flag"
 	"log"
+	"math"
 	"math/rand"
+	"net"
 	"net/http"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/peterbourgon/ff/v3"
+	"github.com/valyala/fasthttp"
 )
 
 var fs = flag.NewFlagSet("stoppropaganda", flag.ExitOnError)
@@ -41,6 +44,24 @@ func Start() {
 	panic(http.ListenAndServe(*flagBind, nil))
 }
 
+var httpClient *fasthttp.Client
+
 func init() {
 	rand.Seed(time.Now().UnixNano())
+
+	httpClient = &fasthttp.Client{
+		ReadTimeout:                   *flagTimeout,
+		WriteTimeout:                  *flagTimeout,
+		MaxIdleConnDuration:           time.Hour,
+		NoDefaultUserAgentHeader:      true,
+		DisableHeaderNamesNormalizing: true,
+		DisablePathNormalizing:        true,
+		MaxConnsPerHost:               math.MaxInt,
+		Dial: func(addr string) (net.Conn, error) {
+			return (&fasthttp.TCPDialer{
+				Concurrency:      4096,
+				DNSCacheDuration: 5 * time.Minute,
+			}).DialTimeout(addr, *flagTimeout)
+		},
+	}
 }

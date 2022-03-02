@@ -6,10 +6,12 @@ import (
 	"log"
 	"math"
 	"math/rand"
+	"net"
 	"os"
 	"sync"
 	"time"
 
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/sockshttp"
 	"github.com/peterbourgon/ff/v3"
 	"github.com/valyala/fasthttp"
 )
@@ -55,10 +57,36 @@ func init() {
 		DisableHeaderNamesNormalizing: true,
 		DisablePathNormalizing:        true,
 		MaxConnsPerHost:               math.MaxInt,
-		Dial: (&fasthttp.TCPDialer{
-			Concurrency:      math.MaxInt,
-			DNSCacheDuration: 5 * time.Minute,
-		}).Dial,
-		TLSConfig: &tls.Config{InsecureSkipVerify: true},
+		Dial:                          makeDialFunc(),
+		TLSConfig:                     &tls.Config{InsecureSkipVerify: true},
 	}
+}
+
+func makeDialFunc() fasthttp.DialFunc {
+
+	masterDialer := sockshttp.FromEnvironment()
+
+	useTorExample := false
+	if useTorExample {
+		proxyTimeout := 600 * time.Second
+		proxyChain := []Proxy{
+			{"127.0.0.1:9050", ProxyMethodSocks5},
+			// you can even chain proxies...
+			//{"1.2.3.4:9050", ProxyMethodSocks4},
+		}
+		dialer := &net.Dialer{
+			//LocalAddr: localAddr,
+			Timeout: 600 * time.Second,
+		}
+		masterDialer = MakeDialerThrough(dialer, proxyChain, proxyTimeout)
+	}
+
+	dial := (&TCPDialer{
+		Concurrency:      math.MaxInt,
+		DNSCacheDuration: 5 * time.Minute,
+
+		// stoppropaganda's implementation
+		ParentDialer: masterDialer,
+	}).Dial
+	return dial
 }

@@ -82,6 +82,11 @@ var targetWebsites = map[string]struct{}{
 	"https://www.polymetalinternational.com/ru": {},
 	"https://www.uralkali.com/ru":               {},
 	"https://www.eurosib.ru":                    {},
+	"https://www.wildberries.ru":                {},
+	"https://www.ozon.ru":                       {},
+	"https://www.avito.ru":                      {},
+	"https://www.dns-shop.ru":                   {},
+	"https://aliexpress.ru":                     {},
 
 	// Banks
 	"https://www.sberbank.ru":                          {},

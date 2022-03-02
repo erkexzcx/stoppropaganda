@@ -33,14 +33,16 @@ docker run --name stoppropaganda -d --ulimit nofile=128000:128000 -p "8049:8049/
 Use environment variables to change settings (for example `--env SP_WORKERS=50 SP_DNSWORKERS=500`) to change configuration. Available environment variables (and their defaults):
 ```
 SP_WORKERS="20"
-SP_DNSWORKERS="100"
 SP_TIMEOUT="10s"
+SP_DNSWORKERS="100"
+SP_DNSTIMEOUT="125ms"
 SP_USERAGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
 ```
 
 **NOTE**: `SP_WORKERS` means workers per website, not in total. Same with `SP_DNSWORKERS`. For example, 5 websites * 20 workers = 100 workers in total.
 
-Then you can see status in this URL: `http://<ip>:8049/status`
+Then you can see status in this URL: `http://<ip>:8049/status`  
+or without browser (Linux only): `curl http://<ip>:8049/status | less`
 
 ## docker-compose
 
@@ -148,6 +150,7 @@ You can also build for other architectures/platforms as well, see `build.sh` fil
 # Recommendations
 
 * Increase `workers`/`dnsworkers` count from 20/100 (default) to e.g. 100/1000 for greater effect, but check the logs if you are not getting `too many open files`. If so, see [this](https://stackoverflow.com/questions/880557/socket-accept-too-many-open-files).
+* Adjust dnstimeout based on your location.  Eastern America ~125-150ms and in Europe this is likely much lower.  To properly adjust this value, check the /status page and if all queries are "successful", lower this value ~20ms and try again until "success" queries are low and thus "timeout errors" increase.
 * Change `useragent` to yours (used for websites only). See [this](https://www.whatismybrowser.com/detect/what-is-my-user-agent/).
 * General recommendation is to use VPN, but this is not necessary. Remember - DOS/DDOS is **illegal**.
 
@@ -155,6 +158,6 @@ You can also build for other architectures/platforms as well, see `build.sh` fil
 
 This application was inspired by the following projects:
 * https://www.reddit.com/r/hacking/comments/t1a8is/simple_html_dos_script_for_russian_sites/
-* https://norussian.tk/
+* https://norussian.xyz/
 * https://stop-russian-desinformation.near.page/
 * https://russianwarshipgofuckyourself.club/

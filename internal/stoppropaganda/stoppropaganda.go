@@ -1,7 +1,6 @@
 package stoppropaganda
 
 import (
-	"crypto/tls"
 	"flag"
 	"log"
 	"math/rand"
@@ -42,22 +41,6 @@ func Start() {
 	panic(http.ListenAndServe(*flagBind, nil))
 }
 
-var httpClient http.Client
-
 func init() {
 	rand.Seed(time.Now().UnixNano())
-
-	fIgnoreRedirects := func(req *http.Request, via []*http.Request) error {
-		return http.ErrUseLastResponse
-	}
-	tr := &http.Transport{
-		DisableCompression: true,                                  // Disable automatic decompression
-		TLSClientConfig:    &tls.Config{InsecureSkipVerify: true}, // Disable TLS verification
-		Proxy:              http.ProxyFromEnvironment,             // Enable proxy functionality
-	}
-	httpClient = http.Client{
-		Timeout:       *flagTimeout,     // Enable timeout
-		CheckRedirect: fIgnoreRedirects, // Disable auto redirects
-		Transport:     tr,
-	}
 }

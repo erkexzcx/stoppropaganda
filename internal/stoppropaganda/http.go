@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"sync"
+	"time"
 )
 
 type StatusStruct struct {
@@ -48,6 +49,15 @@ func status(w http.ResponseWriter, req *http.Request) {
 			statusStruct.mux.Lock()
 			statusStruct.Websites[endpoint] = &tmpWebsite
 			statusStruct.mux.Unlock()
+
+			dosPausedFor := time.Since(tmpWebsite.dnsLastChecked)
+			if tmpWebsite.paused {
+				if dosPausedFor >= VALIDATE_DNS_EVERY {
+					tmpWebsite.WorkersStatus += ", DOS paused for 0s"
+				} else {
+					tmpWebsite.WorkersStatus += ", DOS paused for " + (VALIDATE_DNS_EVERY - dosPausedFor).String()
+				}
+			}
 
 			wg.Done()
 		}(endpoint, ws)

@@ -1,7 +1,6 @@
 package stoppropaganda
 
 import (
-	"io/ioutil"
 	"net/url"
 	"strings"
 	"sync"
@@ -294,6 +293,9 @@ func (ws *Website) Start(endpoint string) {
 	req.Header.Set("Accept", "*/*")
 
 	f := func() {
+		// Create response
+		resp := fasthttp.AcquireResponse()
+
 		for {
 			ws.pauseMux.Lock()
 			if time.Since(ws.dnsLastChecked) >= VALIDATE_DNS_EVERY {
@@ -341,8 +343,7 @@ func (ws *Website) Start(endpoint string) {
 			ws.pauseMux.Unlock()
 
 			// Perform request
-			resp := fasthttp.AcquireResponse()
-			err := httpClient.Do(req, resp)
+			err := httpClient.DoTimeout(req, resp, *flagTimeout)
 			if err != nil {
 				ws.mux.Lock()
 				ws.Requests++
@@ -369,18 +370,6 @@ func (ws *Website) Start(endpoint string) {
 				ws.Counter_code500++
 			}
 			ws.mux.Unlock()
-
-			// Download (and discard) response body to waste traffic
-			err = resp.BodyWriteTo(ioutil.Discard)
-			if err != nil {
-				ws.mux.Lock()
-				ws.Errors++
-				ws.LastErrorMsg = err.Error()
-				ws.mux.Unlock()
-			}
-
-			// Release response
-			fasthttp.ReleaseResponse(resp)
 		}
 	}
 

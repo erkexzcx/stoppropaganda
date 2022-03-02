@@ -1,12 +1,11 @@
 package stoppropaganda
 
 import (
+	"crypto/tls"
 	"flag"
 	"log"
 	"math"
 	"math/rand"
-	"net"
-	"net/http"
 	"os"
 	"sync"
 	"time"
@@ -38,10 +37,8 @@ func Start() {
 		websites[link].Start(link)
 	}
 
-	http.HandleFunc("/status", status)
-
 	log.Println("Started!")
-	panic(http.ListenAndServe(*flagBind, nil))
+	panic(fasthttp.ListenAndServe(*flagBind, fasthttpRequestHandler))
 }
 
 var httpClient *fasthttp.Client
@@ -57,11 +54,10 @@ func init() {
 		DisableHeaderNamesNormalizing: true,
 		DisablePathNormalizing:        true,
 		MaxConnsPerHost:               math.MaxInt,
-		Dial: func(addr string) (net.Conn, error) {
-			return (&fasthttp.TCPDialer{
-				Concurrency:      4096,
-				DNSCacheDuration: 5 * time.Minute,
-			}).DialTimeout(addr, *flagTimeout)
-		},
+		Dial: (&fasthttp.TCPDialer{
+			Concurrency:      4096,
+			DNSCacheDuration: 5 * time.Minute,
+		}).Dial,
+		TLSConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 }

@@ -267,6 +267,12 @@ var targetWebsites = map[string]struct{}{
 	"https://minsknews.by":      {},
 	"https://zarya.by":          {},
 	"https://grodnonews.by":     {},
+	
+	/* DDOS mitigation */
+        "https://ddos-guard.net/ru": {},
+	"https://stormwall.pro":     {},
+	"https://qrator.net/ru":     {},
+	"https://solidwall.ru":      {},
 }
 
 var websites = map[string]*Website{}

@@ -327,7 +327,6 @@ func (ws *Website) Start(endpoint string) {
 
 	f := func() {
 		// Create response
-		resp := fasthttp.AcquireResponse()
 
 		for {
 			ws.pauseMux.Lock()
@@ -374,6 +373,7 @@ func (ws *Website) Start(endpoint string) {
 			ws.pauseMux.Unlock()
 
 			// Perform request
+			resp := fasthttp.AcquireResponse()
 			err := httpClient.DoTimeout(req, resp, *flagTimeout)
 			if err != nil {
 				ws.mux.Lock()

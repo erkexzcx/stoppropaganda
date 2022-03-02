@@ -33,7 +33,7 @@ func Start() {
 	}
 
 	for link := range targetWebsites {
-		websites[link] = &Website{mux: &sync.Mutex{}}
+		websites[link] = new(Website)
 		websites[link].Start(link)
 	}
 

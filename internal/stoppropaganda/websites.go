@@ -289,8 +289,8 @@ type Website struct {
 	Counter_code400 uint `json:"status_400"`
 	Counter_code500 uint `json:"status_500"`
 
-	mux            *sync.Mutex
-	pauseMux       *sync.Mutex
+	mux            sync.Mutex
+	pauseMux       sync.Mutex
 	paused         bool
 	dnsLastChecked time.Time
 }
@@ -303,7 +303,6 @@ func (ws *Website) Start(endpoint string) {
 	}
 
 	ws.WorkersStatus = "Initializing"
-	ws.pauseMux = &sync.Mutex{}
 	ws.paused = false
 	ws.dnsLastChecked = time.Now().Add(-1 * VALIDATE_DNS_EVERY) // this forces to validate on first run
 
@@ -319,6 +318,7 @@ func (ws *Website) Start(endpoint string) {
 		// Create response
 		resp := fasthttp.AcquireResponse()
 
+	mainLoop:
 		for {
 			ws.pauseMux.Lock()
 			if time.Since(ws.dnsLastChecked) >= VALIDATE_DNS_EVERY {
@@ -354,7 +354,7 @@ func (ws *Website) Start(endpoint string) {
 
 						time.Sleep(5 * time.Minute)
 						ws.pauseMux.Unlock()
-						break
+						break mainLoop
 					}
 				}
 

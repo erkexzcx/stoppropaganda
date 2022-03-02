@@ -2,10 +2,18 @@ package stoppropaganda
 
 import (
 	"encoding/json"
-	"net/http"
 	"sync"
 	"time"
+
+	"github.com/valyala/fasthttp"
 )
+
+func fasthttpRequestHandler(ctx *fasthttp.RequestCtx) {
+	switch string(ctx.Path()) {
+	case "/status":
+		fasthttpStatusResponseHandler(ctx)
+	}
+}
 
 type StatusStruct struct {
 	DNS      map[string]*DNSServer `json:"DNS"`
@@ -14,7 +22,7 @@ type StatusStruct struct {
 	mux *sync.Mutex
 }
 
-func status(w http.ResponseWriter, req *http.Request) {
+func fasthttpStatusResponseHandler(ctx *fasthttp.RequestCtx) {
 	statusStruct := StatusStruct{
 		DNS:      make(map[string]*DNSServer, len(dnsServers)),
 		Websites: make(map[string]*Website, len(websites)),
@@ -67,9 +75,9 @@ func status(w http.ResponseWriter, req *http.Request) {
 
 	content, err := json.MarshalIndent(statusStruct, "", "    ")
 	if err != nil {
-		http.Error(w, "failed to marshal data", http.StatusInternalServerError)
+		ctx.SetStatusCode(500)
+		ctx.WriteString("failed to marshal data")
 		return
 	}
-	w.WriteHeader(200)
-	w.Write(content)
+	ctx.Write(content)
 }

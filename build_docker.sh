@@ -2,8 +2,8 @@
 
 # Before using this script, perform "docker login" :)
 
-VERSION=0.0.25
-PLATFORM=linux/amd64,linux/arm64,linux/ppc64le,linux/386,linux/arm/v7,linux/arm/v6
+VERSION=0.0.29
+PLATFORM=linux/amd64,linux/arm64,linux/ppc64le,linux/386,linux/arm/v7
 
 docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 docker buildx create --use --name multiarch --platform ${PLATFORM} || true

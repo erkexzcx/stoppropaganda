@@ -280,36 +280,36 @@ func (ws *Website) Start(endpoint string) {
 		panic(err)
 	}
 
-	// Create HTTP client
-	httpClient := &fasthttp.Client{
-		ReadTimeout:                   *flagTimeout,
-		WriteTimeout:                  *flagTimeout,
-		MaxIdleConnDuration:           time.Hour,
-		NoDefaultUserAgentHeader:      true,
-		DisableHeaderNamesNormalizing: true,
-		DisablePathNormalizing:        true,
-		Dial: (&fasthttp.TCPDialer{
-			Concurrency:      4096,
-			DNSCacheDuration: 5 * time.Minute,
-		}).Dial,
-	}
-
-	// Create request
-	req := fasthttp.AcquireRequest()
-	req.SetRequestURI(endpoint)
-	req.Header.SetMethod(fasthttp.MethodGet)
-
-	// Set request headers
-	req.Header.Set("Host", websiteURL.Host)
-	req.Header.Set("User-Agent", *flagUserAgent)
-	req.Header.Set("Accept", "*/*")
-
 	ws.WorkersStatus = "Initializing"
 	ws.pauseMux = &sync.Mutex{}
 	ws.paused = false
 	ws.dnsLastChecked = time.Now().Add(-1 * VALIDATE_DNS_EVERY) // this forces to validate on first run
 
 	f := func() {
+		// Create HTTP client
+		httpClient := &fasthttp.Client{
+			ReadTimeout:                   *flagTimeout,
+			WriteTimeout:                  *flagTimeout,
+			MaxIdleConnDuration:           time.Hour,
+			NoDefaultUserAgentHeader:      true,
+			DisableHeaderNamesNormalizing: true,
+			DisablePathNormalizing:        true,
+			Dial: (&fasthttp.TCPDialer{
+				Concurrency:      4096,
+				DNSCacheDuration: 5 * time.Minute,
+			}).Dial,
+		}
+
+		// Create request
+		req := fasthttp.AcquireRequest()
+		req.SetRequestURI(endpoint)
+		req.Header.SetMethod(fasthttp.MethodGet)
+
+		// Set request headers
+		req.Header.Set("Host", websiteURL.Host)
+		req.Header.Set("User-Agent", *flagUserAgent)
+		req.Header.Set("Accept", "*/*")
+
 		for {
 			ws.pauseMux.Lock()
 			if time.Since(ws.dnsLastChecked) >= VALIDATE_DNS_EVERY {
@@ -410,7 +410,9 @@ func (ws *Website) Start(endpoint string) {
 				}
 				ws.mux.Unlock()
 			}
-			fasthttp.ReleaseRequest(req)
+
+			// Release response
+			fasthttp.ReleaseResponse(resp)
 		}
 	}
 

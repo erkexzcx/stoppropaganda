@@ -23,6 +23,8 @@ var targetWebsites = map[string]struct{}{
 	"http://sputniknews.lt":     {},
 	"https://lv.sputniknews.ru": {},
 	"https://viada.lt":          {},
+	"https://www.sber.kz":       {},
+	"https://www.sberbank.kz":   {},
 
 	/* Russia */
 
@@ -78,6 +80,15 @@ var targetWebsites = map[string]struct{}{
 	"https://rmk-group.ru/ru":                   {},
 	"https://www.tmk-group.ru":                  {},
 	"https://ya.ru":                             {},
+	"https://yandex.ru":                         {},
+	"https://yandex.com":                        {},
+	"https://disk.yandex.com":                   {},
+	"https://eda.yandex":                        {},
+	"https://mail.yandex.ru":                    {},
+	"https://market.yandex.ru":                  {},
+	"https://metrica.yandex.ru":                 {},
+	"https://music.yandex.ru":                   {},
+	"https://translate.yandex.ru":               {},
 	"https://www.polymetalinternational.com/ru": {},
 	"https://www.uralkali.com/ru":               {},
 	"https://www.eurosib.ru":                    {},
@@ -117,6 +128,9 @@ var targetWebsites = map[string]struct{}{
 	"https://gosuslugi.astrobl.ru": {},
 	"http://pochta.ru":             {},
 	"http://crimea-post.ru":        {},
+
+        // Embassy
+	"https://montreal.mid.ru":      {},
 
 	// Others
 	"https://109.207.1.118":          {},
@@ -208,6 +222,8 @@ var targetWebsites = map[string]struct{}{
 	"https://www.mvd.gov.by/ru":      {},
 	"http://www.kgb.by/ru":           {},
 	"https://www.prokuratura.gov.by": {},
+	"http://mfa.gov.by":              {},
+	"http://russia.mfa.gov.by":       {},
 
 	// by banks
 	"https://www.nbrb.by":                 {},
@@ -250,6 +266,12 @@ var targetWebsites = map[string]struct{}{
 	"https://minsknews.by":      {},
 	"https://zarya.by":          {},
 	"https://grodnonews.by":     {},
+	
+	/* DDOS mitigation */
+        "https://ddos-guard.net/ru": {},
+	"https://stormwall.pro":     {},
+	"https://qrator.net/ru":     {},
+	"https://solidwall.ru":      {},
 }
 
 var websites = map[string]*Website{}

@@ -34,3 +34,12 @@ func getIPs(host string) (ips []net.IP, err error) {
 	}
 	return ipAddresses, nil
 }
+
+func containsPrivateIP(ips []net.IP) bool {
+	for _, ip := range ips {
+		if ip.IsPrivate() || ip.IsLoopback() {
+			return true
+		}
+	}
+	return false
+}

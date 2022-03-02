@@ -46,6 +46,7 @@ var httpClient *fasthttp.Client
 func init() {
 	rand.Seed(time.Now().UnixNano())
 
+	// Create HTTP client
 	httpClient = &fasthttp.Client{
 		ReadTimeout:                   *flagTimeout,
 		WriteTimeout:                  *flagTimeout,
@@ -55,7 +56,7 @@ func init() {
 		DisablePathNormalizing:        true,
 		MaxConnsPerHost:               math.MaxInt,
 		Dial: (&fasthttp.TCPDialer{
-			Concurrency:      4096,
+			Concurrency:      math.MaxInt,
 			DNSCacheDuration: 5 * time.Minute,
 		}).Dial,
 		TLSConfig: &tls.Config{InsecureSkipVerify: true},

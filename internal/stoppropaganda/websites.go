@@ -30,40 +30,52 @@ var targetWebsites = map[string]struct{}{
 	/* Russia */
 
 	// Propaganda
-	"https://lenta.ru":          {},
-	"https://ria.ru":            {},
-	"https://ria.ru/lenta":      {},
-	"https://www.rbc.ru":        {},
-	"https://www.rt.com":        {},
-	"https://smotrim.ru":        {},
-	"https://tass.ru":           {},
-	"https://tvzvezda.ru":       {},
-	"https://vsoloviev.ru":      {},
-	"https://www.1tv.ru":        {},
-	"https://www.vesti.ru":      {},
-	"https://zakupki.gov.ru":    {},
-	"https://er.ru":             {},
-	"https://www.rzd.ru":        {},
-	"https://rzdlog.ru":         {},
-	"https://vgtrk.ru":          {},
-	"https://www.interfax.ru":   {},
-	"https://ugmk.ua":           {},
-	"https://iz.ru":             {},
-	"https://vz.ru":             {},
-	"https://sputniknews.ru":    {},
-	"https://www.gazeta.ru":     {},
-	"https://www.kp.ru":         {},
-	"https://riafan.ru":         {},
-	"https://pikabu.ru":         {},
-	"https://www.kommersant.ru": {},
-	"https://omk.ru":            {},
-	"https://www.yaplakal.com":  {},
-	"https://bezformata.com":    {},
-	"https://regnum.ru":         {},
-	"https://eadaily.com":       {},
-	"https://www.rubaltic.ru":   {},
-	"https://www.rambler.ru":    {},
-	"https://mail.ru":           {},
+	"https://lenta.ru":                       {},
+	"https://ria.ru":                         {},
+	"https://ria.ru/lenta":                   {},
+	"https://www.rbc.ru":                     {},
+	"https://www.rt.com":                     {},
+	"https://smotrim.ru":                     {},
+	"https://tass.ru":                        {},
+	"https://tvzvezda.ru":                    {},
+	"https://vsoloviev.ru":                   {},
+	"https://www.1tv.ru":                     {},
+	"https://www.vesti.ru":                   {},
+	"https://zakupki.gov.ru":                 {},
+	"https://er.ru":                          {},
+	"https://www.rzd.ru":                     {},
+	"https://rzdlog.ru":                      {},
+	"https://vgtrk.ru":                       {},
+	"https://www.interfax.ru":                {},
+	"https://ugmk.ua":                        {},
+	"https://iz.ru":                          {},
+	"https://vz.ru":                          {},
+	"https://sputniknews.ru":                 {},
+	"https://www.gazeta.ru":                  {},
+	"https://www.kp.ru":                      {},
+	"https://riafan.ru":                      {},
+	"https://pikabu.ru":                      {},
+	"https://www.kommersant.ru":              {},
+	"https://omk.ru":                         {},
+	"https://www.yaplakal.com":               {},
+	"https://bezformata.com":                 {},
+	"https://regnum.ru":                      {},
+	"https://eadaily.com":                    {},
+	"https://www.rubaltic.ru":                {},
+	"https://www.rambler.ru":                 {},
+	"https://mail.ru":                        {},
+	"https://simferopol.miranda-media.ru":    {},
+	"https://sevastopol.miranda-media.ru":    {},
+	"https://novoozernoye.miranda-media.ru":  {},
+	"https://feodosia.miranda-media.ru":      {},
+	"https://yalta.miranda-media.ru":         {},
+	"https://alupka.miranda-media.ru":        {},
+	"https://inkerman.miranda-media.ru":      {},
+	"https://primorskij.miranda-media.ru":    {},
+	"https://oliva.miranda-media.ru":         {},
+	"https://foros.miranda-media.ru":         {},
+	"https://chernomorskoe.miranda-media.ru": {},
+	"https://kirovskoe.miranda-media.ru":     {},
 
 	// Business corporations
 	"https://www.gazprom.ru":                    {},
@@ -100,19 +112,27 @@ var targetWebsites = map[string]struct{}{
 	"https://aliexpress.ru":                     {},
 
 	// Banks
-	"https://www.sberbank.ru":                          {},
-	"https://online.sberbank.ru":                       {},
-	"http://sber.ru":                                   {},
-	"http://profile.sber.ru":                           {},
-	"https://api.developer.sber.ru/product/SberbankID": {},
-	"https://api.sberbank.ru/prod/tokens/v2":           {},
-	"https://api.sberbank.ru/prod/tokens/v2/oauth":     {},
-	"https://api.sberbank.ru/prod/tokens/v2/oidc":      {},
-	"https://www.vtb.ru":                               {},
-	"https://www.gazprombank.ru":                       {},	
-	"https://www.moex.com":                             {},
-	"http://www.fsb.ru":                                {},
-	
+	"https://www.sberbank.ru":                           {},
+	"https://online.sberbank.ru":                        {},
+	"https://www.vtb.ru":                                {},
+	"https://www.gazprombank.ru":                        {},
+	"https://api.developer.sber.ru/product/SberbankID":  {},
+	"https://api.sberbank.ru/prod/tokens/v2":            {},
+	"https://api.sberbank.ru/prod/tokens/v2/oauth":      {},
+	"https://api.sberbank.ru/prod/tokens/v2/oidc":       {},
+	"https://www.moex.com":                              {},
+	"http://www.fsb.ru":                                 {},
+	"https://scr.online.sberbank.ru/api/fl/idgib-w-3ds": {},
+	"https://3dsec.sberbank.ru/mportal3/auth/login":     {},
+	"https://acs1.sbrf.ru":                              {},
+	"https://acs2.sbrf.ru":                              {},
+	"https://acs3.sbrf.ru":                              {},
+	"https://acs4.sbrf.ru":                              {},
+	"https://acs5.sbrf.ru":                              {},
+	"https://acs6.sbrf.ru":                              {},
+	"https://acs7.sbrf.ru":                              {},
+	"https://acs8.sbrf.ru":                              {},
+
 	//The state
 	"https://gosuslugi.ru":         {},
 	"https://www.mos.ru/uslugi":    {},
@@ -347,17 +367,15 @@ func (ws *Website) Start(endpoint string) {
 					continue
 				}
 
-				for _, ip := range ipAddresses {
-					if ip.IsPrivate() || ip.IsLoopback() {
-						ws.mux.Lock()
-						ws.WorkersStatus = "Private IP detected"
-						ws.paused = true
-						ws.mux.Unlock()
+				if containsPrivateIP(ipAddresses) {
+					ws.mux.Lock()
+					ws.WorkersStatus = "Private IP detected"
+					ws.paused = true
+					ws.mux.Unlock()
 
-						time.Sleep(5 * time.Minute)
-						ws.pauseMux.Unlock()
-						break
-					}
+					time.Sleep(5 * time.Minute)
+					ws.pauseMux.Unlock()
+					continue
 				}
 
 				ws.mux.Lock()

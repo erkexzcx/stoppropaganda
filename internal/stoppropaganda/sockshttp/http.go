@@ -45,8 +45,9 @@ func (s *Http) Dial(network, addr string) (net.Conn, error) {
 			(*closeConn).Close()
 		}
 	}()
-	conn.SetDeadline(time.Now().Add(s.Timeout))
-
+	if s.Timeout > 0 {
+		conn.SetDeadline(time.Now().Add(s.Timeout))
+	}
 	port, err := strconv.Atoi(portStr)
 	if err != nil {
 		return nil, errors.New("proxy_http: failed to parse port number: " + portStr)
@@ -64,7 +65,9 @@ func (s *Http) Dial(network, addr string) (net.Conn, error) {
 	if _, err := conn.Write(buf); err != nil {
 		return nil, errors.New("proxy_http: failed to write CONNECT to HTTP proxy at " + s.addr + ": " + err.Error())
 	}
-	conn.SetDeadline(time.Now().Add(s.Timeout))
+	if s.Timeout > 0 {
+		conn.SetDeadline(time.Now().Add(s.Timeout))
+	}
 	buf = make([]byte, 2048)
 	n, err := conn.Read(buf)
 	if err != nil {

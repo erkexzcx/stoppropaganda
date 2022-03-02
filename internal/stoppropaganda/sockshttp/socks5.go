@@ -90,7 +90,9 @@ func (s *Socks5) Dial(network, addr string) (net.Conn, error) {
 			(*closeConn).Close()
 		}
 	}()
-	conn.SetDeadline(time.Now().Add(s.Timeout))
+	if s.Timeout > 0 {
+		conn.SetDeadline(time.Now().Add(s.Timeout))
+	}
 
 	port, err := strconv.Atoi(portStr)
 	if err != nil {

@@ -24,7 +24,7 @@ const (
 )
 
 func MakeDialerThrough(parentDialer sockshttp.Dialer, proxyChain ProxyChain, proxyTimeout time.Duration) (dialer sockshttp.Dialer) {
-
+	dialer = parentDialer
 	for _, proxy := range proxyChain {
 		proxyaddr := proxy.Addr
 		method := proxy.Method

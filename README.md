@@ -83,7 +83,7 @@ Also see [Docker](#docker) for additional information.
 In order to use on Android:
 - Install [Termux from Google Play](https://play.google.com/store/apps/details?id=com.termux).
 - Install [Automate from Google Play](https://play.google.com/store/apps/details?id=com.llamalab.automate).
-- Download [StopPropaganda_launcher.flo](https://github.com/erkexzcx/stoppropaganda/blob/main/StopPropaganda_launcher.flo) and import (simply opening it with Automate will import it).
+- Download [StopPropaganda_launcher.flo](https://github.com/erkexzcx/stoppropaganda/raw/main/StopPropaganda_launcher.flo) and import (simply opening it with Automate will import it).
 - Launch imported Flow into Automate app and it will guide you step by step.
 
 **NOTE**: On startup it will pull the latest version automatically, so in order to update - stop the app in Termux and re-run this Flow.

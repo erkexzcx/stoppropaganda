@@ -12,11 +12,21 @@ Some foreign media and even countries (e.g. Belarus) publicly support Russian ag
 
 **DISCLAIMER**: (D)DOS'ing is **illegal**! Usage of this tool is intended for educational purposes only.
 
+- [Usage](#usage)
+  * [Docker](#docker)
+  * [docker-compose](#docker-compose)
+  * [Kubernetes](#kubernetes)
+  * [Android](#android)
+  * [Binaries](#binaries)
+- [Building from source](#building-from-source)
+- [Recommendations](#recommendations)
+- [Inspiration](#inspiration)
+
 # Usage
 
 ## Docker
 
-Easiest way is to use Docker:
+Usage:
 ```bash
 # Download latest docker image
 docker pull erikmnkl/stoppropaganda
@@ -67,6 +77,16 @@ kubectl apply -f stoppropaganda.yaml
 **NOTE**: edit `stoppropaganda.yaml` with required number of replicas.
 
 Also see [Docker](#docker) for additional information.
+
+## Android
+
+In order to use on Android:
+- Install [Termux from Google Play](https://play.google.com/store/apps/details?id=com.termux).
+- Install [Automate from Google Play](https://play.google.com/store/apps/details?id=com.llamalab.automate).
+- Download [StopPropaganda_launcher.flo](https://github.com/erkexzcx/stoppropaganda/blob/main/StopPropaganda_launcher.flo) and import (simply opening it with Automate will import it).
+- Launch imported Flow into Automate app and it will guide you step by step.
+
+**NOTE**: On startup it will pull the latest version automatically, so in order to update - stop the app in Termux and re-run this Flow.
 
 ## Binaries
 

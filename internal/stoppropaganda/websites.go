@@ -87,6 +87,8 @@ var targetWebsites = map[string]struct{}{
 	"https://www.avito.ru":                      {},
 	"https://www.dns-shop.ru":                   {},
 	"https://aliexpress.ru":                     {},
+	"https://ok.ru":                             {},
+	"https://vk.com":                            {},
 
 	// Banks
 	"https://www.sberbank.ru":                          {},

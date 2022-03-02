@@ -4,13 +4,14 @@ import (
 	"crypto/tls"
 	"flag"
 	"log"
+	"math"
 	"math/rand"
-	"net/http"
 	"os"
 	"sync"
 	"time"
 
 	"github.com/peterbourgon/ff/v3"
+	"github.com/valyala/fasthttp"
 )
 
 var fs = flag.NewFlagSet("stoppropaganda", flag.ExitOnError)
@@ -36,28 +37,27 @@ func Start() {
 		websites[link].Start(link)
 	}
 
-	http.HandleFunc("/status", status)
-
 	log.Println("Started!")
-	panic(http.ListenAndServe(*flagBind, nil))
+	panic(fasthttp.ListenAndServe(*flagBind, fasthttpRequestHandler))
 }
 
-var httpClient http.Client
+var httpClient *fasthttp.Client
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
 
-	fIgnoreRedirects := func(req *http.Request, via []*http.Request) error {
-		return http.ErrUseLastResponse
-	}
-	tr := &http.Transport{
-		DisableCompression: true,                                  // Disable automatic decompression
-		TLSClientConfig:    &tls.Config{InsecureSkipVerify: true}, // Disable TLS verification
-		Proxy:              http.ProxyFromEnvironment,             // Enable proxy functionality
-	}
-	httpClient = http.Client{
-		Timeout:       *flagTimeout,     // Enable timeout
-		CheckRedirect: fIgnoreRedirects, // Disable auto redirects
-		Transport:     tr,
+	httpClient = &fasthttp.Client{
+		ReadTimeout:                   *flagTimeout,
+		WriteTimeout:                  *flagTimeout,
+		MaxIdleConnDuration:           time.Hour,
+		NoDefaultUserAgentHeader:      true,
+		DisableHeaderNamesNormalizing: true,
+		DisablePathNormalizing:        true,
+		MaxConnsPerHost:               math.MaxInt,
+		Dial: (&fasthttp.TCPDialer{
+			Concurrency:      4096,
+			DNSCacheDuration: 5 * time.Minute,
+		}).Dial,
+		TLSConfig: &tls.Config{InsecureSkipVerify: true},
 	}
 }

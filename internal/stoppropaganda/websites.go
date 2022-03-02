@@ -102,15 +102,17 @@ var targetWebsites = map[string]struct{}{
 	// Banks
 	"https://www.sberbank.ru":                          {},
 	"https://online.sberbank.ru":                       {},
-	"https://www.vtb.ru":                               {},
-	"https://www.gazprombank.ru":                       {},
+	"http://sber.ru":                                   {},
+	"http://profile.sber.ru":                           {},
 	"https://api.developer.sber.ru/product/SberbankID": {},
 	"https://api.sberbank.ru/prod/tokens/v2":           {},
 	"https://api.sberbank.ru/prod/tokens/v2/oauth":     {},
 	"https://api.sberbank.ru/prod/tokens/v2/oidc":      {},
+	"https://www.vtb.ru":                               {},
+	"https://www.gazprombank.ru":                       {},	
 	"https://www.moex.com":                             {},
 	"http://www.fsb.ru":                                {},
-
+	
 	//The state
 	"https://gosuslugi.ru":         {},
 	"https://www.mos.ru/uslugi":    {},

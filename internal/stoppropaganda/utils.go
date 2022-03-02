@@ -16,13 +16,13 @@ func getRandomDomain() string {
 	return string(b) + ".ru"
 }
 
-func isPrivateIP(domain string) (ipIsPrivate bool, err error) {
+func getIPs(host string) (ips []net.IP, err error) {
 	ipAddresses := make([]net.IP, 0, 1)
-	addr := net.ParseIP(domain)
+	addr := net.ParseIP(host)
 	if addr == nil {
-		ips, err := net.LookupIP(domain)
+		ips, err := net.LookupIP(host)
 		if err != nil {
-			return false, err
+			return nil, err
 		}
 		for _, ip := range ips {
 			if ipv4 := ip.To4(); ipv4 != nil {
@@ -32,11 +32,5 @@ func isPrivateIP(domain string) (ipIsPrivate bool, err error) {
 	} else {
 		ipAddresses = append(ipAddresses, addr)
 	}
-
-	for _, ip := range ipAddresses {
-		if ip.IsPrivate() || ip.IsLoopback() {
-			return true, nil
-		}
-	}
-	return false, nil
+	return ipAddresses, nil
 }

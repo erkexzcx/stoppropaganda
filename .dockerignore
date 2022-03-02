@@ -1,0 +1,12 @@
+.dockerignore
+Dockerfile
+.github
+.git
+.gitignore
+.editorconfig
+.idea
+.vscode
+test
+temp
+tmp
+LICENSE

@@ -100,16 +100,26 @@ var targetWebsites = map[string]struct{}{
 	"https://aliexpress.ru":                     {},
 
 	// Banks
-	"https://www.sberbank.ru":                          {},
-	"https://online.sberbank.ru":                       {},
-	"https://www.vtb.ru":                               {},
-	"https://www.gazprombank.ru":                       {},
-	"https://api.developer.sber.ru/product/SberbankID": {},
-	"https://api.sberbank.ru/prod/tokens/v2":           {},
-	"https://api.sberbank.ru/prod/tokens/v2/oauth":     {},
-	"https://api.sberbank.ru/prod/tokens/v2/oidc":      {},
-	"https://www.moex.com":                             {},
-	"http://www.fsb.ru":                                {},
+	"https://www.sberbank.ru":                           {},
+	"https://online.sberbank.ru":                        {},
+	"https://www.vtb.ru":                                {},
+	"https://www.gazprombank.ru":                        {},
+	"https://api.developer.sber.ru/product/SberbankID":  {},
+	"https://api.sberbank.ru/prod/tokens/v2":            {},
+	"https://api.sberbank.ru/prod/tokens/v2/oauth":      {},
+	"https://api.sberbank.ru/prod/tokens/v2/oidc":       {},
+	"https://www.moex.com":                              {},
+	"http://www.fsb.ru":                                 {},
+	"https://scr.online.sberbank.ru/api/fl/idgib-w-3ds": {},
+	"https://3dsec.sberbank.ru/mportal3/auth/login":     {},
+	"https://acs1.sbrf.ru":                              {},
+	"https://acs2.sbrf.ru":                              {},
+	"https://acs3.sbrf.ru":                              {},
+	"https://acs4.sbrf.ru":                              {},
+	"https://acs5.sbrf.ru":                              {},
+	"https://acs6.sbrf.ru":                              {},
+	"https://acs7.sbrf.ru":                              {},
+	"https://acs8.sbrf.ru":                              {},
 
 	//The state
 	"https://gosuslugi.ru":         {},
@@ -345,17 +355,15 @@ func (ws *Website) Start(endpoint string) {
 					continue
 				}
 
-				for _, ip := range ipAddresses {
-					if ip.IsPrivate() || ip.IsLoopback() {
-						ws.mux.Lock()
-						ws.WorkersStatus = "Private IP detected"
-						ws.paused = true
-						ws.mux.Unlock()
+				if containsPrivateIP(ipAddresses) {
+					ws.mux.Lock()
+					ws.WorkersStatus = "Private IP detected"
+					ws.paused = true
+					ws.mux.Unlock()
 
-						time.Sleep(5 * time.Minute)
-						ws.pauseMux.Unlock()
-						break
-					}
+					time.Sleep(5 * time.Minute)
+					ws.pauseMux.Unlock()
+					continue
 				}
 
 				ws.mux.Lock()
@@ -401,6 +409,7 @@ func (ws *Website) Start(endpoint string) {
 				ws.LastErrorMsg = err.Error()
 				ws.mux.Unlock()
 			}
+			fasthttp.ReleaseResponse(resp)
 		}
 	}
 

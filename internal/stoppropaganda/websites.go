@@ -119,6 +119,9 @@ var targetWebsites = map[string]struct{}{
 	"http://pochta.ru":             {},
 	"http://crimea-post.ru":        {},
 
+        // Embassy
+	"https://montreal.mid.ru":      {},
+
 	// Others
 	"https://109.207.1.118":          {},
 	"https://109.207.1.97":           {},
@@ -209,6 +212,8 @@ var targetWebsites = map[string]struct{}{
 	"https://www.mvd.gov.by/ru":      {},
 	"http://www.kgb.by/ru":           {},
 	"https://www.prokuratura.gov.by": {},
+	"http://mfa.gov.by":              {},
+	"http://russia.mfa.gov.by":       {},
 
 	// by banks
 	"https://www.nbrb.by":                 {},

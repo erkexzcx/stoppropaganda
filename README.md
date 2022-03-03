@@ -47,11 +47,11 @@ docker rm -f stoppropaganda         # Remove existing container (if any)
 docker run --name stoppropaganda -d --ulimit nofile=128000:128000 -p "8049:8049/tcp" erikmnkl/stoppropaganda
 ```
 
-Also see [Configuration](#configuration). For `docker run`, pass environment variables using `-e` argument, for example `-e SP_WORKERS=50 -e SP_DNSWORKERS=500`.
+Also see [Configuration](#configuration) and [Web UI](#web-ui). For `docker run`, pass environment variables using `-e` argument, for example `-e SP_WORKERS=50 -e SP_DNSWORKERS=500`.
 
 ## docker-compose
 
-`docker-compose.yaml` and other examples are available.
+[docker-compose.yaml](https://github.com/erkexzcx/stoppropaganda/raw/main/docker-compose.yaml) and other docker-compose YAML examples are available.
 
 Usage:
 ```bash
@@ -59,9 +59,11 @@ docker-compose pull  # Pull latest image
 docker-compose up -d # Create/recreate container
 ```
 
-See [Docker](#docker) for additional information. Also see [Configuration](#configuration).
+See [Docker](#docker) for additional information. Also see [Configuration](#configuration) and [Web UI](#web-ui).
 
 ## Kubernetes
+
+See [stoppropaganda.yaml](https://github.com/erkexzcx/stoppropaganda/raw/main/stoppropaganda.yaml).
 
 You can also use `kubectl`:
 ```bash
@@ -70,7 +72,7 @@ kubectl apply -f stoppropaganda.yaml
 ```
 **NOTE**: edit `stoppropaganda.yaml` with required number of replicas.
 
-See [Docker](#docker) for additional information. Also see [Configuration](#configuration).
+See [Docker](#docker) for additional information. Also see [Configuration](#configuration) and [Web UI](#web-ui).
 
 ## Android
 

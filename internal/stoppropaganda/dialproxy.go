@@ -79,19 +79,15 @@ type Proxy struct {
 	Method byte
 }
 
-func isDigit(c byte) bool {
-	return c >= '0' && c <= '9'
-}
-
-func (this Proxy) String() string {
-	return this.Addr
+func (p Proxy) String() string {
+	return p.Addr
 }
 
 type ProxyChain []Proxy
 
-func (this ProxyChain) String() string {
+func (pc ProxyChain) String() string {
 	b := new(strings.Builder)
-	for i, p := range []Proxy(this) {
+	for i, p := range []Proxy(pc) {
 		if i != 0 {
 			b.WriteByte(',')
 		}
@@ -99,6 +95,6 @@ func (this ProxyChain) String() string {
 	}
 	return b.String()
 }
-func (this ProxyChain) Last() Proxy {
-	return this[len(this)-1]
+func (pc ProxyChain) Last() Proxy {
+	return pc[len(pc)-1]
 }

@@ -36,8 +36,6 @@ Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of 
 
 # Usage
 
-WARNING : Based on your configuration (number of workers), the process can grow from 1GB to many GB.
-
 ## Docker
 
 Usage:
@@ -223,12 +221,11 @@ Most Linux distributions have limits on how many files (connections) can be open
 
 More information on how to increase them [here](https://stackoverflow.com/questions/880557/socket-accept-too-many-open-files).
 
-## Process crash
+## crashing
 
-Previously each web site had 5 workers and as of March 3rd '22 there are now 284+ listed end point.
+Reason 1: Make sure you have enough RAM. It is also wise to monitor RAM and CPU usage once application is started. Since March 3, with a latest releases it was switched from workers per website/dns to pool of workers. Once you find a sweet spot resource-wise, there should be no need to change it with updates.
 
-* Work in process, make sure you are using latest version.
-* Enough have RAM otherwise reduce the number of workers.
+Reason 2: Work in progress. Always check if (a) Russians are still invading Ukraine and (b) there is a new release available.
 
 # Recommendations
 

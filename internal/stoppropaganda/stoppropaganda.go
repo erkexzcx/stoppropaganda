@@ -83,7 +83,7 @@ func makeDialFunc() fasthttp.DialFunc {
 	}
 
 	myResolver := &customfasthttp.CustomResolver{}
-	dial := (&customfasthttp.TCPDialer{
+	dial := (&customfasthttp.CustomTCPDialer{
 		DialTicketsC:     newConnTicketC,
 		Concurrency:      0,
 		DNSCacheDuration: 5 * time.Minute,

@@ -13,124 +13,8 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-// Dial dials the given TCP addr using tcp4.
-//
-// This function has the following additional features comparing to net.Dial:
-//
-//   * It reduces load on DNS resolver by caching resolved TCP addressed
-//     for DNSCacheDuration.
-//   * It dials all the resolved TCP addresses in round-robin manner until
-//     connection is established. This may be useful if certain addresses
-//     are temporarily unreachable.
-//   * It returns ErrDialTimeout if connection cannot be established during
-//     DefaultDialTimeout seconds. Use DialTimeout for customizing dial timeout.
-//
-// This dialer is intended for custom code wrapping before passing
-// to Client.Dial or HostClient.Dial.
-//
-// For instance, per-host counters and/or limits may be implemented
-// by such wrappers.
-//
-// The addr passed to the function must contain port. Example addr values:
-//
-//     * foobar.baz:443
-//     * foo.bar:80
-//     * aaa.com:8080
-//
-// Modified by stoppropaganda contributors only where it's marked:
-// // stoppropaganda start
-// ...
-// // stoppropaganda end
-
-func Dial(addr string) (net.Conn, error) {
-	return defaultDialer.Dial(addr)
-}
-
-// DialTimeout dials the given TCP addr using tcp4 using the given timeout.
-//
-// This function has the following additional features comparing to net.Dial:
-//
-//   * It reduces load on DNS resolver by caching resolved TCP addressed
-//     for DNSCacheDuration.
-//   * It dials all the resolved TCP addresses in round-robin manner until
-//     connection is established. This may be useful if certain addresses
-//     are temporarily unreachable.
-//
-// This dialer is intended for custom code wrapping before passing
-// to Client.Dial or HostClient.Dial.
-//
-// For instance, per-host counters and/or limits may be implemented
-// by such wrappers.
-//
-// The addr passed to the function must contain port. Example addr values:
-//
-//     * foobar.baz:443
-//     * foo.bar:80
-//     * aaa.com:8080
-func DialTimeout(addr string, timeout time.Duration) (net.Conn, error) {
-	return defaultDialer.DialTimeout(addr, timeout)
-}
-
-// DialDualStack dials the given TCP addr using both tcp4 and tcp6.
-//
-// This function has the following additional features comparing to net.Dial:
-//
-//   * It reduces load on DNS resolver by caching resolved TCP addressed
-//     for DNSCacheDuration.
-//   * It dials all the resolved TCP addresses in round-robin manner until
-//     connection is established. This may be useful if certain addresses
-//     are temporarily unreachable.
-//   * It returns ErrDialTimeout if connection cannot be established during
-//     DefaultDialTimeout seconds. Use DialDualStackTimeout for custom dial
-//     timeout.
-//
-// This dialer is intended for custom code wrapping before passing
-// to Client.Dial or HostClient.Dial.
-//
-// For instance, per-host counters and/or limits may be implemented
-// by such wrappers.
-//
-// The addr passed to the function must contain port. Example addr values:
-//
-//     * foobar.baz:443
-//     * foo.bar:80
-//     * aaa.com:8080
-func DialDualStack(addr string) (net.Conn, error) {
-	return defaultDialer.DialDualStack(addr)
-}
-
-// DialDualStackTimeout dials the given TCP addr using both tcp4 and tcp6
-// using the given timeout.
-//
-// This function has the following additional features comparing to net.Dial:
-//
-//   * It reduces load on DNS resolver by caching resolved TCP addressed
-//     for DNSCacheDuration.
-//   * It dials all the resolved TCP addresses in round-robin manner until
-//     connection is established. This may be useful if certain addresses
-//     are temporarily unreachable.
-//
-// This dialer is intended for custom code wrapping before passing
-// to Client.Dial or HostClient.Dial.
-//
-// For instance, per-host counters and/or limits may be implemented
-// by such wrappers.
-//
-// The addr passed to the function must contain port. Example addr values:
-//
-//     * foobar.baz:443
-//     * foo.bar:80
-//     * aaa.com:8080
-func DialDualStackTimeout(addr string, timeout time.Duration) (net.Conn, error) {
-	return defaultDialer.DialDualStackTimeout(addr, timeout)
-}
-
-var (
-	defaultDialer = &TCPDialer{Concurrency: 1000}
-)
-
 // TCPDialer contains options to control a group of Dial calls.
-type TCPDialer struct {
+type CustomTCPDialer struct {
 	// Concurrency controls the maximum number of concurrent Dials
 	// that can be performed using this object.
 	// Setting this to 0 means unlimited.
@@ -200,7 +84,7 @@ type TCPDialer struct {
 //     * foobar.baz:443
 //     * foo.bar:80
 //     * aaa.com:8080
-func (d *TCPDialer) Dial(addr string) (net.Conn, error) {
+func (d *CustomTCPDialer) Dial(addr string) (net.Conn, error) {
 	return d.dial(addr, false, DefaultDialTimeout)
 }
 
@@ -225,7 +109,7 @@ func (d *TCPDialer) Dial(addr string) (net.Conn, error) {
 //     * foobar.baz:443
 //     * foo.bar:80
 //     * aaa.com:8080
-func (d *TCPDialer) DialTimeout(addr string, timeout time.Duration) (net.Conn, error) {
+func (d *CustomTCPDialer) DialTimeout(addr string, timeout time.Duration) (net.Conn, error) {
 	return d.dial(addr, false, timeout)
 }
 
@@ -253,7 +137,7 @@ func (d *TCPDialer) DialTimeout(addr string, timeout time.Duration) (net.Conn, e
 //     * foobar.baz:443
 //     * foo.bar:80
 //     * aaa.com:8080
-func (d *TCPDialer) DialDualStack(addr string) (net.Conn, error) {
+func (d *CustomTCPDialer) DialDualStack(addr string) (net.Conn, error) {
 	return d.dial(addr, true, DefaultDialTimeout)
 }
 
@@ -279,11 +163,11 @@ func (d *TCPDialer) DialDualStack(addr string) (net.Conn, error) {
 //     * foobar.baz:443
 //     * foo.bar:80
 //     * aaa.com:8080
-func (d *TCPDialer) DialDualStackTimeout(addr string, timeout time.Duration) (net.Conn, error) {
+func (d *CustomTCPDialer) DialDualStackTimeout(addr string, timeout time.Duration) (net.Conn, error) {
 	return d.dial(addr, true, timeout)
 }
 
-func (d *TCPDialer) dial(addr string, dualStack bool, timeout time.Duration) (net.Conn, error) {
+func (d *CustomTCPDialer) dial(addr string, dualStack bool, timeout time.Duration) (net.Conn, error) {
 	ticketC := d.DialTicketsC
 	if ticketC != nil {
 		select {
@@ -330,7 +214,7 @@ func (d *TCPDialer) dial(addr string, dualStack bool, timeout time.Duration) (ne
 	return nil, err
 }
 
-func (d *TCPDialer) tryDial(network string, addr *net.TCPAddr, deadline time.Time, concurrencyCh chan struct{}) (net.Conn, error) {
+func (d *CustomTCPDialer) tryDial(network string, addr *net.TCPAddr, deadline time.Time, concurrencyCh chan struct{}) (net.Conn, error) {
 	timeout := -time.Since(deadline)
 	if timeout <= 0 {
 		return nil, ErrDialTimeout
@@ -389,7 +273,7 @@ type tcpAddrEntry struct {
 // by Dial* functions.
 const DefaultDNSCacheDuration = time.Minute
 
-func (d *TCPDialer) tcpAddrsClean() {
+func (d *CustomTCPDialer) tcpAddrsClean() {
 	expireDuration := 2 * d.DNSCacheDuration
 	for {
 		time.Sleep(time.Second)
@@ -404,7 +288,7 @@ func (d *TCPDialer) tcpAddrsClean() {
 	}
 }
 
-func (d *TCPDialer) getTCPAddrs(addr string, dualStack bool) ([]net.TCPAddr, uint32, error) {
+func (d *CustomTCPDialer) getTCPAddrs(addr string, dualStack bool) ([]net.TCPAddr, uint32, error) {
 	item, exist := d.tcpAddrsMap.Load(addr)
 	e, ok := item.(*tcpAddrEntry)
 	if exist && ok && e != nil && time.Since(e.resolveTime) > d.DNSCacheDuration {

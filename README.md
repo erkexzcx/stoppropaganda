@@ -92,7 +92,7 @@ More advanced users might want to edit Automate flow themselves to further custo
 
 Download binary from [releases](https://github.com/erkexzcx/stoppropaganda/releases/).
 
-Additional steps needed for Linux prior usage;
+Additional steps needed for Linux prior usage:
 ```bash
 # Make downloaded binary executable
 chmod +x stoppropaganda_v0.0.1_linux_x86_64

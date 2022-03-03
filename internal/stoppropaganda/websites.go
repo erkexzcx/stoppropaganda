@@ -346,8 +346,8 @@ type Website struct {
 
 	host string
 
-	mux            *sync.Mutex
-	pauseMux       *sync.Mutex
+	mux            sync.Mutex
+	pauseMux       sync.Mutex
 	paused         bool
 	dnsLastChecked time.Time
 
@@ -375,8 +375,6 @@ func startWebsites() {
 		websites[website] = &Website{
 			host:           websiteURL.Host,
 			Status:         "Initializing",
-			mux:            &sync.Mutex{},
-			pauseMux:       &sync.Mutex{},
 			paused:         false,
 			dnsLastChecked: time.Now().Add(-1 * VALIDATE_DNS_EVERY), // this forces to validate on first run
 			req:            newReq,

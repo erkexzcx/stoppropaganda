@@ -19,15 +19,13 @@ type StatusStruct struct {
 	DNS      map[string]*DNSServer `json:"DNS"`
 	Websites map[string]*Website   `json:"Websites"`
 
-	mux *sync.Mutex
+	mux sync.Mutex
 }
 
 func fasthttpStatusResponseHandler(ctx *fasthttp.RequestCtx) {
 	statusStruct := StatusStruct{
 		DNS:      make(map[string]*DNSServer, len(dnsServers)),
 		Websites: make(map[string]*Website, len(websites)),
-
-		mux: &sync.Mutex{},
 	}
 
 	wg := sync.WaitGroup{}

@@ -201,8 +201,8 @@ cd stoppropaganda
 
 Now you have 2 options to run this application:
 ```bash
-# (Linux only) Increase open files limit for current terminal session
-ulimit -n 128000
+# Increase open files limit for current terminal session to a maximum allowed by a kernel
+ulimit -n unlimited
 
 # Run without compiling to binary
 go run cmd/stoppropaganda/main.go --help

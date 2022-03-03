@@ -35,8 +35,6 @@ Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of 
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
-
 # Usage
 
 ## Docker

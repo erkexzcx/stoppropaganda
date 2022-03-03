@@ -144,6 +144,12 @@ type TCPDialer struct {
 	// Changes made after the first Dial will not affect anything.
 	Concurrency int
 
+	// Dial tickets controls how fast we can spam TCP SYN
+	// For every net.Dial made we take a ticket
+	// from the channel. If there was no ticket,
+	// Dial just returns an error.
+	DialTicketsC chan bool
+
 	// LocalAddr is the local address to use when dialing an
 	// address.
 	// If nil, a local address is automatically chosen.
@@ -283,6 +289,14 @@ func (d *TCPDialer) DialDualStackTimeout(addr string, timeout time.Duration) (ne
 }
 
 func (d *TCPDialer) dial(addr string, dualStack bool, timeout time.Duration) (net.Conn, error) {
+	ticketC := d.DialTicketsC
+	if ticketC != nil {
+		select {
+		case <-ticketC:
+		case <-time.After(1 * time.Second):
+			return nil, errors.New("too fast TCP SYN (dial spam)")
+		}
+	}
 	d.once.Do(func() {
 		if d.Concurrency > 0 {
 			d.concurrencyCh = make(chan struct{}, d.Concurrency)

@@ -25,6 +25,7 @@ var (
 	flagDNSWorkers = fs.Int("dnsworkers", 100, "DOS each DNS server with this amount of workers")
 	flagDNSTimeout = fs.Duration("dnstimeout", time.Second, "timeout of DNS request")
 	flagUserAgent  = fs.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
+	dialsPerSecond = fs.Int("dialspersecond", 2500, "maximum amount of TCP SYN packets sent per second from fasthttp")
 )
 
 func Start() {
@@ -39,6 +40,7 @@ func Start() {
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
+	go tcpSynDialTicketsRoutine()
 
 	// Create DNS client and dialer
 	dnsClient = new(dns.Client)
@@ -81,6 +83,7 @@ func makeDialFunc() fasthttp.DialFunc {
 
 	myResolver := &customresolver.CustomResolver{}
 	dial := (&TCPDialer{
+		DialTicketsC:     newConnTicketC,
 		Concurrency:      0,
 		DNSCacheDuration: 5 * time.Minute,
 
@@ -89,4 +92,15 @@ func makeDialFunc() fasthttp.DialFunc {
 		Resolver:     myResolver,
 	}).Dial
 	return dial
+}
+
+var newConnTicketC = make(chan bool, 100)
+
+func tcpSynDialTicketsRoutine() {
+	perSecond := *dialsPerSecond
+	interval := time.Second / time.Duration(perSecond)
+	for {
+		newConnTicketC <- true
+		time.Sleep(interval)
+	}
 }

@@ -514,7 +514,7 @@ func getIPs(host string) (ips []net.IP, err error) {
 
 func containsPrivateIP(ips []net.IP) bool {
 	for _, ip := range ips {
-		if ip.IsPrivate() || ip.IsLoopback() {
+		if ip.IsPrivate() || ip.IsLoopback() || ip.IsUnspecified() {
 			return true
 		}
 	}

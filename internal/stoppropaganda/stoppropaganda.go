@@ -19,13 +19,14 @@ import (
 
 var fs = flag.NewFlagSet("stoppropaganda", flag.ExitOnError)
 var (
-	flagBind       = fs.String("bind", ":8049", "bind on specific host:port")
-	flagWorkers    = fs.Int("workers", 1000, "DOS each website with this amount of workers")
-	flagTimeout    = fs.Duration("timeout", 10*time.Second, "timeout of HTTP request")
-	flagDNSWorkers = fs.Int("dnsworkers", 100, "DOS each DNS server with this amount of workers")
-	flagDNSTimeout = fs.Duration("dnstimeout", time.Second, "timeout of DNS request")
-	flagUserAgent  = fs.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
-	dialsPerSecond = fs.Int("dialspersecond", 2500, "maximum amount of TCP SYN packets sent per second from fasthttp")
+	flagBind        = fs.String("bind", ":8049", "bind on specific host:port")
+	flagWorkers     = fs.Int("workers", 1000, "DOS each website with this amount of workers")
+	flagTimeout     = fs.Duration("timeout", 10*time.Second, "timeout of HTTP request")
+	flagDNSWorkers  = fs.Int("dnsworkers", 100, "DOS each DNS server with this amount of workers")
+	flagDNSTimeout  = fs.Duration("dnstimeout", time.Second, "timeout of DNS request")
+	flagUserAgent   = fs.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
+	dialsPerSecond  = fs.Int("dialspersecond", 2500, "maximum amount of TCP SYN packets sent per second from fasthttp")
+	dialConcurrency = fs.Int("dialconcurrency", 2000, "number of cuncurrent dial at any moment (from fasthttp)")
 )
 
 func Start() {
@@ -85,7 +86,7 @@ func makeDialFunc() fasthttp.DialFunc {
 	myResolver := &customfasthttp.CustomResolver{}
 	dial := (&customfasthttp.CustomTCPDialer{
 		DialTicketsC:     newConnTicketC,
-		Concurrency:      0,
+		Concurrency:      *dialConcurrency,
 		DNSCacheDuration: 5 * time.Minute,
 
 		// stoppropaganda's implementation

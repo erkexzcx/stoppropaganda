@@ -36,6 +36,8 @@ Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of 
 
 # Usage
 
+WARNING : Based on your configuration (number of workers), the process can grow from 1GB to many GB.
+
 ## Docker
 
 Usage:
@@ -220,6 +222,13 @@ You can also build for other architectures/platforms as well, see `build.sh` fil
 Most Linux distributions have limits on how many files (connections) can be opened to prevents things like [fork bomb](https://en.wikipedia.org/wiki/Fork_bomb).
 
 More information on how to increase them [here](https://stackoverflow.com/questions/880557/socket-accept-too-many-open-files).
+
+## Process crash
+
+Previously each web site had 5 workers and as of March 3rd '22 there are now 284+ listed end point.
+
+* Work in process, make sure you are using latest version.
+* Enough have RAM otherwise reduce the number of workers.
 
 # Recommendations
 

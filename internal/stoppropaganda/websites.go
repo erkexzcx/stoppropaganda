@@ -398,10 +398,11 @@ func startWebsites() {
 func runWebsiteWorker(c chan *Website) {
 	// Each worker has it's own response
 	resp := fasthttp.AcquireResponse()
+	var req *fasthttp.Request
 
 	for {
 		website := <-c
-		req := website.req // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
+		website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
 
 		website.pauseMux.Lock()
 		if time.Since(website.dnsLastChecked) >= VALIDATE_DNS_EVERY {

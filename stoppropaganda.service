@@ -1,0 +1,15 @@
+[Unit]
+Description=Stoppropaganda service
+After=network-online.target
+
+[Service]
+LimitAS=infinity
+LimitRSS=infinity
+LimitCORE=infinity
+LimitNOFILE=128000
+ExecStart=/path/to/binary --workers 10000 --dnsworkers 50000
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

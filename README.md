@@ -18,9 +18,21 @@ Some foreign media and even countries (e.g. Belarus) publicly support Russian ag
   * [Kubernetes](#kubernetes)
   * [Android](#android)
   * [Binaries](#binaries)
+- [Configuration](#configuration)
+  * [bind](#bind)
+  * [workers](#workers)
+  * [timeout](#timeout)
+  * [useragent](#useragent)
+  * [dnsworkers](#dnsworkers)
+  * [dnstimeout](#dnstimeout)
+- [Web UI](#web-ui)
 - [Building from source](#building-from-source)
+- [Troubleshooting](#troubleshooting)
+  * [too many open files](#too-many-open-files)
 - [Recommendations](#recommendations)
 - [Inspiration](#inspiration)
+
+<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
 # Usage
 
@@ -28,29 +40,14 @@ Some foreign media and even countries (e.g. Belarus) publicly support Russian ag
 
 Usage:
 ```bash
-# Download latest docker image
-docker pull erikmnkl/stoppropaganda
+docker pull erikmnkl/stoppropaganda # Download latest docker image
+docker rm -f stoppropaganda         # Remove existing container (if any)
 
-# If exists, remove running container
-docker rm -f stoppropaganda
-
-# Create new container
+# Run container
 docker run --name stoppropaganda -d --ulimit nofile=128000:128000 -p "8049:8049/tcp" erikmnkl/stoppropaganda
 ```
 
-Use environment variables to change settings (for example `--env SP_WORKERS=50 SP_DNSWORKERS=500`) to change configuration. Available environment variables (and their defaults):
-```
-SP_WORKERS="20"
-SP_TIMEOUT="10s"
-SP_DNSWORKERS="100"
-SP_DNSTIMEOUT="125ms"
-SP_USERAGENT="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
-```
-
-**NOTE**: `SP_WORKERS` means workers per website, not in total. Same with `SP_DNSWORKERS`. For example, 5 websites * 20 workers = 100 workers in total.
-
-Then you can see status in this URL: `http://<ip>:8049/status`  
-or without browser (Linux only): `curl http://<ip>:8049/status | less`
+Also see [Configuration](#configuration). For `docker run`, pass environment variables using `-e` argument, for example `-e SP_WORKERS=50 -e SP_DNSWORKERS=500`.
 
 ## docker-compose
 
@@ -58,14 +55,11 @@ or without browser (Linux only): `curl http://<ip>:8049/status | less`
 
 Usage:
 ```bash
-# Pull latest image
-docker-compose pull
-
-# Create/recreate container
-docker-compose up -d
+docker-compose pull  # Pull latest image
+docker-compose up -d # Create/recreate container
 ```
 
-Also see [Docker](#docker) for additional information.
+See [Docker](#docker) for additional information. Also see [Configuration](#configuration).
 
 ## Kubernetes
 
@@ -76,7 +70,7 @@ kubectl apply -f stoppropaganda.yaml
 ```
 **NOTE**: edit `stoppropaganda.yaml` with required number of replicas.
 
-Also see [Docker](#docker) for additional information.
+See [Docker](#docker) for additional information. Also see [Configuration](#configuration).
 
 ## Android
 
@@ -90,51 +84,101 @@ In order to use on Android:
 
 **NOTE 2**: DNS resolution does not work in Termux, therefore it's impossible to DOS websites. Only DNS DOS is working.
 
+More advanced users might want to edit Automate flow themselves to further customize configuration. See [Configuration](#configuration) and [Usage](#usage).
+
 ## Binaries
 
 Download binary from [releases](https://github.com/erkexzcx/stoppropaganda/releases/).
 
-Use from terminal:
-
+Additional steps needed for Linux prior usage;
 ```bash
-# (Linux only) make the binary executable
+# Make downloaded binary executable
 chmod +x stoppropaganda_v0.0.1_linux_x86_64
 
-# (Linux only) Increase open files limit for current terminal session
+# Increase open files limit for current terminal session
 ulimit -n 128000
-
-# Show help
-$ ./stoppropaganda_v0.0.1_linux_x86_64 --help
-
-# Use with defaults
-./stoppropaganda_v0.0.1_linux_x86_64
-
-# Use with increased workers count (you might experience "too many open files" error on some systems)
-./stoppropaganda_v0.0.1_linux_x86_64 --workers 50 --dnsworkers 500
 ```
 
-Then open in your browser to see the status: http://127.0.0.1:8049/status
+Usage:
+```bash
+# Execute binary
+./stoppropaganda_v0.0.1_linux_x86_64 --help
 
-You might want to create SystemD script (Linux only) to autostart this on boot. Create `/etc/systemd/system/stoppropaganda.service` with below contents:
-```
-[Unit]
-Description=Stoppropaganda service
-After=network-online.target
-
-[Service]
-LimitAS=infinity
-LimitRSS=infinity
-LimitCORE=infinity
-LimitNOFILE=128000
-ExecStart=/path/to/binary --workers 50 --dnsworkers 500
-Restart=always
-RestartSec=3
-
-[Install]
-WantedBy=multi-user.target
+# Example
+./stoppropaganda_v0.0.1_linux_x86_64 --workers 10000 --dnsworkers 50000
 ```
 
-Then `systemctl daemon-reload && systemctl enable --now stoppropaganda.service`. To stop, use `systemctl stop stoppropaganda.service`.
+Linux users might want to autostart this on boot, see [stoppropaganda.service](https://github.com/erkexzcx/stoppropaganda/raw/main/stoppropaganda.service). Upload that file to `/etc/systemd/system/stoppropaganda.service` with updated `ExecStart` value and then usage;
+```bash
+# Reload SystemD daaemon (after editing service file)
+systemctl daemon-reload
+
+# Then usage
+systemctl enable stoppropaganda.service
+systemctl disable stoppropaganda.service
+systemctl start stoppropaganda.service
+systemctl stop stoppropaganda.service
+systemctl status stoppropaganda.service
+systemctl kill stoppropaganda.service
+journalctl -f -u stoppropaganda.service
+```
+
+# Configuration
+
+Configuration can only be done in 2 ways:
+* Command line arguments
+* Environment variables
+
+## bind
+
+Configuration via command line argument `-bind ":8049"` or via environment variable `SP_BIND=":8049"`.
+
+Default value of `:8049` is the same as `0.0.0.0:8049` which means web interface is accessible externally on port `8049`. If you want to limit web interface to be accessible only from the same host, use `127.0.0.1:8049`.
+
+## workers
+
+Configuration via command line argument `-workers 1000` or via environment variable `SP_WORKERS=1000`.
+
+Default value of `1000` means that there will be a pool of 1000 workers that will DOS all the defined websites.
+
+## timeout
+
+Configuration via command line argument `-timeout 10s` or via environment variable `SP_TIMEOUT=10s`.
+
+Default value of `10s` means that worker will wait for a website response for `10s` until it gives up.
+
+## useragent
+
+Configuration via command line argument `-useragent "..."` or via environment variable `SP_USERAGENT="..."`.
+
+Default value is `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36`. User agent is sent with HTTP requests to defined websites.
+
+## dnsworkers
+
+Configuration via command line argument `-dnsworkers 5000` or via environment variable `SP_DNSWORKERS=5000`.
+
+Default value of `5000` means that there will be a pool of 5000 workers that will DOS all the defined DNS servers.
+
+## dnstimeout
+
+Configuration via command line argument `-dnstimeout 1s` or via environment variable `SP_DNSTIMEOUT=1s`.
+
+Default value of `1s` means that worker will wait for a DNS server response for `1s` until it gives up.
+
+# Web UI
+
+As of now there is no fancy web interface, only a JSON pre-formatted output. You can access it using URL http://127.0.0.1:8049/status
+
+For Linux users, you can see status nicely in terminal using `jq` formatter. Examples:
+```bash
+# Simple:
+curl http://127.0.0.1:8049/status | jq .
+
+# Using JQ to format output
+curl http://127.0.0.1:8049/status | jq .
+```
+
+Also see [bind](#bind) for host and port configuration.
 
 # Building from source
 
@@ -167,10 +211,18 @@ go build -o stoppropaganda cmd/stoppropaganda/main.go
 
 You can also build for other architectures/platforms as well, see `build.sh` file.
 
+# Troubleshooting
+
+## too many open files
+
+Most Linux distributions have limits on how many files (connections) can be opened to prevents things like [fork bomb](https://en.wikipedia.org/wiki/Fork_bomb).
+
+More information on how to increase them [here](https://stackoverflow.com/questions/880557/socket-accept-too-many-open-files).
+
 # Recommendations
 
-* Increase `workers`/`dnsworkers` count from 20/100 (default) to e.g. 100/1000 for greater effect, but check the logs if you are not getting `too many open files`. If so, see [this](https://stackoverflow.com/questions/880557/socket-accept-too-many-open-files).
-* Adjust dnstimeout based on your location.  Eastern America ~125-150ms and in Europe this is likely much lower.  To properly adjust this value, check the /status page and if all queries are "successful", lower this value ~20ms and try again until "success" queries are low and thus "timeout errors" increase.
+* Increase `workers`/`dnsworkers` count for a greater effect.
+* Adjust `dnstimeout` based on your location. Change to something like `200ms` and see how it behaves. If "success" queries are low and thus "timeout errors" increase - increase timeout.
 * Change `useragent` to yours (used for websites only). See [this](https://www.whatismybrowser.com/detect/what-is-my-user-agent/).
 * General recommendation is to use VPN, but this is not necessary. Remember - DOS/DDOS is **illegal**.
 

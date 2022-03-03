@@ -44,7 +44,7 @@ func startDNS() {
 			target:  targetDNSServer,
 		}
 		questionDomain := getRandomDomain() + "."
-		dnsServers[targetDNSServer].message.SetQuestion(questionDomain, dns.TypeAAAA)
+		dnsServers[targetDNSServer].message.SetQuestion(questionDomain, dns.TypeA)
 	}
 
 	dnsChannel := make(chan *DNSServer, *flagDNSWorkers)

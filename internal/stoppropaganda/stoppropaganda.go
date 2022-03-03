@@ -29,6 +29,7 @@ var (
 
 func Start() {
 	ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("SP"))
+	log.Println("Starting...")
 
 	startWebsites()
 	startDNS()

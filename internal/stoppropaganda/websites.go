@@ -345,14 +345,39 @@ type WebsiteStatus struct {
 	Counter_code500 uint `json:"status_500"`
 }
 
+func (ws *WebsiteStatus) IncreateCounters(responseCode int) {
+	ws.Requests++
+	switch {
+	case responseCode < 200:
+		ws.Counter_code100++
+	case responseCode < 300:
+		ws.Counter_code200++
+	case responseCode < 400:
+		ws.Counter_code300++
+	case responseCode < 500:
+		ws.Counter_code400++
+	default:
+		ws.Counter_code500++
+	}
+}
+func (ws *WebsiteStatus) IncreateCountersErr(err error) {
+	ws.Requests++
+	ws.Errors++
+	ws.LastErrorMsg = err.Error()
+}
+
 type Website struct {
+	mux    sync.Mutex
 	Status WebsiteStatus
 	host   string
 
-	mux            sync.Mutex
-	pauseMux       sync.Mutex
+	validateMux    sync.Mutex
 	paused         bool
 	dnsLastChecked time.Time
+	unpauseTime    time.Time
+	// unpauseTimer can be used like time.Sleep:
+	// <-ws.unpauseTimer.C
+	unpauseTimer *time.Timer
 
 	req *fasthttp.Request
 }
@@ -403,6 +428,67 @@ func startWebsites() {
 	}()
 }
 
+func (ws *Website) ShouldRun() bool {
+	if ws.paused {
+		paused := time.Now().Before(ws.unpauseTime)
+		if !paused {
+			ws.paused = false
+		}
+		return paused
+	}
+	return true
+}
+
+func (ws *Website) SchedulePause(duration time.Duration, reason string) {
+	ws.mux.Lock()
+	ws.paused = true
+	ws.Status.Status = reason
+	unpauseTime := time.Now().Add(duration)
+	ws.unpauseTime = unpauseTime
+
+	// unpauseTimer can be used like time.Sleep:
+	// <-ws.unpauseTimer.C
+	ws.unpauseTimer = time.NewTimer(duration)
+
+	ws.mux.Unlock()
+
+}
+func (website *Website) ValidateDNS() {
+	// Lock, because we don't want multiple validations
+	// running at the same time
+	website.validateMux.Lock()
+	defer website.validateMux.Unlock()
+
+	if time.Since(website.dnsLastChecked) >= VALIDATE_DNS_EVERY {
+		ipAddresses, err := getIPs(website.host)
+		website.dnsLastChecked = time.Now()
+
+		if err != nil {
+			errStr := err.Error()
+			if strings.HasSuffix(errStr, "Temporary failure in name resolution") || strings.HasSuffix(errStr, "connection refused") {
+				website.SchedulePause(1*time.Second, "Your DNS servers unreachable or returned an error: "+errStr)
+				return
+			}
+
+			reason := errStr
+			switch {
+			case strings.HasSuffix(errStr, "no such host"):
+				reason = "Domain does not exist: " + errStr
+			case strings.HasSuffix(errStr, "No address associated with hostname"):
+				reason = "Domain does not have any IPs assigned: " + errStr
+			}
+
+			website.SchedulePause(10*time.Second, reason)
+			return
+		}
+
+		if containsPrivateIP(ipAddresses) {
+			website.SchedulePause(5*time.Minute, "Private/Unspecified IP detected")
+			return
+		}
+	}
+}
+
 func runWebsiteWorker(c chan *Website) {
 	// Each worker has it's own response
 	req := fasthttp.AcquireRequest()
@@ -410,65 +496,27 @@ func runWebsiteWorker(c chan *Website) {
 
 	for {
 		website := <-c
-		website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
-
-		website.pauseMux.Lock()
-		if time.Since(website.dnsLastChecked) >= VALIDATE_DNS_EVERY {
-			ipAddresses, err := getIPs(website.host)
-			website.dnsLastChecked = time.Now()
-
-			if err != nil {
-				if strings.HasSuffix(err.Error(), "Temporary failure in name resolution") || strings.HasSuffix(err.Error(), "connection refused") {
-					website.mux.Lock()
-					website.Status.Status = "Your DNS servers unreachable or returned an error"
-					website.mux.Unlock()
-					time.Sleep(1 * time.Second)
-					website.pauseMux.Unlock()
-					continue
-				}
-
-				website.mux.Lock()
-				switch {
-				case strings.HasSuffix(err.Error(), "no such host"):
-					website.Status.Status = "Domain does not exist"
-				case strings.HasSuffix(err.Error(), "No address associated with hostname"):
-					website.Status.Status = "Domain does not have any IPs assigned"
-				default:
-					website.Status.Status = err.Error()
-				}
-				website.paused = true
-				website.mux.Unlock()
-
-				time.Sleep(10 * time.Second)
-				website.pauseMux.Unlock()
-				continue
-			}
-
-			if containsPrivateIP(ipAddresses) {
-				website.mux.Lock()
-				website.Status.Status = "Private IP detected"
-				website.paused = true
-				website.mux.Unlock()
-
-				time.Sleep(5 * time.Minute)
-				website.pauseMux.Unlock()
-				continue
-			}
-
+		if !website.ShouldRun() {
+			continue
+		}
+		website.ValidateDNS()
+		// Check again after DNS validated
+		if website.paused {
+			continue
+		}
+		{
 			website.mux.Lock()
 			website.Status.Status = "Running"
-			website.paused = false
 			website.mux.Unlock()
 		}
-		website.pauseMux.Unlock()
+
+		website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
 
 		// Perform request
 		err := httpClient.DoTimeout(req, resp, *flagTimeout)
 		if err != nil {
 			website.mux.Lock()
-			website.Status.Requests++
-			website.Status.Errors++
-			website.Status.LastErrorMsg = err.Error()
+			website.Status.IncreateCountersErr(err)
 			website.mux.Unlock()
 			continue
 		}
@@ -476,19 +524,7 @@ func runWebsiteWorker(c chan *Website) {
 
 		// Increase counters
 		website.mux.Lock()
-		website.Status.Requests++
-		switch {
-		case responseCode < 200:
-			website.Status.Counter_code100++
-		case responseCode < 300:
-			website.Status.Counter_code200++
-		case responseCode < 400:
-			website.Status.Counter_code300++
-		case responseCode < 500:
-			website.Status.Counter_code400++
-		default:
-			website.Status.Counter_code500++
-		}
+		website.Status.IncreateCounters(responseCode)
 		website.mux.Unlock()
 	}
 }

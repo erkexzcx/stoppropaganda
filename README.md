@@ -8,7 +8,7 @@ Russia has invaded Ukraine and committed various war crimes. Russian media denie
 
 Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of Ukraine) has shared [this twitter post](https://twitter.com/FedorovMykhailo/status/1497642156076511233) encouraging cyber attack on certain targets via Telegram group. This will be primary source of the target websites for this application.
 
-*Русский военный корабль, иди нахуй*
+*Русский военный корабль, иди нахуй!*
 
 **DISCLAIMER**: (D)DOS'ing is **illegal**! Usage of this tool is intended for educational purposes only.
 

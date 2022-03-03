@@ -472,6 +472,10 @@ func (website *Website) ValidateDNS() {
 
 			reason := errStr
 			switch {
+			case strings.HasSuffix(err.Error(), "Temporary failure in name resolution"):
+				reason = "Your DNS servers unreachable or returned an error"
+			case strings.HasSuffix(err.Error(), "connection refused"):
+				reason = "Your DNS servers reachable, but refusing connections"
 			case strings.HasSuffix(errStr, "no such host"):
 				reason = "Domain does not exist: " + errStr
 			case strings.HasSuffix(errStr, "No address associated with hostname"):
@@ -482,8 +486,8 @@ func (website *Website) ValidateDNS() {
 			return
 		}
 
-		if containsPrivateIP(ipAddresses) {
-			website.SchedulePause(5*time.Minute, "Private/Unspecified IP detected")
+		if containsNonPublicIP(ipAddresses) {
+			website.SchedulePause(5*time.Minute, "Non public IP detected")
 			return
 		}
 	}
@@ -548,7 +552,7 @@ func getIPs(host string) (ips []net.IP, err error) {
 	return ipAddresses, nil
 }
 
-func containsPrivateIP(ips []net.IP) bool {
+func containsNonPublicIP(ips []net.IP) bool {
 	for _, ip := range ips {
 		if ip.IsPrivate() || ip.IsLoopback() || ip.IsUnspecified() {
 			return true

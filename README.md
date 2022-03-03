@@ -35,8 +35,6 @@ Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of 
 
 <small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
 
-<small><i><a href='http://ecotrust-canada.github.io/markdown-toc/'>Table of contents generated with markdown-toc</a></i></small>
-
 # Usage
 
 ## Docker
@@ -100,8 +98,8 @@ Additional steps needed for Linux prior usage:
 # Make downloaded binary executable
 chmod +x stoppropaganda_v0.0.1_linux_x86_64
 
-# Increase open files limit for current terminal session
-ulimit -n 128000
+# Increase open files limit for current terminal session to a maximum allowed by a kernel
+ulimit -n unlimited
 ```
 
 Usage:
@@ -203,8 +201,8 @@ cd stoppropaganda
 
 Now you have 2 options to run this application:
 ```bash
-# (Linux only) Increase open files limit for current terminal session
-ulimit -n 128000
+# Increase open files limit for current terminal session to a maximum allowed by a kernel
+ulimit -n unlimited
 
 # Run without compiling to binary
 go run cmd/stoppropaganda/main.go --help

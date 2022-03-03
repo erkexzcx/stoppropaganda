@@ -157,9 +157,9 @@ Default value is `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (
 
 ## dnsworkers
 
-Configuration via command line argument `-dnsworkers 5000` or via environment variable `SP_DNSWORKERS=5000`.
+Configuration via command line argument `-dnsworkers 100` or via environment variable `SP_DNSWORKERS=100`.
 
-Default value of `5000` means that there will be a pool of 5000 workers that will DOS all the defined DNS servers.
+Default value of `100` means that there will be a pool of 100 workers that will DOS all the defined DNS servers.
 
 ## dnstimeout
 

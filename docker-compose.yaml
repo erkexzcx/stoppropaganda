@@ -7,10 +7,10 @@ services:
     ports:
       - "8049:8049/tcp"
     environment:
-      SP_WORKERS: "20"
+      SP_WORKERS: "1000"
       SP_TIMEOUT: "10s"
       SP_DNSWORKERS: "100"
-      SP_DNSTIMEOUT: "125ms"
+      SP_DNSTIMEOUT: "1s"
       SP_USERAGENT: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
     ulimits:
       nofile:

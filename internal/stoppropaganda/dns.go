@@ -46,7 +46,7 @@ func startDNS() {
 	dnsChannel := make(chan *DNSServer, *flagDNSWorkers)
 
 	// Spawn workers
-	for i := 0; i < *flagWorkers; i++ {
+	for i := 0; i < *flagDNSWorkers; i++ {
 		go runDNSWorker(dnsChannel)
 	}
 

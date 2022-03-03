@@ -180,6 +180,7 @@ var targetWebsites = map[string]struct{}{
 	"https://stroi.gov.ru":           {},
 	"https://proverki.gov.ru":        {},
 	"https://shop-rt.com":            {},
+	"https://www.glonass-iac.ru":     {},
 
 	// Exchanges connected to russian banks
 	"https://cleanbtc.ru":         {},
@@ -291,6 +292,7 @@ var targetWebsites = map[string]struct{}{
 	"http://www.bellegprom.by":    {},
 	"https://www.energo.by":       {},
 	"http://belres.by/ru":         {},
+	"http://rw.by":                {},
 
 	// by media
 	"http://belta.by":             {},

@@ -179,6 +179,7 @@ var targetWebsites = map[string]struct{}{
 	"https://stroi.gov.ru":           {},
 	"https://proverki.gov.ru":        {},
 	"https://shop-rt.com":            {},
+	"https://www.glonass-iac.ru":     {},
 
 	// Exchanges connected to russian banks
 	"https://cleanbtc.ru":         {},

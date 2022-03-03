@@ -1,4 +1,4 @@
-package customresolver
+package customfasthttp
 
 import (
 	"context"

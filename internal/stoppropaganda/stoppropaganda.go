@@ -10,7 +10,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customresolver"
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customfasthttp"
 	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/sockshttp"
 	"github.com/miekg/dns"
 	"github.com/peterbourgon/ff/v3"
@@ -82,8 +82,8 @@ func makeDialFunc() fasthttp.DialFunc {
 		masterDialer = MakeDialerThrough(dialer, proxyChain, proxyTimeout)
 	}
 
-	myResolver := &customresolver.CustomResolver{}
-	dial := (&TCPDialer{
+	myResolver := &customfasthttp.CustomResolver{}
+	dial := (&customfasthttp.TCPDialer{
 		DialTicketsC:     newConnTicketC,
 		Concurrency:      0,
 		DNSCacheDuration: 5 * time.Minute,

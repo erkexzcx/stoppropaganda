@@ -1,4 +1,4 @@
-package stoppropaganda
+package customfasthttp
 
 import (
 	"context"
@@ -128,11 +128,6 @@ func DialDualStackTimeout(addr string, timeout time.Duration) (net.Conn, error) 
 var (
 	defaultDialer = &TCPDialer{Concurrency: 1000}
 )
-
-// Resolver represents interface of the tcp resolver.
-type Resolver interface {
-	LookupIPAddr(context.Context, string) (names []net.IPAddr, err error)
-}
 
 // TCPDialer contains options to control a group of Dial calls.
 type TCPDialer struct {

@@ -10,6 +10,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customresolver"
 	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/sockshttp"
 	"github.com/miekg/dns"
 	"github.com/peterbourgon/ff/v3"
@@ -35,10 +36,6 @@ func Start() {
 	log.Println("Started!")
 	panic(fasthttp.ListenAndServe(*flagBind, fasthttpRequestHandler))
 }
-
-var httpClient *fasthttp.Client
-
-var dnsClient *dns.Client
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
@@ -82,12 +79,14 @@ func makeDialFunc() fasthttp.DialFunc {
 		masterDialer = MakeDialerThrough(dialer, proxyChain, proxyTimeout)
 	}
 
+	myResolver := &customresolver.CustomResolver{}
 	dial := (&TCPDialer{
-		Concurrency:      math.MaxInt,
+		Concurrency:      0,
 		DNSCacheDuration: 5 * time.Minute,
 
 		// stoppropaganda's implementation
 		ParentDialer: masterDialer,
+		Resolver:     myResolver,
 	}).Dial
 	return dial
 }

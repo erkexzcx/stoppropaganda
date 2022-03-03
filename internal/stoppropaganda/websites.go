@@ -353,6 +353,8 @@ type Website struct {
 	req *fasthttp.Request
 }
 
+var httpClient *fasthttp.Client
+
 var websites = map[string]*Website{}
 
 func startWebsites() {
@@ -412,10 +414,17 @@ func runWebsiteWorker(c chan *Website) {
 			website.dnsLastChecked = time.Now()
 
 			if err != nil {
+				if strings.HasSuffix(err.Error(), "Temporary failure in name resolution") || strings.HasSuffix(err.Error(), "connection refused") {
+					website.mux.Lock()
+					website.Status = "Your DNS servers unreachable or returned an error"
+					website.mux.Unlock()
+					time.Sleep(1 * time.Second)
+					website.pauseMux.Unlock()
+					continue
+				}
+
 				website.mux.Lock()
 				switch {
-				case strings.HasSuffix(err.Error(), "Temporary failure in name resolution"):
-					website.Status = "Your DNS servers unreachable or returned an error"
 				case strings.HasSuffix(err.Error(), "no such host"):
 					website.Status = "Domain does not exist"
 				case strings.HasSuffix(err.Error(), "No address associated with hostname"):
@@ -426,7 +435,7 @@ func runWebsiteWorker(c chan *Website) {
 				website.paused = true
 				website.mux.Unlock()
 
-				time.Sleep(5 * time.Minute)
+				time.Sleep(10 * time.Second)
 				website.pauseMux.Unlock()
 				continue
 			}

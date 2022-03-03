@@ -290,6 +290,7 @@ var targetWebsites = map[string]struct{}{
 	"http://www.bellegprom.by":    {},
 	"https://www.energo.by":       {},
 	"http://belres.by/ru":         {},
+	"http://rw.by":                {},
 
 	// by media
 	"http://belta.by":             {},

@@ -30,6 +30,8 @@ type DNSServer struct {
 	target  string
 }
 
+var dnsClient *dns.Client
+
 var dnsServers = map[string]*DNSServer{}
 
 func startDNS() {

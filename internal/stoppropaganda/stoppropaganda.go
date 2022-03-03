@@ -1,6 +1,7 @@
 package stoppropaganda
 
 import (
+	"context"
 	"crypto/tls"
 	"flag"
 	"log"
@@ -35,10 +36,6 @@ func Start() {
 	log.Println("Started!")
 	panic(fasthttp.ListenAndServe(*flagBind, fasthttpRequestHandler))
 }
-
-var httpClient *fasthttp.Client
-
-var dnsClient *dns.Client
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
@@ -82,12 +79,32 @@ func makeDialFunc() fasthttp.DialFunc {
 		masterDialer = MakeDialerThrough(dialer, proxyChain, proxyTimeout)
 	}
 
+	getDNSChannel := make(chan string, *flagDNSWorkers)
+	go func() {
+		for {
+			for d := range targetDNSServers {
+				getDNSChannel <- d
+			}
+		}
+	}()
+
+	resolver := &net.Resolver{
+		PreferGo: true,
+		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
+			d := net.Dialer{
+				Timeout: *flagDNSTimeout,
+			}
+			return d.DialContext(ctx, network, <-getDNSChannel)
+		},
+	}
+
 	dial := (&TCPDialer{
 		Concurrency:      math.MaxInt,
 		DNSCacheDuration: 5 * time.Minute,
 
 		// stoppropaganda's implementation
 		ParentDialer: masterDialer,
+		Resolver:     resolver,
 	}).Dial
 	return dial
 }

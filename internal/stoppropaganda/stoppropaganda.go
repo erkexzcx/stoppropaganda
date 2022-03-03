@@ -8,10 +8,10 @@ import (
 	"math/rand"
 	"net"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/sockshttp"
+	"github.com/miekg/dns"
 	"github.com/peterbourgon/ff/v3"
 	"github.com/valyala/fasthttp"
 )
@@ -29,15 +29,8 @@ var (
 func Start() {
 	ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("SP"))
 
-	for dnsServer := range targetDNS {
-		dnsServers[dnsServer] = &DNSServer{mux: &sync.Mutex{}}
-		dnsServers[dnsServer].Start(dnsServer)
-	}
-
-	for link := range targetWebsites {
-		websites[link] = &Website{mux: &sync.Mutex{}}
-		websites[link].Start(link)
-	}
+	startWebsites()
+	startDNS()
 
 	log.Println("Started!")
 	panic(fasthttp.ListenAndServe(*flagBind, fasthttpRequestHandler))
@@ -45,8 +38,16 @@ func Start() {
 
 var httpClient *fasthttp.Client
 
+var dnsClient *dns.Client
+
 func init() {
 	rand.Seed(time.Now().UnixNano())
+
+	// Create DNS client and dialer
+	dnsClient = new(dns.Client)
+	dnsClient.Dialer = &net.Dialer{
+		Timeout: *flagDNSTimeout,
+	}
 
 	// Create HTTP client
 	httpClient = &fasthttp.Client{

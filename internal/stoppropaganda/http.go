@@ -61,9 +61,9 @@ func fasthttpStatusResponseHandler(ctx *fasthttp.RequestCtx) {
 			dosPausedFor := time.Since(tmpWebsite.dnsLastChecked)
 			if tmpWebsite.paused {
 				if dosPausedFor >= VALIDATE_DNS_EVERY {
-					tmpWebsite.WorkersStatus += ", DOS paused for 0s"
+					tmpWebsite.Status += ", DOS paused for 0s"
 				} else {
-					tmpWebsite.WorkersStatus += ", DOS paused for " + (VALIDATE_DNS_EVERY - dosPausedFor).String()
+					tmpWebsite.Status += ", DOS paused for " + (VALIDATE_DNS_EVERY - dosPausedFor).String()
 				}
 			}
 

@@ -332,7 +332,7 @@ var targetWebsites = map[string]struct{}{
 	"https://solidwall.ru":      {},
 }
 
-type Website struct {
+type WebsiteStatus struct {
 	Requests     uint   `json:"requests"`
 	Errors       uint   `json:"errors"`
 	LastErrorMsg string `json:"last_error_msg"`
@@ -343,8 +343,11 @@ type Website struct {
 	Counter_code300 uint `json:"status_300"`
 	Counter_code400 uint `json:"status_400"`
 	Counter_code500 uint `json:"status_500"`
+}
 
-	host string
+type Website struct {
+	Status WebsiteStatus
+	host   string
 
 	mux            sync.Mutex
 	pauseMux       sync.Mutex
@@ -373,8 +376,10 @@ func startWebsites() {
 		newReq.Header.Set("Accept", "*/*")
 
 		websites[website] = &Website{
-			host:           websiteURL.Host,
-			Status:         "Initializing",
+			host: websiteURL.Host,
+			Status: WebsiteStatus{
+				Status: "Initializing",
+			},
 			paused:         false,
 			dnsLastChecked: time.Now().Add(-1 * VALIDATE_DNS_EVERY), // this forces to validate on first run
 			req:            newReq,
@@ -415,7 +420,7 @@ func runWebsiteWorker(c chan *Website) {
 			if err != nil {
 				if strings.HasSuffix(err.Error(), "Temporary failure in name resolution") || strings.HasSuffix(err.Error(), "connection refused") {
 					website.mux.Lock()
-					website.Status = "Your DNS servers unreachable or returned an error"
+					website.Status.Status = "Your DNS servers unreachable or returned an error"
 					website.mux.Unlock()
 					time.Sleep(1 * time.Second)
 					website.pauseMux.Unlock()
@@ -425,11 +430,11 @@ func runWebsiteWorker(c chan *Website) {
 				website.mux.Lock()
 				switch {
 				case strings.HasSuffix(err.Error(), "no such host"):
-					website.Status = "Domain does not exist"
+					website.Status.Status = "Domain does not exist"
 				case strings.HasSuffix(err.Error(), "No address associated with hostname"):
-					website.Status = "Domain does not have any IPs assigned"
+					website.Status.Status = "Domain does not have any IPs assigned"
 				default:
-					website.Status = err.Error()
+					website.Status.Status = err.Error()
 				}
 				website.paused = true
 				website.mux.Unlock()
@@ -441,7 +446,7 @@ func runWebsiteWorker(c chan *Website) {
 
 			if containsPrivateIP(ipAddresses) {
 				website.mux.Lock()
-				website.Status = "Private IP detected"
+				website.Status.Status = "Private IP detected"
 				website.paused = true
 				website.mux.Unlock()
 
@@ -451,7 +456,7 @@ func runWebsiteWorker(c chan *Website) {
 			}
 
 			website.mux.Lock()
-			website.Status = "Running"
+			website.Status.Status = "Running"
 			website.paused = false
 			website.mux.Unlock()
 		}
@@ -461,9 +466,9 @@ func runWebsiteWorker(c chan *Website) {
 		err := httpClient.DoTimeout(req, resp, *flagTimeout)
 		if err != nil {
 			website.mux.Lock()
-			website.Requests++
-			website.Errors++
-			website.LastErrorMsg = err.Error()
+			website.Status.Requests++
+			website.Status.Errors++
+			website.Status.LastErrorMsg = err.Error()
 			website.mux.Unlock()
 			continue
 		}
@@ -471,18 +476,18 @@ func runWebsiteWorker(c chan *Website) {
 
 		// Increase counters
 		website.mux.Lock()
-		website.Requests++
+		website.Status.Requests++
 		switch {
 		case responseCode < 200:
-			website.Counter_code100++
+			website.Status.Counter_code100++
 		case responseCode < 300:
-			website.Counter_code200++
+			website.Status.Counter_code200++
 		case responseCode < 400:
-			website.Counter_code300++
+			website.Status.Counter_code300++
 		case responseCode < 500:
-			website.Counter_code400++
+			website.Status.Counter_code400++
 		default:
-			website.Counter_code500++
+			website.Status.Counter_code500++
 		}
 		website.mux.Unlock()
 	}

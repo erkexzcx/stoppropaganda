@@ -16,16 +16,21 @@ func fasthttpRequestHandler(ctx *fasthttp.RequestCtx) {
 }
 
 type StatusStruct struct {
-	DNS      map[string]*DNSServer `json:"DNS"`
-	Websites map[string]*Website   `json:"Websites"`
+	DNS      map[string]*DNSServerStatus `json:"DNS"`
+	Websites map[string]*WebsiteStatus   `json:"Websites"`
+}
+type StatusService struct {
+	AllStatus StatusStruct
 
 	mux sync.Mutex
 }
 
 func fasthttpStatusResponseHandler(ctx *fasthttp.RequestCtx) {
-	statusStruct := StatusStruct{
-		DNS:      make(map[string]*DNSServer, len(dnsServers)),
-		Websites: make(map[string]*Website, len(websites)),
+	statusService := StatusService{
+		AllStatus: StatusStruct{
+			DNS:      make(map[string]*DNSServerStatus, len(dnsServers)),
+			Websites: make(map[string]*WebsiteStatus, len(websites)),
+		},
 	}
 
 	wg := sync.WaitGroup{}
@@ -35,12 +40,12 @@ func fasthttpStatusResponseHandler(ctx *fasthttp.RequestCtx) {
 	for endpoint, ds := range dnsServers {
 		go func(endpoint string, ds *DNSServer) {
 			ds.mux.Lock()
-			dnsServer := *ds
+			dnsStatus := ds.Status
 			ds.mux.Unlock()
 
-			statusStruct.mux.Lock()
-			statusStruct.DNS[endpoint] = &dnsServer
-			statusStruct.mux.Unlock()
+			statusService.mux.Lock()
+			statusService.AllStatus.DNS[endpoint] = &dnsStatus
+			statusService.mux.Unlock()
 
 			wg.Done()
 		}(endpoint, ds)
@@ -49,19 +54,19 @@ func fasthttpStatusResponseHandler(ctx *fasthttp.RequestCtx) {
 	for endpoint, ws := range websites {
 		go func(endpoint string, ws *Website) {
 			ws.mux.Lock()
-			tmpWebsite := *ws
+			tmpStatus := ws.Status
 			ws.mux.Unlock()
 
-			statusStruct.mux.Lock()
-			statusStruct.Websites[endpoint] = &tmpWebsite
-			statusStruct.mux.Unlock()
+			statusService.mux.Lock()
+			statusService.AllStatus.Websites[endpoint] = &tmpStatus
+			statusService.mux.Unlock()
 
-			dosPausedFor := time.Since(tmpWebsite.dnsLastChecked)
-			if tmpWebsite.paused {
+			dosPausedFor := time.Since(ws.dnsLastChecked)
+			if ws.paused {
 				if dosPausedFor >= VALIDATE_DNS_EVERY {
-					tmpWebsite.Status += ", DOS paused for 0s"
+					tmpStatus.Status += ", DOS paused for 0s"
 				} else {
-					tmpWebsite.Status += ", DOS paused for " + (VALIDATE_DNS_EVERY - dosPausedFor).String()
+					tmpStatus.Status += ", DOS paused for " + (VALIDATE_DNS_EVERY - dosPausedFor).String()
 				}
 			}
 
@@ -71,7 +76,9 @@ func fasthttpStatusResponseHandler(ctx *fasthttp.RequestCtx) {
 
 	wg.Wait()
 
-	content, err := json.MarshalIndent(statusStruct, "", "    ")
+	statusService.mux.Lock()
+	content, err := json.MarshalIndent(statusService.AllStatus, "", "    ")
+	statusService.mux.Unlock()
 	if err != nil {
 		ctx.SetStatusCode(500)
 		ctx.WriteString("failed to marshal data")

@@ -1,7 +1,6 @@
 package stoppropaganda
 
 import (
-	"io"
 	"net/url"
 	"strings"
 	"sync"
@@ -445,14 +444,6 @@ func (ws *Website) Start(endpoint string) {
 				ws.Counter_code500++
 			}
 			ws.mux.Unlock()
-
-			// Download content, to waste traffic
-			if err = resp.BodyWriteTo(io.Discard); err != nil {
-				ws.mux.Lock()
-				ws.Errors++
-				ws.LastErrorMsg = err.Error()
-				ws.mux.Unlock()
-			}
 		}
 	}
 

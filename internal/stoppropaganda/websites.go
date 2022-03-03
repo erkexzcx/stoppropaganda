@@ -397,8 +397,8 @@ func startWebsites() {
 
 func runWebsiteWorker(c chan *Website) {
 	// Each worker has it's own response
+	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
-	var req *fasthttp.Request
 
 	for {
 		website := <-c

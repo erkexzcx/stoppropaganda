@@ -435,9 +435,9 @@ func runWebsiteWorker(c chan *Website) {
 				continue
 			}
 
-			if containsPrivateIP(ipAddresses) {
+			if containsNonPublicIP(ipAddresses) {
 				website.mux.Lock()
-				website.Status = "Private IP detected"
+				website.Status = "Non public IP detected"
 				website.paused = true
 				website.mux.Unlock()
 
@@ -503,9 +503,9 @@ func getIPs(host string) (ips []net.IP, err error) {
 	return ipAddresses, nil
 }
 
-func containsPrivateIP(ips []net.IP) bool {
+func containsNonPublicIP(ips []net.IP) bool {
 	for _, ip := range ips {
-		if ip.IsPrivate() || ip.IsLoopback() {
+		if ip.IsPrivate() || ip.IsLoopback() || ip.IsUnspecified() {
 			return true
 		}
 	}

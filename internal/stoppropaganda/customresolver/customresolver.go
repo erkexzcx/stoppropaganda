@@ -1,4 +1,4 @@
-package customfasthttp
+package customresolver
 
 import (
 	"context"
@@ -8,10 +8,11 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-var resolver *net.Resolver
 var dnscache *cache.Cache
 
-type CustomResolver struct{}
+type CustomResolver struct {
+	ParentResolver *net.Resolver
+}
 
 type Resolver interface {
 	LookupIPAddr(context.Context, string) (names []net.IPAddr, err error)
@@ -22,7 +23,7 @@ func (cs *CustomResolver) LookupIPAddr(ctx context.Context, host string) (names 
 		return c.([]net.IPAddr), nil
 	}
 
-	names, err = resolver.LookupIPAddr(ctx, host)
+	names, err = cs.ParentResolver.LookupIPAddr(ctx, host)
 	if err == nil {
 		dnscache.SetDefault(host, names)
 	}
@@ -30,6 +31,5 @@ func (cs *CustomResolver) LookupIPAddr(ctx context.Context, host string) (names 
 }
 
 func init() {
-	resolver = net.DefaultResolver
 	dnscache = cache.New(5*time.Minute, 10*time.Minute)
 }

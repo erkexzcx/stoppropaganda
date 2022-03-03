@@ -10,7 +10,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customfasthttp"
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customresolver"
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customtcpdial"
 	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/sockshttp"
 	"github.com/miekg/dns"
 	"github.com/peterbourgon/ff/v3"
@@ -33,6 +34,8 @@ func Start() {
 	ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("SP"))
 	log.Println("Starting...")
 
+	initWebsites()
+	initDNS()
 	startWebsites()
 	startDNS()
 
@@ -43,13 +46,17 @@ func Start() {
 func init() {
 	rand.Seed(time.Now().UnixNano())
 	go tcpSynDialTicketsRoutine()
+}
 
+func initDNS() {
 	// Create DNS client and dialer
 	dnsClient = new(dns.Client)
 	dnsClient.Dialer = &net.Dialer{
 		Timeout: *flagDNSTimeout,
 	}
+}
 
+func initWebsites() {
 	// Create HTTP client
 	httpClient = &fasthttp.Client{
 		ReadTimeout:                   *flagTimeout,
@@ -83,8 +90,10 @@ func makeDialFunc() fasthttp.DialFunc {
 		masterDialer = MakeDialerThrough(dialer, proxyChain, proxyTimeout)
 	}
 
-	myResolver := &customfasthttp.CustomResolver{}
-	dial := (&customfasthttp.CustomTCPDialer{
+	myResolver := &customresolver.CustomResolver{
+		ParentResolver: net.DefaultResolver,
+	}
+	dial := (&customtcpdial.CustomTCPDialer{
 		DialTicketsC:     newConnTicketC,
 		Concurrency:      *dialConcurrency,
 		DNSCacheDuration: 5 * time.Minute,

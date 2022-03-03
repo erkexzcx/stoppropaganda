@@ -1,4 +1,4 @@
-package customfasthttp
+package customtcpdial
 
 import (
 	"context"
@@ -45,7 +45,7 @@ type CustomTCPDialer struct {
 	// 		},
 	// 	},
 	// }
-	Resolver Resolver
+	Resolver fasthttp.Resolver
 
 	// DNSCacheDuration may be used to override the default DNS cache duration (DefaultDNSCacheDuration)
 	DNSCacheDuration time.Duration
@@ -321,7 +321,7 @@ func (d *CustomTCPDialer) getTCPAddrs(addr string, dualStack bool) ([]net.TCPAdd
 	return e.addrs, idx, nil
 }
 
-func resolveTCPAddrs(addr string, dualStack bool, resolver Resolver) ([]net.TCPAddr, error) {
+func resolveTCPAddrs(addr string, dualStack bool, resolver fasthttp.Resolver) ([]net.TCPAddr, error) {
 	host, portS, err := net.SplitHostPort(addr)
 	if err != nil {
 		return nil, err

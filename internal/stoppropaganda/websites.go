@@ -1,12 +1,13 @@
 package stoppropaganda
 
 import (
-	"net"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customresolver"
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/resolvefix"
 	"github.com/valyala/fasthttp"
 )
 
@@ -460,7 +461,7 @@ func (website *Website) ValidateDNS() {
 	defer website.validateMux.Unlock()
 
 	if time.Since(website.dnsLastChecked) >= VALIDATE_DNS_EVERY {
-		ipAddresses, err := getIPs(website.host)
+		ipAddresses, err := customresolver.GetIPs(website.host)
 		website.dnsLastChecked = time.Now()
 
 		if err != nil {
@@ -486,8 +487,9 @@ func (website *Website) ValidateDNS() {
 			return
 		}
 
-		if containsNonPublicIP(ipAddresses) {
-			website.SchedulePause(5*time.Minute, "Non public IP detected")
+		nonpublicerr := resolvefix.CheckNonPublicIP(ipAddresses)
+		if nonpublicerr != nil {
+			website.SchedulePause(5*time.Minute, nonpublicerr.Error())
 			return
 		}
 	}
@@ -531,32 +533,4 @@ func runWebsiteWorker(c chan *Website) {
 		website.Status.IncreateCounters(responseCode)
 		website.mux.Unlock()
 	}
-}
-
-func getIPs(host string) (ips []net.IP, err error) {
-	ipAddresses := make([]net.IP, 0, 1)
-	addr := net.ParseIP(host)
-	if addr == nil {
-		ips, err := net.LookupIP(host)
-		if err != nil {
-			return nil, err
-		}
-		for _, ip := range ips {
-			if ipv4 := ip.To4(); ipv4 != nil {
-				ipAddresses = append(ipAddresses, ipv4)
-			}
-		}
-	} else {
-		ipAddresses = append(ipAddresses, addr)
-	}
-	return ipAddresses, nil
-}
-
-func containsNonPublicIP(ips []net.IP) bool {
-	for _, ip := range ips {
-		if ip.IsPrivate() || ip.IsLoopback() || ip.IsUnspecified() {
-			return true
-		}
-	}
-	return false
 }

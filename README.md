@@ -88,6 +88,8 @@ In order to use on Android:
 
 **NOTE**: On startup it will pull the latest version automatically, so in order to update - stop the app in Termux and re-run this Flow.
 
+**NOTE 2**: DNS resolution does not work in Termux, therefore it's impossible to DOS websites. Only DNS DOS is working.
+
 ## Binaries
 
 Download binary from [releases](https://github.com/erkexzcx/stoppropaganda/releases/).

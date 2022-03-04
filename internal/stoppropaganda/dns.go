@@ -1,12 +1,12 @@
 package stoppropaganda
 
 import (
-	"math/rand"
 	"strings"
 	"sync"
 
 	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/targets"
 	"github.com/miekg/dns"
+	"github.com/valyala/fastrand"
 )
 
 type DNSTargetStatus struct {
@@ -85,10 +85,13 @@ func runDNSWorker(c chan *DNSTarget) {
 var randomDomainRunes = []rune("abcdefghijklmnopqrstuvwxyz")
 
 func getRandomDomain() string {
-	randomLength := rand.Intn(20-6) + 6 // from 6 to 20 characters length + ".ru"
+	rng := new(fastrand.RNG)
+	randomLength := rng.Uint32n(20-6) + 6 // from 6 to 20 characters length + ".ru"
+	runes := uint32(len(randomDomainRunes))
 	b := make([]rune, randomLength)
 	for i := range b {
-		b[i] = randomDomainRunes[rand.Intn(len(randomDomainRunes))]
+		idx := int(rng.Uint32n(runes))
+		b[i] = randomDomainRunes[idx]
 	}
 	return string(b) + ".ru"
 }

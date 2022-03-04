@@ -1,7 +1,10 @@
 package stoppropaganda
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"sort"
 	"sync"
 
 	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customresolver"
@@ -14,6 +17,8 @@ func fasthttpRequestHandler(ctx *fasthttp.RequestCtx) {
 		fasthttpStatusResponseHandler(ctx)
 	case "/dnscache":
 		fasthttpDnsCacheResponseHandler(ctx)
+	case "/downloaded":
+		fasthttpDownloadedResponseHandler(ctx)
 	}
 }
 
@@ -92,4 +97,56 @@ func fasthttpDnsCacheResponseHandler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 	ctx.Write(content)
+}
+
+type DownloadedStat struct {
+	Endpoint   string
+	Downloaded uint64
+}
+
+func (ds *DownloadedStat) FormatMegabytes() string {
+	return fmt.Sprintf("%9.3f", float64(ds.Downloaded)/(1024.0*1024.0))
+}
+
+type DownloadedStats []*DownloadedStat
+
+func (s DownloadedStats) Len() int      { return len(s) }
+func (s DownloadedStats) Swap(i, j int) { s[i], s[j] = s[j], s[i] }
+func (s DownloadedStats) Less(i, j int) bool {
+	a := s[i].Downloaded
+	b := s[j].Downloaded
+	if a == b {
+		return s[i].Endpoint < s[j].Endpoint
+	}
+	return a > b
+}
+
+func fasthttpDownloadedResponseHandler(ctx *fasthttp.RequestCtx) {
+	stats := make([]*DownloadedStat, 0, len(websites))
+	for endpoint, website := range websites {
+		website.statusMux.Lock()
+		downloaded := website.status.Downloaded
+		website.statusMux.Unlock()
+		stat := &DownloadedStat{
+			Endpoint:   endpoint,
+			Downloaded: downloaded,
+		}
+		stats = append(stats, stat)
+	}
+
+	sort.Sort(DownloadedStats(stats))
+
+	buf := new(bytes.Buffer)
+
+	if ctx.URI().QueryArgs().Has("raw") {
+		for _, stat := range stats {
+			fmt.Fprintf(buf, "%d\t%s\n", stat.Downloaded, stat.Endpoint)
+		}
+	} else {
+		for _, stat := range stats {
+			fmt.Fprintf(buf, "%s MB\t%s\n", stat.FormatMegabytes(), stat.Endpoint)
+		}
+	}
+
+	ctx.Write(buf.Bytes())
 }

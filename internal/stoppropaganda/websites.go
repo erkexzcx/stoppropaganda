@@ -1,6 +1,8 @@
 package stoppropaganda
 
 import (
+	"bytes"
+	"log"
 	"net"
 	"net/url"
 	"strings"
@@ -18,6 +20,7 @@ const VALIDATE_DNS_EVERY = 5 * time.Minute
 type WebsiteStatus struct {
 	Requests     uint   `json:"requests"`
 	Errors       uint   `json:"errors"`
+	Downloaded   uint64 `json:"downloaded"`
 	LastErrorMsg string `json:"last_error_msg"`
 	Status       string `json:"status"`
 
@@ -28,8 +31,9 @@ type WebsiteStatus struct {
 	Counter_code500 uint `json:"status_500"`
 }
 
-func (ws *WebsiteStatus) IncreaseCounters(responseCode int) {
+func (ws *WebsiteStatus) IncreaseCounters(downloaded int, responseCode int) {
 	ws.Requests++
+	ws.Downloaded += uint64(downloaded)
 	switch {
 	case responseCode < 200:
 		ws.Counter_code100++
@@ -63,6 +67,7 @@ type Website struct {
 	checksPauseMux sync.Mutex
 	dnsLastChecked time.Time
 	pausedUntil    time.Time
+	pausedTimer    *time.Timer
 
 	// optimizations
 	helperIPBuf []net.IP
@@ -103,21 +108,24 @@ func startWebsites() {
 		websites[websiteUrl] = NewWebsite(websiteUrl)
 	}
 
-	websitesChannel := make(chan *Website, *flagWorkers)
-
-	// Spawn workers
-	for i := 0; i < *flagWorkers; i++ {
-		go runWebsiteWorker(websitesChannel)
+	websitesArr := make([]*Website, 0, len(websites))
+	for _, website := range websites {
+		websitesArr = append(websitesArr, website)
 	}
 
-	// Issue tasks
-	go func() {
-		for {
-			for _, website := range websites {
-				websitesChannel <- website
-			}
-		}
-	}()
+	// Spawn workers
+	numWorkers := *flagWorkers
+	perWebsite := float64(numWorkers) / float64(len(websitesArr))
+	log.Printf("Spawning %d workers for %d websites = %.1f workers/website", numWorkers, len(websitesArr), perWebsite)
+	for i := 0; i < numWorkers; i++ {
+		idx := i % len(websitesArr)
+		website := websitesArr[idx]
+		go website.runWebsiteWorker()
+	}
+	if perWebsite < 1.0 {
+		log.Printf("Warn: Some websites have 0 workers, websites choosen randomly")
+	}
+
 }
 
 // checksPauseMux must be locked prior calling this func
@@ -126,6 +134,7 @@ func (ws *Website) setPaused(duration time.Duration, reason string) {
 	ws.status.Status = "Paused: " + reason
 	ws.statusMux.Unlock()
 	ws.pausedUntil = time.Now().Add(duration)
+	ws.pausedTimer = time.NewTimer(duration)
 }
 
 func (ws *Website) allowedToRun() bool {
@@ -171,13 +180,15 @@ func (ws *Website) allowedToRun() bool {
 	return true
 }
 
-func runWebsiteWorker(c chan *Website) {
+func (ws *Website) runWebsiteWorker() {
 	// Each worker has it's own response
 	req := fasthttp.AcquireRequest()
+	resp := fasthttp.AcquireResponse()
 
 	for {
-		ws := <-c
 		if !ws.allowedToRun() {
+			// Wait for unpause
+			<-ws.pausedTimer.C
 			continue
 		}
 		ws.statusMux.Lock()
@@ -186,20 +197,25 @@ func runWebsiteWorker(c chan *Website) {
 
 		ws.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
 
-		resp := fasthttp.AcquireResponse()
+		bodyReader := bytes.NewReader([]byte{})
+		resp.SetBodyStream(bodyReader, -1)
+
 		// Perform request
-		err := httpClient.DoTimeout(req, resp, *flagTimeout)
+		err := httpClient.Do(req, resp)
 		if err != nil {
 			ws.statusMux.Lock()
 			ws.status.IncreaseCountersErr("httpClient.Do: " + err.Error())
 			ws.statusMux.Unlock()
 			continue
 		}
-		fasthttp.ReleaseResponse(resp)
+		// Prevent site memory leaking us with 32+ MB (uno reverso)
+		if len(resp.Body()) > 32*1024*1024 {
+			resp.ResetBody()
+		}
 
 		// Increase counters
 		ws.statusMux.Lock()
-		ws.status.IncreaseCounters(resp.StatusCode())
+		ws.status.IncreaseCounters(len(resp.Body()), resp.StatusCode())
 		ws.statusMux.Unlock()
 	}
 }

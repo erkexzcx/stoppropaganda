@@ -174,7 +174,6 @@ func (ws *Website) allowedToRun() bool {
 func runWebsiteWorker(c chan *Website) {
 	// Each worker has it's own response
 	req := fasthttp.AcquireRequest()
-	resp := fasthttp.AcquireResponse()
 
 	for {
 		ws := <-c
@@ -187,6 +186,7 @@ func runWebsiteWorker(c chan *Website) {
 
 		ws.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
 
+		resp := fasthttp.AcquireResponse()
 		// Perform request
 		err := httpClient.DoTimeout(req, resp, *flagTimeout)
 		if err != nil {
@@ -195,6 +195,7 @@ func runWebsiteWorker(c chan *Website) {
 			ws.statusMux.Unlock()
 			continue
 		}
+		fasthttp.ReleaseResponse(resp)
 
 		// Increase counters
 		ws.statusMux.Lock()

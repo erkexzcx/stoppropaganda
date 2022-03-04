@@ -498,11 +498,10 @@ func runWebsiteWorker(c chan *Website) {
 			ws.mux.Unlock()
 			continue
 		}
-		responseCode := resp.StatusCode()
 
 		// Increase counters
 		ws.mux.Lock()
-		ws.Status.IncreaseCounters(responseCode)
+		ws.Status.IncreaseCounters(resp.StatusCode())
 		ws.mux.Unlock()
 	}
 }

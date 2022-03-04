@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"sync"
 
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customresolver"
 	"github.com/valyala/fasthttp"
 )
 
@@ -11,6 +12,8 @@ func fasthttpRequestHandler(ctx *fasthttp.RequestCtx) {
 	switch string(ctx.Path()) {
 	case "/status":
 		fasthttpStatusResponseHandler(ctx)
+	case "/dnscache":
+		fasthttpDnsCacheResponseHandler(ctx)
 	}
 }
 
@@ -69,6 +72,20 @@ func fasthttpStatusResponseHandler(ctx *fasthttp.RequestCtx) {
 	statusService.mux.Lock()
 	content, err := json.MarshalIndent(statusService.AllStatus, "", "    ")
 	statusService.mux.Unlock()
+	if err != nil {
+		ctx.SetStatusCode(500)
+		ctx.WriteString("failed to marshal data")
+		return
+	}
+	ctx.Write(content)
+}
+
+func fasthttpDnsCacheResponseHandler(ctx *fasthttp.RequestCtx) {
+
+	cache := customresolver.DnsCache
+
+	dnsCacheItems := cache.Items()
+	content, err := json.MarshalIndent(dnsCacheItems, "", "    ")
 	if err != nil {
 		ctx.SetStatusCode(500)
 		ctx.WriteString("failed to marshal data")

@@ -192,7 +192,7 @@ func (d *CustomTCPDialer) dial(addr string, dualStack bool, timeout time.Duratio
 	if dualStack {
 		network = "tcp"
 	}
-	checkErr := resolvefix.CheckNonPublicIPAddrs(addrs)
+	checkErr := resolvefix.CheckNonPublicTCPEndpoints(addrs)
 	if checkErr != nil {
 		return nil, errors.New("CustomTCPDialer: " + checkErr.Error())
 	}

@@ -5,7 +5,7 @@ import (
 	"net"
 )
 
-func CheckNonPublicIPAddrs(addrs []net.TCPAddr) error {
+func CheckNonPublicTCPEndpoints(addrs []net.TCPAddr) error {
 	ips := make([]net.IP, len(addrs))
 	for i, addr := range addrs {
 		ips[i] = addr.IP
@@ -20,15 +20,6 @@ func CheckNonPublicIP(ips []net.IP) error {
 		}
 	}
 	return nil
-}
-
-func ContainsNonPublicIP(ips []net.IP) bool {
-	for _, ip := range ips {
-		if IsNonPublic(ip) {
-			return true
-		}
-	}
-	return false
 }
 
 func IsNonPublic(ip net.IP) bool {

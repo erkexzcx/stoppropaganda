@@ -58,9 +58,7 @@ type CustomTCPDialer struct {
 
 	once sync.Once
 
-	// stoppropaganda start
 	ParentDialer sockshttp.Dialer
-	// stoppropaganda end
 }
 
 // Dial dials the given TCP addr using tcp4.
@@ -197,18 +195,6 @@ func (d *CustomTCPDialer) dial(addr string, dualStack bool, timeout time.Duratio
 		return nil, errors.New("CustomTCPDialer: " + checkErr.Error())
 	}
 
-	ticketC := d.DialTicketsC
-	if ticketC != nil {
-		select {
-		// either we catch the ticket instantly
-		case <-ticketC:
-		// or maybe let's wait until we have a green light
-		case <-time.After(timeout / 2):
-			// time passed, we didn't get a ticket :(
-			return nil, ErrTooFastDialSpam
-		}
-	}
-
 	var conn net.Conn
 	n := uint32(len(addrs))
 	deadline := time.Now().Add(timeout)
@@ -251,7 +237,17 @@ func (d *CustomTCPDialer) tryDial(network string, addr *net.TCPAddr, deadline ti
 		}
 		defer func() { <-concurrencyCh }()
 	}
-	// stoppropaganda start - add parent dialer
+	ticketC := d.DialTicketsC
+	if ticketC != nil {
+		select {
+		// either we catch the ticket instantly
+		case <-ticketC:
+		// or maybe let's wait until we have a green light
+		case <-time.After(timeout / 2):
+			// time passed, we didn't get a ticket :(
+			return nil, ErrTooFastDialSpam
+		}
+	}
 
 	dialer := d.ParentDialer
 	if dialer == nil {
@@ -263,7 +259,6 @@ func (d *CustomTCPDialer) tryDial(network string, addr *net.TCPAddr, deadline ti
 	}
 
 	conn, err := dialer.Dial(network, addr.String())
-	// stoppropaganda end
 	return conn, err
 }
 

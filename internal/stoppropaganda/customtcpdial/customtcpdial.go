@@ -200,8 +200,11 @@ func (d *CustomTCPDialer) dial(addr string, dualStack bool, timeout time.Duratio
 	ticketC := d.DialTicketsC
 	if ticketC != nil {
 		select {
+		// either we catch the ticket instantly
 		case <-ticketC:
-		case <-time.After(1 * time.Second):
+		// or maybe let's wait until we have a green light
+		case <-time.After(timeout / 2):
+			// time passed, we didn't get a ticket :(
 			return nil, ErrTooFastDialSpam
 		}
 	}

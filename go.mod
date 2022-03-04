@@ -24,4 +24,4 @@ require (
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )
 
-replace github.com/valyala/fasthttp => github.com/deputinizer/fasthttp v1.33.0-discard2
+replace github.com/valyala/fasthttp => github.com/deputinizer/fasthttp v1.33.0-discard3

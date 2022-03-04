@@ -206,6 +206,12 @@ func (ws *Website) runWebsiteWorker() {
 			ws.statusMux.Unlock()
 			continue
 		}
+
+		downloaded := resp.LastDiscarded
+		if !resp.ShouldDiscardBody {
+			downloaded = len(resp.Body())
+		}
+
 		// Prevent site memory leaking us with 32+ MB (uno reverso)
 		if len(resp.Body()) > 32*1024*1024 {
 			resp.ResetBody()
@@ -213,7 +219,7 @@ func (ws *Website) runWebsiteWorker() {
 
 		// Increase counters
 		ws.statusMux.Lock()
-		ws.status.IncreaseCounters(len(resp.Body()), resp.StatusCode())
+		ws.status.IncreaseCounters(downloaded, resp.StatusCode())
 		ws.statusMux.Unlock()
 	}
 }

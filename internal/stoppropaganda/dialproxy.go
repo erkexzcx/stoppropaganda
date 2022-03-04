@@ -1,20 +1,13 @@
 package stoppropaganda
 
 import (
+	"bytes"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/sockshttp"
 )
-
-// func CustomDial(addr string) (conn net.Conn, err error) {
-// 	dialer, err := MakeDialerThrough(proxyChain)
-// 	if err != nil {
-// 		return
-// 	}
-// 	return
-// }
 
 const (
 	ProxyMethodSocks5 = byte(iota)
@@ -71,6 +64,9 @@ func MethodID2Name(id byte) string {
 	if id == ProxyMethodSocks4 {
 		return "socks4"
 	}
+	if id == ProxyMethodDirect {
+		return "direct"
+	}
 	return "unknown " + strconv.Itoa(int(id))
 }
 
@@ -97,4 +93,68 @@ func (pc ProxyChain) String() string {
 }
 func (pc ProxyChain) Last() Proxy {
 	return pc[len(pc)-1]
+}
+
+func MaybeExtract(proxyDesc []byte, prefix []byte, methodIn byte) (ok bool, proxyAddr []byte, method byte) {
+	ok = bytes.HasPrefix(proxyDesc, prefix)
+	if ok {
+		method = methodIn
+		proxyAddr = proxyDesc[len(prefix):]
+	}
+	return
+}
+func ExtractProxyMethod(proxyDesc []byte) (proxyAddr []byte, method byte) {
+	method = ProxyMethodSocks5
+
+	if bytes.Equal(proxyDesc, []byte("direct")) {
+		return proxyDesc, ProxyMethodDirect
+	}
+
+	var ok bool
+	if ok, proxyAddr, method = MaybeExtract(proxyDesc, []byte("4:"), ProxyMethodSocks4); ok {
+		return
+	}
+	if ok, proxyAddr, method = MaybeExtract(proxyDesc, []byte("socks4:"), ProxyMethodSocks4); ok {
+		return
+	}
+	if ok, proxyAddr, method = MaybeExtract(proxyDesc, []byte("h:"), ProxyMethodHttp); ok {
+		return
+	}
+	if ok, proxyAddr, method = MaybeExtract(proxyDesc, []byte("http:"), ProxyMethodHttp); ok {
+		return
+	}
+	if ok, proxyAddr, method = MaybeExtract(proxyDesc, []byte("socks5:"), ProxyMethodSocks5); ok {
+		return
+	}
+	if ok, proxyAddr, method = MaybeExtract(proxyDesc, []byte("5:"), ProxyMethodSocks5); ok {
+		return
+	}
+	proxyAddr = proxyDesc
+
+	return
+}
+func ParseProxy(proxyDesc string) (proxy Proxy) {
+	proxyaddrBytes, method := ExtractProxyMethod([]byte(proxyDesc))
+	proxyaddr := string(proxyaddrBytes)
+	proxy = Proxy{Addr: proxyaddr, Method: method}
+	return
+}
+
+func ParseProxyChain(proxyChain string) (chain ProxyChain) {
+	// "socks4://1.1.1.1:1,h://2.2.2.2:2"
+	proxyChain = strings.Replace(proxyChain, "//", "", -1)
+	// "socks4:1.1.1.1:1,h:2.2.2.2:2"
+
+	proxyAddrs := strings.Split(proxyChain, ",")
+	// "socks4:1.1.1.1:1"
+	// "h:2.2.2.2:2"
+
+	chain = make([]Proxy, 0, len(proxyAddrs))
+	for _, proxyDesc := range proxyAddrs {
+		if proxyDesc != "direct" {
+			proxy := ParseProxy(proxyDesc)
+			chain = append(chain, proxy)
+		}
+	}
+	return
 }

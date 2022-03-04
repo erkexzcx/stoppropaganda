@@ -21,13 +21,16 @@ var targetDNSServers = map[string]struct{}{
 	"95.173.148.50:53":  {},
 }
 
-type DNSServer struct {
+type DNSServerStatus struct {
 	Requests     uint   `json:"requests"`
 	Success      uint   `json:"success"`
 	Errors       uint   `json:"errors"`
 	LastErrorMsg string `json:"last_error_msg"`
+}
 
-	mux     *sync.Mutex
+type DNSServer struct {
+	Status  DNSServerStatus
+	mux     sync.Mutex
 	message *dns.Msg
 	target  string
 }
@@ -38,13 +41,14 @@ var dnsServers = map[string]*DNSServer{}
 
 func startDNS() {
 	for targetDNSServer := range targetDNSServers {
+		questionDomain := getRandomDomain() + "."
+		message := new(dns.Msg)
+		message.SetQuestion(questionDomain, dns.TypeA)
+
 		dnsServers[targetDNSServer] = &DNSServer{
-			mux:     &sync.Mutex{},
-			message: new(dns.Msg),
+			message: message,
 			target:  targetDNSServer,
 		}
-		questionDomain := getRandomDomain() + "."
-		dnsServers[targetDNSServer].message.SetQuestion(questionDomain, dns.TypeA)
 	}
 
 	dnsChannel := make(chan *DNSServer, *flagDNSWorkers)
@@ -70,21 +74,21 @@ func runDNSWorker(c chan *DNSServer) {
 		_, _, err := dnsClient.Exchange(dnsServer.message, dnsServer.target)
 
 		dnsServer.mux.Lock()
-		dnsServer.Requests++
+		dnsServer.Status.Requests++
 		if err != nil {
-			dnsServer.Errors++
+			dnsServer.Status.Errors++
 			switch {
 			case strings.HasSuffix(err.Error(), "no such host"):
-				dnsServer.LastErrorMsg = "Host does not exist"
+				dnsServer.Status.LastErrorMsg = "Host does not exist"
 			case strings.HasSuffix(err.Error(), "connection refused"):
-				dnsServer.LastErrorMsg = "Connection refused"
+				dnsServer.Status.LastErrorMsg = "Connection refused"
 			case strings.HasSuffix(err.Error(), "i/o timeout"):
-				dnsServer.LastErrorMsg = "Query timeout"
+				dnsServer.Status.LastErrorMsg = "Query timeout"
 			default:
-				dnsServer.LastErrorMsg = err.Error()
+				dnsServer.Status.LastErrorMsg = err.Error()
 			}
 		} else {
-			dnsServer.Success++
+			dnsServer.Status.Success++
 		}
 		dnsServer.mux.Unlock()
 	}

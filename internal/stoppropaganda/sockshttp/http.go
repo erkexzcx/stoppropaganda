@@ -74,7 +74,7 @@ func (s *Http) Dial(network, addr string) (net.Conn, error) {
 		return nil, errors.New("proxy_http: failed to read from HTTP proxy at " + s.addr + ": " + err.Error())
 	}
 	lines := bytes.Split(buf[:n], []byte("\n"))
-	if len(lines) < 0 {
+	if len(lines) == 0 {
 		return nil, errors.New("proxy_http: received fewer lines from HTTP proxy at " + s.addr)
 	}
 	response := string(lines[0])

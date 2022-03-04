@@ -8,6 +8,8 @@ github.com/deputinizer/fasthttp v1.33.0-discard2 h1:V1B6jiWUqkQlqSMUk3SlqGKAKAm4
 github.com/deputinizer/fasthttp v1.33.0-discard2/go.mod h1:eznmi1XLARdqNIktB7brDqBBO0jmJ5bqlqh/wf00U1I=
 github.com/deputinizer/fasthttp v1.33.0-discard3 h1:Z68bkm3uVXpaSvrWUoeitil7Up0BGY96L4jyfan25WA=
 github.com/deputinizer/fasthttp v1.33.0-discard3/go.mod h1:eznmi1XLARdqNIktB7brDqBBO0jmJ5bqlqh/wf00U1I=
+github.com/deputinizer/fasthttp v1.33.0-discard4 h1:GPSNfgr/CdISxSrPcFxVii9tsDRQ9dX0jC/vhepwfv4=
+github.com/deputinizer/fasthttp v1.33.0-discard4/go.mod h1:eznmi1XLARdqNIktB7brDqBBO0jmJ5bqlqh/wf00U1I=
 github.com/deputinizer/fasthttp v1.33.0 h1:YwWkMHj7bMA+WEeyAlOCmyceD7A0bwAl8SC9q5DZ/8o=
 github.com/deputinizer/fasthttp v1.33.0/go.mod h1:KJRK/MXx0J+yd0c5hlR+s1tIHD72sniU8ZJjl97LIw4=
 github.com/klauspost/compress v1.14.1/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47etQ6QUkpK6sk=

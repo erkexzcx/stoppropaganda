@@ -790,6 +790,7 @@ func swapResponseBody(a, b *Response) {
 	a.bodyRaw, b.bodyRaw = b.bodyRaw, a.bodyRaw
 	a.bodyStream, b.bodyStream = b.bodyStream, a.bodyStream
 	a.LastDiscarded, b.LastDiscarded = b.LastDiscarded, a.LastDiscarded
+	a.ShouldDiscardBody, b.ShouldDiscardBody = b.ShouldDiscardBody, a.ShouldDiscardBody
 }
 
 // URI returns request URI

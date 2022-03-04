@@ -18,12 +18,12 @@ type Resolver interface {
 	LookupIPAddr(context.Context, string) (names []net.IPAddr, err error)
 }
 
-func (cs *CustomResolver) LookupIPAddr(ctx context.Context, host string) (names []net.IPAddr, err error) {
+func (cr *CustomResolver) LookupIPAddr(ctx context.Context, host string) (names []net.IPAddr, err error) {
 	if c, found := dnscache.Get(host); found {
 		return c.([]net.IPAddr), nil
 	}
 
-	names, err = cs.ParentResolver.LookupIPAddr(ctx, host)
+	names, err = cr.ParentResolver.LookupIPAddr(ctx, host)
 	if err == nil {
 		dnscache.SetDefault(host, names)
 	}

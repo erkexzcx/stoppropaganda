@@ -55,19 +55,17 @@ func fasthttpStatusResponseHandler(ctx *fasthttp.RequestCtx) {
 		go func(endpoint string, ws *Website) {
 			ws.mux.Lock()
 			tmpStatus := ws.Status
+			unpauseTime := ws.unpauseTime
+			paused := ws.paused
 			ws.mux.Unlock()
 
 			statusService.mux.Lock()
 			statusService.AllStatus.Websites[endpoint] = &tmpStatus
 			statusService.mux.Unlock()
 
-			dosPausedFor := time.Since(ws.dnsLastChecked)
-			if ws.paused {
-				if dosPausedFor >= VALIDATE_DNS_EVERY {
-					tmpStatus.Status += ", DOS paused for 0s"
-				} else {
-					tmpStatus.Status += ", DOS paused for " + (VALIDATE_DNS_EVERY - dosPausedFor).String()
-				}
+			dosPausedFor := -time.Since(unpauseTime)
+			if paused {
+				tmpStatus.Status += ", DOS paused for " + dosPausedFor.String()
 			}
 
 			wg.Done()

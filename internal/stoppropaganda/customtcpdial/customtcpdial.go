@@ -191,7 +191,7 @@ func (d *CustomTCPDialer) dial(addr string, dualStack bool, timeout time.Duratio
 	}
 	checkErr := resolvefix.CheckNonPublicIPAddrs(addrs)
 	if checkErr != nil {
-		return nil, errors.New("CustomTCPDialer: " + err.Error())
+		return nil, errors.New("CustomTCPDialer: " + checkErr.Error())
 	}
 
 	ticketC := d.DialTicketsC

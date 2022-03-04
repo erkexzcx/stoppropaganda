@@ -2126,7 +2126,7 @@ func discardBodyIdentity(r *bufio.Reader, maxBodySize int) (discarded int, err e
 	// }
 
 	for {
-		nn, err := r.Discard(maxBodySize)
+		nn, err := r.Discard(10 * 1024 * 1024)
 		//if nn <= 0 {
 		if err != nil {
 			if err == io.EOF {

@@ -4,6 +4,8 @@ github.com/andybalholm/brotli v1.0.4/go.mod h1:fO7iG3H7G2nSZ7m0zPUDn85XEX2GTukHG
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/deputinizer/fasthttp v1.33.0-discard h1:hdB26T32ywsELr0uttlxEltzRxvHHs00xLhlc2Znb+A=
 github.com/deputinizer/fasthttp v1.33.0-discard/go.mod h1:eznmi1XLARdqNIktB7brDqBBO0jmJ5bqlqh/wf00U1I=
+github.com/deputinizer/fasthttp v1.33.0-discard2 h1:V1B6jiWUqkQlqSMUk3SlqGKAKAm4Tu+vz38RMkFSpgc=
+github.com/deputinizer/fasthttp v1.33.0-discard2/go.mod h1:eznmi1XLARdqNIktB7brDqBBO0jmJ5bqlqh/wf00U1I=
 github.com/deputinizer/fasthttp v1.33.0 h1:YwWkMHj7bMA+WEeyAlOCmyceD7A0bwAl8SC9q5DZ/8o=
 github.com/deputinizer/fasthttp v1.33.0/go.mod h1:KJRK/MXx0J+yd0c5hlR+s1tIHD72sniU8ZJjl97LIw4=
 github.com/klauspost/compress v1.14.1/go.mod h1:/3/Vjq9QcHkK5uEr5lBEmyoZ1iFhe47etQ6QUkpK6sk=

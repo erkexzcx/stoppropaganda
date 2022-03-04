@@ -1,6 +1,7 @@
 package stoppropaganda
 
 import (
+	"net"
 	"net/url"
 	"strings"
 	"sync"
@@ -382,6 +383,9 @@ type Website struct {
 	dnsLastChecked time.Time
 	unpauseTime    time.Time
 
+	// optimizations
+	helperIPBuf []net.IP
+
 	req *fasthttp.Request
 }
 
@@ -389,29 +393,33 @@ var httpClient *fasthttp.Client
 
 var websites = map[string]*Website{}
 
+func NewWebsite(websiteUrlStr string) (website *Website) {
+	websiteURL, err := url.Parse(websiteUrlStr)
+	if err != nil {
+		panic(err)
+	}
+	newReq := fasthttp.AcquireRequest()
+	newReq.SetRequestURI(websiteUrlStr)
+	newReq.Header.SetMethod(fasthttp.MethodGet)
+	newReq.Header.Set("Host", websiteURL.Host)
+	newReq.Header.Set("User-Agent", *flagUserAgent)
+	newReq.Header.Set("Accept", "*/*")
+
+	return &Website{
+		host: websiteURL.Host,
+		Status: WebsiteStatus{
+			Status: "Initializing",
+		},
+		dnsLastChecked: time.Now().Add(-1 * VALIDATE_DNS_EVERY), // this forces to validate on first run
+		unpauseTime:    time.Now(),
+		req:            newReq,
+		helperIPBuf:    make([]net.IP, 128),
+	}
+}
+
 func startWebsites() {
-	for website := range targetWebsites {
-		websiteURL, err := url.Parse(website)
-		if err != nil {
-			panic(err)
-		}
-
-		newReq := fasthttp.AcquireRequest()
-		newReq.SetRequestURI(website)
-		newReq.Header.SetMethod(fasthttp.MethodGet)
-		newReq.Header.Set("Host", websiteURL.Host)
-		newReq.Header.Set("User-Agent", *flagUserAgent)
-		newReq.Header.Set("Accept", "*/*")
-
-		websites[website] = &Website{
-			host: websiteURL.Host,
-			Status: WebsiteStatus{
-				Status: "Initializing",
-			},
-			dnsLastChecked: time.Now().Add(-1 * VALIDATE_DNS_EVERY), // this forces to validate on first run
-			unpauseTime:    time.Now(),
-			req:            newReq,
-		}
+	for websiteUrl := range targetWebsites {
+		websites[websiteUrl] = NewWebsite(websiteUrl)
 	}
 
 	websitesChannel := make(chan *Website, *flagWorkers)
@@ -454,7 +462,7 @@ func (ws *Website) allowedToRun() bool {
 			return false
 		}
 
-		ipAddresses, err := customresolver.GetIPs(ws.host)
+		ipAddresses, err := customresolver.GetIPs(ws.host, ws.helperIPBuf)
 
 		if err != nil {
 			errStr := err.Error()

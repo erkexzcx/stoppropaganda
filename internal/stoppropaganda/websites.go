@@ -362,11 +362,11 @@ func (ws *WebsiteStatus) IncreateCounters(responseCode int) {
 		ws.Counter_code500++
 	}
 }
-func (ws *WebsiteStatus) IncreateCountersErr(err error) {
+func (ws *WebsiteStatus) IncreateCountersErr(errMsg string) {
 	ws.Requests++
-	if !strings.Contains(err.Error(), customtcpdial.ErrTooFastDialSpam.Error()) {
+	if !strings.Contains(errMsg, customtcpdial.ErrTooFastDialSpam.Error()) {
 		ws.Errors++
-		ws.LastErrorMsg = err.Error()
+		ws.LastErrorMsg = errMsg
 	}
 }
 
@@ -446,7 +446,7 @@ func (ws *Website) ShouldRun() bool {
 func (ws *Website) SchedulePause(duration time.Duration, reason string) {
 	ws.mux.Lock()
 	ws.paused = true
-	ws.Status.Status = reason
+	ws.Status.Status = "Paused: " + reason
 	unpauseTime := time.Now().Add(duration)
 	ws.unpauseTime = unpauseTime
 
@@ -525,7 +525,7 @@ func runWebsiteWorker(c chan *Website) {
 		err := httpClient.DoTimeout(req, resp, *flagTimeout)
 		if err != nil {
 			website.mux.Lock()
-			website.Status.IncreateCountersErr(err)
+			website.Status.IncreateCountersErr("httpClient.Do: " + err.Error())
 			website.mux.Unlock()
 			continue
 		}

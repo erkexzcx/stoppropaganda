@@ -440,7 +440,7 @@ func (ws *Website) paused() bool {
 	return time.Now().Before(ws.unpauseTime)
 }
 
-func (ws *Website) setPause(duration time.Duration, reason string) {
+func (ws *Website) setPaused(duration time.Duration, reason string) {
 	ws.mux.Lock()
 	defer ws.mux.Unlock()
 	ws.Status.Status = "Paused: " + reason
@@ -448,34 +448,37 @@ func (ws *Website) setPause(duration time.Duration, reason string) {
 }
 
 func (ws *Website) allowedToRun() bool {
-	// Lock, because we don't want multiple validations
-	// running at the same time
-	ws.validateMux.Lock()
-	defer ws.validateMux.Unlock()
-
 	if !ws.paused() {
+		ws.validateMux.Lock()
+		defer ws.validateMux.Unlock()
+
+		// Exit if first worker in the mux queue has paused the website
+		if ws.paused() {
+			return false
+		}
+
 		ipAddresses, err := customresolver.GetIPs(ws.host)
 
 		if err != nil {
 			errStr := err.Error()
 			switch {
 			case strings.HasSuffix(errStr, "Temporary failure in name resolution") || strings.HasSuffix(errStr, "connection refused"):
-				ws.setPause(time.Second, "Your DNS servers unreachable or returned an error: "+errStr)
+				ws.setPaused(time.Second, "Your DNS servers unreachable or returned an error: "+errStr)
 				return false
 			case strings.HasSuffix(errStr, "no such host"):
-				ws.setPause(5*time.Minute, "Domain does not exist: "+errStr)
+				ws.setPaused(5*time.Minute, "Domain does not exist: "+errStr)
 				return false
 			case strings.HasSuffix(errStr, "No address associated with hostname"):
-				ws.setPause(5*time.Minute, "Domain does not have any IPs assigned: "+errStr)
+				ws.setPaused(5*time.Minute, "Domain does not have any IPs assigned: "+errStr)
 				return false
 			default:
-				ws.setPause(10*time.Second, errStr)
+				ws.setPaused(10*time.Second, errStr)
 				return false
 			}
 		}
 
 		if err = resolvefix.CheckNonPublicIP(ipAddresses); err != nil {
-			ws.setPause(5*time.Minute, err.Error())
+			ws.setPaused(5*time.Minute, err.Error())
 			return false
 		}
 		return true

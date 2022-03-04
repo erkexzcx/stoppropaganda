@@ -17,6 +17,18 @@ import (
 	"github.com/valyala/bytebufferpool"
 )
 
+var (
+	requestBodyPoolSizeLimit  = -1
+	responseBodyPoolSizeLimit = -1
+)
+
+// SetBodySizePoolLimit set the max body size for bodies to be returned to the pool.
+// If the body size is larger it will be released instead of put back into the pool for reuse.
+func SetBodySizePoolLimit(reqBodyLimit, respBodyLimit int) {
+	requestBodyPoolSizeLimit = reqBodyLimit
+	responseBodyPoolSizeLimit = respBodyLimit
+}
+
 // Request represents HTTP request.
 //
 // It is forbidden copying Request instances. Create new instances
@@ -98,6 +110,12 @@ type Response struct {
 	raddr net.Addr
 	// Local TCPAddr from concurrently net.Conn
 	laddr net.Addr
+
+	// True if response body should be bufio.Reader.Discard
+	ShouldDiscardBody bool
+
+	// len(resp.Body()) like if it was not discarded
+	LastDiscarded int
 }
 
 // SetHost sets host for the request.
@@ -957,6 +975,9 @@ func readMultipartForm(r io.Reader, boundary string, size, maxInMemoryFileSize i
 
 // Reset clears request contents.
 func (req *Request) Reset() {
+	if requestBodyPoolSizeLimit >= 0 && req.body != nil {
+		req.ReleaseBody(requestBodyPoolSizeLimit)
+	}
 	req.Header.Reset()
 	req.resetSkipHeader()
 	req.timeout = 0
@@ -986,6 +1007,9 @@ func (req *Request) RemoveMultipartFormFiles() {
 
 // Reset clears response contents.
 func (resp *Response) Reset() {
+	if responseBodyPoolSizeLimit >= 0 && resp.body != nil {
+		resp.ReleaseBody(responseBodyPoolSizeLimit)
+	}
 	resp.Header.Reset()
 	resp.resetSkipHeader()
 	resp.SkipBody = false
@@ -1291,6 +1315,9 @@ func (resp *Response) ReadLimitBody(r *bufio.Reader, maxBodySize int) error {
 // If maxBodySize > 0 and the body size exceeds maxBodySize,
 // then ErrBodyTooLarge is returned.
 func (resp *Response) ReadBody(r *bufio.Reader, maxBodySize int) (err error) {
+	if resp.ShouldDiscardBody {
+		return resp.DiscardBody(r, maxBodySize)
+	}
 	bodyBuf := resp.bodyBuffer()
 	bodyBuf.Reset()
 
@@ -1306,6 +1333,23 @@ func (resp *Response) ReadBody(r *bufio.Reader, maxBodySize int) (err error) {
 		resp.Header.SetContentLength(len(bodyBuf.B))
 	}
 	return err
+}
+
+func (resp *Response) DiscardBody(r *bufio.Reader, maxBodySize int) (err error) {
+	contentLength := resp.Header.ContentLength()
+	var discarded int
+	if contentLength >= 0 {
+		discarded, err = discardBody(r, contentLength, maxBodySize)
+
+	} else if contentLength == -1 {
+		discarded, err = discardBodyChunked(r, maxBodySize)
+
+	} else {
+		discarded, err = discardBodyIdentity(r, maxBodySize)
+		resp.Header.SetContentLength(discarded)
+	}
+	resp.LastDiscarded = discarded
+	return
 }
 
 func (resp *Response) mustSkipBody() bool {
@@ -2002,6 +2046,13 @@ func readBody(r *bufio.Reader, contentLength int, maxBodySize int, dst []byte) (
 	return appendBodyFixedSize(r, dst, contentLength)
 }
 
+func discardBody(r *bufio.Reader, contentLength int, maxBodySize int) (int, error) {
+	if maxBodySize > 0 && contentLength > maxBodySize {
+		return 0, ErrBodyTooLarge
+	}
+	return discardBodyFixedSize(r, contentLength)
+}
+
 var errChunkedStream = errors.New("chunked stream")
 
 func readBodyWithStreaming(r *bufio.Reader, contentLength int, maxBodySize int, dst []byte) (b []byte, err error) {
@@ -2068,6 +2119,39 @@ func readBodyIdentity(r *bufio.Reader, maxBodySize int, dst []byte) ([]byte, err
 	}
 }
 
+func discardBodyIdentity(r *bufio.Reader, maxBodySize int) (discarded int, err error) {
+	// dst = dst[:cap(dst)]
+	// if len(dst) == 0 {
+	// 	dst = make([]byte, 1024)
+	// }
+
+	for {
+		nn, err := r.Discard(maxBodySize)
+		//if nn <= 0 {
+		if err != nil {
+			if err == io.EOF {
+				return discarded, nil
+			}
+			return discarded, err
+		}
+		//panic(fmt.Sprintf("BUG: bufio.Read() returned (%d, nil)", nn))
+		//}
+		discarded += nn
+		if maxBodySize > 0 && discarded > maxBodySize {
+			return discarded, ErrBodyTooLarge
+		}
+		// if len(dst) == discarded {
+		// 	n := round2(2 * discarded)
+		// 	if maxBodySize > 0 && n > maxBodySize {
+		// 		n = maxBodySize + 1
+		// 	}
+		// 	b := make([]byte, n)
+		// 	copy(b, dst)
+		// 	dst = b
+		// }
+	}
+}
+
 func appendBodyFixedSize(r *bufio.Reader, dst []byte, n int) ([]byte, error) {
 	if n == 0 {
 		return dst, nil
@@ -2096,6 +2180,38 @@ func appendBodyFixedSize(r *bufio.Reader, dst []byte, n int) ([]byte, error) {
 		offset += nn
 		if offset == dstLen {
 			return dst, nil
+		}
+	}
+}
+
+func discardBodyFixedSize(r *bufio.Reader, n int) (discarded int, err error) {
+	if n == 0 {
+		return 0, nil
+	}
+
+	// offset := len(dst)
+	// dstLen := offset + n
+	// if cap(dst) < dstLen {
+	// 	b := make([]byte, round2(dstLen))
+	// 	copy(b, dst)
+	// 	dst = b
+	// }
+	// dst = dst[:dstLen]
+
+	for {
+		nn, err := r.Discard(n)
+		//if nn <= 0 {
+		if err != nil {
+			if err == io.EOF {
+				err = io.ErrUnexpectedEOF
+			}
+			return discarded, err
+		}
+		//panic(fmt.Sprintf("BUG: bufio.Discard() returned (%d, nil)", nn))
+		//}
+		discarded += nn
+		if discarded >= n {
+			return discarded, nil
 		}
 	}
 }
@@ -2132,6 +2248,37 @@ func readBodyChunked(r *bufio.Reader, maxBodySize int, dst []byte) ([]byte, erro
 			}
 		}
 		dst = dst[:len(dst)-strCRLFLen]
+	}
+}
+
+func discardBodyChunked(r *bufio.Reader, maxBodySize int) (discarded int, err error) {
+
+	strCRLFLen := len(strCRLF)
+	for {
+		chunkSize, err := parseChunkSize(r)
+		if err != nil {
+			return discarded, err
+		}
+		if chunkSize == 0 {
+			return discarded, err
+		}
+		if maxBodySize > 0 && discarded+chunkSize > maxBodySize {
+			return discarded, ErrBodyTooLarge
+		}
+		var nn int
+		nn, err = discardBodyFixedSize(r, chunkSize+strCRLFLen)
+		if err != nil {
+			return discarded, err
+		}
+		discarded += nn
+		// TODO: we can't check CRLF since there's bufio.Reader.Discard
+
+		// if !bytes.Equal(dst[len(dst)-strCRLFLen:], strCRLF) {
+		// 	return discarded, ErrBrokenChunk{
+		// 		error: fmt.Errorf("cannot find crlf at the end of chunk"),
+		// 	}
+		// }
+		discarded -= strCRLFLen
 	}
 }
 

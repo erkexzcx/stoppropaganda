@@ -37,6 +37,7 @@ func GetIPs(host string, helperIPBuf []net.IP) (ips []net.IP, err error) {
 				// - swap i and last element
 				ips[i] = ips[len(ips)-1]
 				// - pop last element
+				ips[len(ips)-1] = nil
 				ips = ips[:len(ips)-1]
 			}
 		}

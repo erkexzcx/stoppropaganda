@@ -347,7 +347,7 @@ type WebsiteStatus struct {
 	Counter_code500 uint `json:"status_500"`
 }
 
-func (ws *WebsiteStatus) IncreateCounters(responseCode int) {
+func (ws *WebsiteStatus) IncreaseCounters(responseCode int) {
 	ws.Requests++
 	switch {
 	case responseCode < 200:
@@ -362,7 +362,7 @@ func (ws *WebsiteStatus) IncreateCounters(responseCode int) {
 		ws.Counter_code500++
 	}
 }
-func (ws *WebsiteStatus) IncreateCountersErr(errMsg string) {
+func (ws *WebsiteStatus) IncreaseCountersErr(errMsg string) {
 	ws.Requests++
 	if !strings.Contains(errMsg, customtcpdial.ErrTooFastDialSpam.Error()) {
 		ws.Errors++
@@ -518,7 +518,7 @@ func runWebsiteWorker(c chan *Website) {
 		err := httpClient.DoTimeout(req, resp, *flagTimeout)
 		if err != nil {
 			website.mux.Lock()
-			website.Status.IncreateCountersErr("httpClient.Do: " + err.Error())
+			website.Status.IncreaseCountersErr("httpClient.Do: " + err.Error())
 			website.mux.Unlock()
 			continue
 		}
@@ -526,7 +526,7 @@ func runWebsiteWorker(c chan *Website) {
 
 		// Increase counters
 		website.mux.Lock()
-		website.Status.IncreateCounters(responseCode)
+		website.Status.IncreaseCounters(responseCode)
 		website.mux.Unlock()
 	}
 }

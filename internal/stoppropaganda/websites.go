@@ -508,11 +508,9 @@ func runWebsiteWorker(c chan *Website) {
 		if website.paused {
 			continue
 		}
-		{
-			website.mux.Lock()
-			website.Status.Status = "Running"
-			website.mux.Unlock()
-		}
+		website.mux.Lock()
+		website.Status.Status = "Running"
+		website.mux.Unlock()
 
 		website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
 

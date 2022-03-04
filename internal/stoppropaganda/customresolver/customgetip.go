@@ -6,7 +6,7 @@ import (
 )
 
 var getIPcachedResolver = &CustomResolver{
-	ParentResolver: net.DefaultResolver,
+	ParentResolver: injectionGoResolver,
 }
 
 // Modified to use stoppropaganda's CustomResolver

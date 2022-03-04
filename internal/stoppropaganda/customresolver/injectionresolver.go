@@ -8,7 +8,7 @@ import (
 	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/targets"
 )
 
-var injectionGoResolver = &net.Resolver{
+var InjectionGoResolver = &net.Resolver{
 	PreferGo: true,
 	Dial: func(ctx context.Context, network, address string) (conn net.Conn, err error) {
 		tries := 3

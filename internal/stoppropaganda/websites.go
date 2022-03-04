@@ -432,14 +432,15 @@ func startWebsites() {
 	}()
 }
 
-func (ws *Website) ShouldRun() (paused bool) {
-	paused = false // false by default
+func (ws *Website) ShouldRun() (shouldRun bool) {
+	shouldRun = true // true by default
 	ws.mux.Lock()
 	if ws.paused {
-		paused = time.Now().Before(ws.unpauseTime)
+		paused := time.Now().Before(ws.unpauseTime)
 		if !paused {
 			ws.paused = false
 		}
+		shouldRun = !paused
 	}
 	ws.mux.Unlock()
 	return

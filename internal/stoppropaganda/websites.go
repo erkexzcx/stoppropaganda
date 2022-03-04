@@ -432,15 +432,23 @@ func startWebsites() {
 	}()
 }
 
-func (ws *Website) ShouldRun() bool {
+func (ws *Website) ShouldRun() (paused bool) {
+	paused = false // false by default
+	ws.mux.Lock()
 	if ws.paused {
-		paused := time.Now().Before(ws.unpauseTime)
+		paused = time.Now().Before(ws.unpauseTime)
 		if !paused {
 			ws.paused = false
 		}
-		return paused
 	}
-	return true
+	ws.mux.Unlock()
+	return
+}
+func (ws *Website) IsPausedMutex() (paused bool) {
+	ws.mux.Lock()
+	paused = ws.paused
+	ws.mux.Unlock()
+	return
 }
 
 func (ws *Website) SchedulePause(duration time.Duration, reason string) {
@@ -510,7 +518,7 @@ func runWebsiteWorker(c chan *Website) {
 		}
 		website.ValidateDNS()
 		// Check again after DNS validated
-		if website.paused {
+		if website.IsPausedMutex() {
 			continue
 		}
 		{

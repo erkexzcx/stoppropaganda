@@ -200,12 +200,6 @@ For example `-proxybypass "localhost"`.
 
 This parameter is only applicable when used with [proxy](#proxy) parameter.
 
-// AddFromString parses a string that contains comma-separated values
-// specifying hosts that should use the bypass proxy. Each value is either an
-// IP address, a CIDR range, a zone (*.example.com) or a hostname
-// (localhost). A best effort is made to parse the string and errors are
-// ignored.
-
 # Web UI
 
 As of now there is no fancy web interface, only a JSON pre-formatted output. You can access it using URL http://127.0.0.1:8049/status

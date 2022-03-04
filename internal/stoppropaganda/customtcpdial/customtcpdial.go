@@ -3,6 +3,7 @@ package customtcpdial
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	"strconv"
 	"sync"
@@ -209,12 +210,13 @@ func (d *CustomTCPDialer) dial(addr string, dualStack bool, timeout time.Duratio
 	n := uint32(len(addrs))
 	deadline := time.Now().Add(timeout)
 	for n > 0 {
-		conn, err = d.tryDial(network, &addrs[idx%n], deadline, d.concurrencyCh)
+		currentAddr := &addrs[idx%n]
+		conn, err = d.tryDial(network, currentAddr, deadline, d.concurrencyCh)
 		if err == nil {
 			return conn, nil
 		}
 		if err == ErrDialTimeout {
-			return nil, err
+			return nil, fmt.Errorf("CustomTCPDialer: %s timed out", currentAddr)
 		}
 		idx++
 		n--

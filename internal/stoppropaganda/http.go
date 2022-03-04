@@ -3,7 +3,6 @@ package stoppropaganda
 import (
 	"encoding/json"
 	"sync"
-	"time"
 
 	"github.com/valyala/fasthttp"
 )
@@ -53,21 +52,13 @@ func fasthttpStatusResponseHandler(ctx *fasthttp.RequestCtx) {
 
 	for endpoint, ws := range websites {
 		go func(endpoint string, ws *Website) {
-			ws.mux.Lock()
-			tmpStatus := ws.Status
-			unpauseTime := ws.unpauseTime
-			ws.mux.Unlock()
+			ws.statusMux.Lock()
+			tmpStatus := ws.status
+			ws.statusMux.Unlock()
 
 			statusService.mux.Lock()
 			statusService.AllStatus.Websites[endpoint] = &tmpStatus
 			statusService.mux.Unlock()
-
-			dosPausedFor := -time.Since(unpauseTime)
-			if dosPausedFor > 0 {
-				tmpStatus.Status += " for " + dosPausedFor.String()
-			} else {
-				tmpStatus.Status = "Running"
-			}
 
 			wg.Done()
 		}(endpoint, ws)

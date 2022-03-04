@@ -474,19 +474,14 @@ func (website *Website) ValidateDNS() {
 				return
 			}
 
-			reason := errStr
 			switch {
-			case strings.HasSuffix(err.Error(), "Temporary failure in name resolution"):
-				reason = "Your DNS servers unreachable or returned an error"
-			case strings.HasSuffix(err.Error(), "connection refused"):
-				reason = "Your DNS servers reachable, but refusing connections"
 			case strings.HasSuffix(errStr, "no such host"):
-				reason = "Domain does not exist: " + errStr
+				errStr = "Domain does not exist: " + errStr
 			case strings.HasSuffix(errStr, "No address associated with hostname"):
-				reason = "Domain does not have any IPs assigned: " + errStr
+				errStr = "Domain does not have any IPs assigned: " + errStr
 			}
 
-			website.SchedulePause(10*time.Second, reason)
+			website.SchedulePause(10*time.Second, errStr)
 			return
 		}
 

@@ -211,7 +211,7 @@ As of now there is no fancy web interface, only a JSON pre-formatted output. You
 For Linux users, you can see status nicely in terminal using `jq` formatter. Examples:
 ```bash
 # Simple:
-curl http://127.0.0.1:8049/status | jq .
+curl http://127.0.0.1:8049/status
 
 # Using JQ to format output
 curl http://127.0.0.1:8049/status | jq .

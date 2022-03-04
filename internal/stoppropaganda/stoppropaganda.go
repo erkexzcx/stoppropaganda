@@ -75,22 +75,6 @@ func initWebsites() {
 
 func makeDialFunc() fasthttp.DialFunc {
 	masterDialer := sockshttp.Initialize(*flagProxy, *flagProxyBypass)
-
-	useTorExample := false
-	if useTorExample {
-		proxyTimeout := 600 * time.Second
-		proxyChain := []Proxy{
-			{"127.0.0.1:9050", ProxyMethodSocks5},
-			// you can even chain proxies...
-			//{"1.2.3.4:9050", ProxyMethodSocks4},
-		}
-		dialer := &net.Dialer{
-			//LocalAddr: localAddr,
-			Timeout: 600 * time.Second,
-		}
-		masterDialer = MakeDialerThrough(dialer, proxyChain, proxyTimeout)
-	}
-
 	myResolver := &customresolver.CustomResolver{
 		ParentResolver: net.DefaultResolver,
 	}

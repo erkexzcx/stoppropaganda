@@ -10,7 +10,6 @@ import (
 	"errors"
 	"net"
 	"net/url"
-	"os"
 )
 
 // A Dialer is a means to establish a connection.
@@ -26,13 +25,12 @@ type Auth struct {
 
 // FromEnvironment returns the dialer specified by the proxy related variables in
 // the environment.
-func FromEnvironment() Dialer {
-	allProxy := os.Getenv("all_proxy")
-	if len(allProxy) == 0 {
+func Initialize(proxyParam, proxyBypassParam string) Dialer {
+	if len(proxyParam) == 0 {
 		return Direct
 	}
 
-	proxyURL, err := url.Parse(allProxy)
+	proxyURL, err := url.Parse(proxyParam)
 	if err != nil {
 		return Direct
 	}
@@ -41,13 +39,12 @@ func FromEnvironment() Dialer {
 		return Direct
 	}
 
-	noProxy := os.Getenv("no_proxy")
-	if len(noProxy) == 0 {
+	if len(proxyBypassParam) == 0 {
 		return proxy
 	}
 
 	perHost := NewPerHost(proxy, Direct)
-	perHost.AddFromString(noProxy)
+	perHost.AddFromString(proxyBypassParam)
 	return perHost
 }
 

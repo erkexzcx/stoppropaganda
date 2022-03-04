@@ -489,9 +489,10 @@ func (website *Website) ValidateDNS() {
 			case strings.HasSuffix(errStr, "No address associated with hostname"):
 				website.SchedulePause(5*time.Minute, "Domain does not have any IPs assigned: "+errStr)
 				return
+			default:
+				website.SchedulePause(10*time.Second, errStr)
+				return
 			}
-			website.SchedulePause(10*time.Second, errStr)
-			return
 		}
 
 		nonpublicerr := resolvefix.CheckNonPublicIP(ipAddresses)

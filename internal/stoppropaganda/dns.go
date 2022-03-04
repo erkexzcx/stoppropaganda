@@ -5,21 +5,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/targets"
 	"github.com/miekg/dns"
 )
-
-// Source: https://twitter.com/FedorovMykhailo/status/1497642156076511233
-
-var targetDNSServers = map[string]struct{}{
-	"194.54.14.186:53":  {},
-	"194.54.14.187:53":  {},
-	"194.67.7.1:53":     {},
-	"194.67.2.109:53":   {},
-	"84.252.147.118:53": {},
-	"84.252.147.119:53": {},
-	"95.173.148.51:53":  {},
-	"95.173.148.50:53":  {},
-}
 
 type DNSServerStatus struct {
 	Requests     uint   `json:"requests"`
@@ -40,7 +28,7 @@ var dnsClient *dns.Client
 var dnsServers = map[string]*DNSServer{}
 
 func startDNS() {
-	for targetDNSServer := range targetDNSServers {
+	for targetDNSServer := range targets.TargetDNSServers {
 		questionDomain := getRandomDomain() + "."
 		message := new(dns.Msg)
 		message.SetQuestion(questionDomain, dns.TypeA)

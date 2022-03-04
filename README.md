@@ -186,6 +186,8 @@ Default value of `2000` means that there will be maximum of 2000 cuncurrent dial
 
 ## proxy
 
+WARNING - proxy feature is not yet ready. See [#98](https://github.com/erkexzcx/stoppropaganda/issues/98).
+
 Configuration via command line argument `-proxy ""` or via environment variable `SP_PROXY=""`.
 
 Proxy supports SOCKS4, SOCKS5 and HTTP proxies (or comma separated proxy chains). For example `-proxy "socks5://tor:9050"`.
@@ -193,6 +195,8 @@ Proxy supports SOCKS4, SOCKS5 and HTTP proxies (or comma separated proxy chains)
 Usage of this parameter can be combined with `proxybypass` parameter.
 
 ## proxybypass
+
+WARNING - proxy feature is not yet ready. See [#98](https://github.com/erkexzcx/stoppropaganda/issues/98).
 
 Configuration via command line argument `-proxybypass ""` or via environment variable `SP_PROXYBYPASS=""`.
 

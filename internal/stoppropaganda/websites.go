@@ -362,9 +362,10 @@ func (ws *WebsiteStatus) IncreaseCounters(responseCode int) {
 		ws.Counter_code500++
 	}
 }
+
 func (ws *WebsiteStatus) IncreaseCountersErr(errMsg string) {
-	ws.Requests++
 	if !strings.Contains(errMsg, customtcpdial.ErrTooFastDialSpam.Error()) {
+		ws.Requests++
 		ws.Errors++
 		ws.LastErrorMsg = errMsg
 	}

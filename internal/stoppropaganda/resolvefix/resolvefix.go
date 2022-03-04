@@ -5,6 +5,14 @@ import (
 	"net"
 )
 
+func CheckNonPublicIPAddrs(addrs []net.TCPAddr) error {
+	ips := make([]net.IP, len(addrs))
+	for i, addr := range addrs {
+		ips[i] = addr.IP
+	}
+	return CheckNonPublicIP(ips)
+}
+
 func CheckNonPublicIP(ips []net.IP) error {
 	if ContainsNonPublicIP(ips) {
 		return errors.New("Non public IP detected")

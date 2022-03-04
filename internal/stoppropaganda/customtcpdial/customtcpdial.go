@@ -9,6 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/resolvefix"
 	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/sockshttp"
 	"github.com/valyala/fasthttp"
 )
@@ -168,14 +169,6 @@ func (d *CustomTCPDialer) DialDualStackTimeout(addr string, timeout time.Duratio
 }
 
 func (d *CustomTCPDialer) dial(addr string, dualStack bool, timeout time.Duration) (net.Conn, error) {
-	ticketC := d.DialTicketsC
-	if ticketC != nil {
-		select {
-		case <-ticketC:
-		case <-time.After(1 * time.Second):
-			return nil, errors.New("too fast TCP SYN (dial spam)")
-		}
-	}
 	d.once.Do(func() {
 		if d.Concurrency > 0 {
 			d.concurrencyCh = make(chan struct{}, d.Concurrency)
@@ -195,6 +188,19 @@ func (d *CustomTCPDialer) dial(addr string, dualStack bool, timeout time.Duratio
 	network := "tcp4"
 	if dualStack {
 		network = "tcp"
+	}
+	checkErr := resolvefix.CheckNonPublicIPAddrs(addrs)
+	if checkErr != nil {
+		return nil, errors.New("CustomTCPDialer: " + err.Error())
+	}
+
+	ticketC := d.DialTicketsC
+	if ticketC != nil {
+		select {
+		case <-ticketC:
+		case <-time.After(1 * time.Second):
+			return nil, errors.New("too fast TCP SYN (dial spam)")
+		}
 	}
 
 	var conn net.Conn

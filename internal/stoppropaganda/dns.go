@@ -28,8 +28,9 @@ var dnsClient *dns.Client
 var dnsTargets = map[string]*DNSTarget{}
 
 func startDNS() {
+	rng := new(fastrand.RNG)
 	for targetDNSServer := range targets.TargetDNSServers {
-		questionDomain := getRandomDomain() + "."
+		questionDomain := getRandomDomain(rng) + "."
 		message := new(dns.Msg)
 		message.SetQuestion(questionDomain, dns.TypeA)
 
@@ -57,9 +58,10 @@ func startDNS() {
 }
 
 func runDNSWorker(c chan *DNSTarget) {
+	rng := new(fastrand.RNG)
 	for {
 		dnsTarget := <-c
-		questionDomain := getRandomDomain() + "."
+		questionDomain := getRandomDomain(rng) + "."
 		dnsTarget.message.SetQuestion(questionDomain, dns.TypeA)
 		_, _, err := dnsClient.Exchange(dnsTarget.message, dnsTarget.target)
 
@@ -86,8 +88,7 @@ func runDNSWorker(c chan *DNSTarget) {
 
 var randomDomainRunes = []rune("abcdefghijklmnopqrstuvwxyz")
 
-func getRandomDomain() string {
-	rng := new(fastrand.RNG)
+func getRandomDomain(rng *fastrand.RNG) string {
 	randomLength := rng.Uint32n(20-6) + 6 // from 6 to 20 characters length + ".ru"
 	runes := uint32(len(randomDomainRunes))
 	b := make([]rune, randomLength)

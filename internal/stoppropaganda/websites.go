@@ -1,7 +1,6 @@
 package stoppropaganda
 
 import (
-	"bytes"
 	"log"
 	"net"
 	"net/url"
@@ -197,8 +196,7 @@ func (ws *Website) runWebsiteWorker() {
 
 		ws.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
 
-		bodyReader := bytes.NewReader([]byte{})
-		resp.SetBodyStream(bodyReader, -1)
+		resp.ShouldDiscardBody = true
 
 		// Perform request
 		err := httpClient.Do(req, resp)

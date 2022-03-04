@@ -4,7 +4,7 @@
 [![Docker Hub Pulls](https://img.shields.io/docker/pulls/erikmnkl/stoppropaganda)](https://hub.docker.com/r/erikmnkl/stoppropaganda)
 [![Go Report Card](https://goreportcard.com/badge/github.com/erkexzcx/stoppropaganda)](https://goreportcard.com/report/github.com/erkexzcx/stoppropaganda)
 
-Russia has invaded Ukraine and committed various war crimes. Russian media denies any of its attacks on civilian as well as any Russian troops casualties. According to them, they are doing this "special operation" to protect Ukrainians from...Ukraine. On top of that, some foreign media and even countries (e.g. Belarus) publicly support Russian aggression, therefore I created this simple DOS application that targets those websites/endpoints in order to take them down or significantly distrupt their services.
+Russia has invaded Ukraine and committed various war crimes. Russian media denies any of its attacks on civilian as well as any Russian troops casualties. According to them, they are doing this "special operation" to protect Ukrainians from...Ukraine. On top of that, some foreign media and even countries (e.g. Belarus) publicly support Russian aggression, therefore I created this simple DOS application that targets those websites/endpoints in order to take them down or significantly disrupt their services.
 
 Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of Ukraine) has shared [this twitter post](https://twitter.com/FedorovMykhailo/status/1497642156076511233) encouraging cyber attack on certain targets via Telegram group. This will be primary source of the target websites for this application.
 
@@ -180,7 +180,7 @@ Default value of `2500` means that there will be maximum of 2500 TCP SYN packets
 
 Configuration via command line argument `-dialconcurrency 2000` or via environment variable `SP_DIALCONCURRENCY=2000`.
 
-Default value of `2000` means that there will be maximum of 2000 cuncurrent dials from fasthttp.
+Default value of `2000` means that there will be maximum of 2000 concurrent dials from fasthttp.
 
 ## proxy
 
@@ -258,7 +258,7 @@ More information on how to increase them [here](https://stackoverflow.com/questi
 
 ## crashing
 
-Reason 1: Make sure you have enough RAM. It is also wise to monitor RAM and CPU usage once application is started. Since March 3, with a latest releases it was switched from workers per website/dns to pool of workers. Once you find a sweet spot resource-wise, there should be no need to change it with updates.
+Reason 1: Make sure you have enough RAM. It is also wise to monitor RAM and CPU usage once application is started. Since March 3, with the latest release it was switched from workers per website/dns to pool of workers. Once you find a sweet spot resource-wise, there should be no need to change it with updates.
 
 Reason 2: Work in progress. Always check if (a) Russians are still invading Ukraine and (b) there is a new release available.
 
@@ -267,7 +267,7 @@ Reason 2: Work in progress. Always check if (a) Russians are still invading Ukra
 * Increase `workers`/`dnsworkers` count for a greater effect.
 * Adjust `dnstimeout` based on your location. Change to something like `200ms` and see how it behaves. If "success" queries are low and thus "timeout errors" increase - increase timeout.
 * Change `useragent` to yours (used for websites only). See [this](https://www.whatismybrowser.com/detect/what-is-my-user-agent/).
-* Set your DNS to [russian ones](https://github.com/erkexzcx/stoppropaganda/blob/main/internal/stoppropaganda/dns.go#L13). This will add extra pressure on those russian DNS servers.
+* Set your DNS to [russian ones](https://github.com/erkexzcx/stoppropaganda/blob/main/internal/stoppropaganda/targets/dns.go#L6-L13). This will add extra pressure on those russian DNS servers.
 * General recommendation is to use VPN, but this is not necessary. Remember - DOS/DDOS is **illegal**.
 
 # Inspiration

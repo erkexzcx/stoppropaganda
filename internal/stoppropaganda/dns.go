@@ -41,12 +41,14 @@ var dnsServers = map[string]*DNSServer{}
 
 func startDNS() {
 	for targetDNSServer := range targetDNSServers {
+		questionDomain := getRandomDomain() + "."
+		message := new(dns.Msg)
+		message.SetQuestion(questionDomain, dns.TypeA)
+
 		dnsServers[targetDNSServer] = &DNSServer{
-			message: new(dns.Msg),
+			message: message,
 			target:  targetDNSServer,
 		}
-		questionDomain := getRandomDomain() + "."
-		dnsServers[targetDNSServer].message.SetQuestion(questionDomain, dns.TypeA)
 	}
 
 	dnsChannel := make(chan *DNSServer, *flagDNSWorkers)

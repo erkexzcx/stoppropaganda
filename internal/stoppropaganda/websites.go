@@ -107,24 +107,51 @@ func startWebsites() {
 		websites[websiteUrl] = NewWebsite(websiteUrl)
 	}
 
+	useRoundRobinAlgorithm := *flagRoundRobin
+	if useRoundRobinAlgorithm {
+		startWebsitesRoundRobin()
+	} else {
+		startWebsitesParallel()
+	}
+
+}
+func startWebsitesRoundRobin() {
+	websitesChannel := make(chan *Website, *flagWorkers)
+	log.Printf("Spawning %d round-robin workers", *flagWorkers)
+
+	// Spawn workers
+	for i := 0; i < *flagWorkers; i++ {
+		go runRoundRobinWorker(websitesChannel)
+	}
+
+	// Issue tasks
+	go func() {
+		for {
+			// Round robin algorithm
+			for _, website := range websites {
+				websitesChannel <- website
+			}
+		}
+	}()
+}
+
+func startWebsitesParallel() {
 	websitesArr := make([]*Website, 0, len(websites))
 	for _, website := range websites {
 		websitesArr = append(websitesArr, website)
 	}
-
-	// Spawn workers
+	// Spawn few workers for each website
 	numWorkers := *flagWorkers
 	perWebsite := float64(numWorkers) / float64(len(websitesArr))
 	log.Printf("Spawning %d workers for %d websites = %.1f workers/website", numWorkers, len(websitesArr), perWebsite)
 	for i := 0; i < numWorkers; i++ {
 		idx := i % len(websitesArr)
 		website := websitesArr[idx]
-		go website.runWebsiteWorker()
+		go runPerWebsiteWorker(website)
 	}
 	if perWebsite < 1.0 {
 		log.Printf("Warn: Some websites have 0 workers, websites choosen randomly")
 	}
-
 }
 
 // checksPauseMux must be locked prior calling this func
@@ -179,47 +206,76 @@ func (ws *Website) allowedToRun() bool {
 	return true
 }
 
-func (ws *Website) runWebsiteWorker() {
+func runPerWebsiteWorker(website *Website) {
 	// Each worker has it's own response
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
+	withTimeout := false
 
 	for {
-		if !ws.allowedToRun() {
+		if !website.allowedToRun() {
 			// Wait for unpause
-			<-ws.pausedTimer.C
-			continue
-		}
-		ws.statusMux.Lock()
-		ws.status.Status = "Running"
-		ws.statusMux.Unlock()
-
-		ws.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
-
-		resp.ShouldDiscardBody = true
-
-		// Perform request
-		err := httpClient.Do(req, resp)
-		if err != nil {
-			ws.statusMux.Lock()
-			ws.status.IncreaseCountersErr("httpClient.Do: " + err.Error())
-			ws.statusMux.Unlock()
+			<-website.pausedTimer.C
 			continue
 		}
 
-		downloaded := resp.LastDiscarded
-		if !resp.ShouldDiscardBody {
-			downloaded = len(resp.Body())
-		}
-
-		// Prevent site memory leaking us with 32+ MB (uno reverso)
-		if len(resp.Body()) > 32*1024*1024 {
-			resp.ResetBody()
-		}
-
-		// Increase counters
-		ws.statusMux.Lock()
-		ws.status.IncreaseCounters(downloaded, resp.StatusCode())
-		ws.statusMux.Unlock()
+		doSingleRequest(website, req, resp, withTimeout)
 	}
+}
+
+func runRoundRobinWorker(websitesC chan *Website) {
+	// Each worker has it's own response
+	req := fasthttp.AcquireRequest()
+	resp := fasthttp.AcquireResponse()
+	withTimeout := true
+
+	for {
+		website := <-websitesC
+		if !website.allowedToRun() {
+			// Instantly skip to another website
+			continue
+		}
+
+		doSingleRequest(website, req, resp, withTimeout)
+	}
+}
+
+func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response, withTimeout bool) {
+	ws.statusMux.Lock()
+	ws.status.Status = "Running"
+	ws.statusMux.Unlock()
+
+	ws.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
+
+	resp.ShouldDiscardBody = true
+
+	// Perform request
+	var err error
+	if withTimeout {
+		err = httpClient.DoTimeout(req, resp, *flagTimeout)
+	} else {
+		err = httpClient.Do(req, resp)
+	}
+	if err != nil {
+		ws.statusMux.Lock()
+		ws.status.IncreaseCountersErr("httpClient.Do: " + err.Error())
+		ws.statusMux.Unlock()
+		return
+	}
+
+	downloaded := resp.LastDiscarded
+	if !resp.ShouldDiscardBody {
+		downloaded = len(resp.Body())
+	}
+
+	// Prevent site memory leaking us with 32+ MB (uno reverso)
+	if len(resp.Body()) > 32*1024*1024 {
+		resp.ResetBody()
+	}
+
+	// Increase counters
+	ws.statusMux.Lock()
+	ws.status.IncreaseCounters(downloaded, resp.StatusCode())
+	ws.statusMux.Unlock()
+	return
 }

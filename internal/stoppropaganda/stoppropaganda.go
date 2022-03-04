@@ -30,6 +30,7 @@ var (
 	flagDialConcurrency = fs.Int("dialconcurrency", 2000, "number of cuncurrent dial at any moment (from fasthttp)")
 	flagProxy           = fs.String("proxy", "", "list of comma separated proxies to be used for websites DOS")
 	flagProxyBypass     = fs.String("proxybypass", "", "list of comma separated IP addresses, CIDR ranges, zones (*.example.com) or a hostnames (e.g. localhost) that needs to bypass used proxy")
+	flagRoundRobin      = fs.Bool("roundrobin", false, "true if websites should be scheduled in a specific order; if false - create parallel goroutines assigned to one website")
 )
 
 func Start() {

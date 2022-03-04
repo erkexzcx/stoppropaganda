@@ -417,6 +417,7 @@ func NewWebsite(websiteUrlStr string) (website *Website) {
 		dnsLastChecked: time.Now().Add(-VALIDATE_DNS_EVERY), // this forces validation on first run
 		pausedUntil:    time.Now(),
 		req:            newReq,
+		helperIPBuf:    make([]net.IP, 128),
 	}
 	return
 }

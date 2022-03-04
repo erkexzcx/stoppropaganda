@@ -376,12 +376,8 @@ type Website struct {
 	host   string
 
 	validateMux    sync.Mutex
-	paused         bool
 	dnsLastChecked time.Time
 	unpauseTime    time.Time
-	// unpauseTimer can be used like time.Sleep:
-	// <-ws.unpauseTimer.C
-	unpauseTimer *time.Timer
 
 	req *fasthttp.Request
 }
@@ -409,8 +405,8 @@ func startWebsites() {
 			Status: WebsiteStatus{
 				Status: "Initializing",
 			},
-			paused:         false,
 			dnsLastChecked: time.Now().Add(-1 * VALIDATE_DNS_EVERY), // this forces to validate on first run
+			unpauseTime:    time.Now(),
 			req:            newReq,
 		}
 	}
@@ -432,75 +428,53 @@ func startWebsites() {
 	}()
 }
 
-func (ws *Website) ShouldRun() (shouldRun bool) {
-	shouldRun = true // true by default
+func (ws *Website) paused() bool {
 	ws.mux.Lock()
-	if ws.paused {
-		paused := time.Now().Before(ws.unpauseTime)
-		if !paused {
-			ws.paused = false
-		}
-		shouldRun = !paused
-	}
-	ws.mux.Unlock()
-	return
+	defer ws.mux.Unlock()
+	return time.Now().Before(ws.unpauseTime)
 }
 
-func (ws *Website) IsPausedMutex() (paused bool) {
+func (ws *Website) setPause(duration time.Duration, reason string) {
 	ws.mux.Lock()
-	paused = ws.paused
-	ws.mux.Unlock()
-	return
-}
-
-func (ws *Website) SchedulePause(duration time.Duration, reason string) {
-	ws.mux.Lock()
-	ws.paused = true
+	defer ws.mux.Unlock()
 	ws.Status.Status = "Paused: " + reason
-	unpauseTime := time.Now().Add(duration)
-	ws.unpauseTime = unpauseTime
-
-	// unpauseTimer can be used like time.Sleep:
-	// <-ws.unpauseTimer.C
-	ws.unpauseTimer = time.NewTimer(duration)
-
-	ws.mux.Unlock()
-
+	ws.unpauseTime = time.Now().Add(duration)
 }
-func (website *Website) ValidateDNS() {
+
+func (ws *Website) allowedToRun() bool {
 	// Lock, because we don't want multiple validations
 	// running at the same time
-	website.validateMux.Lock()
-	defer website.validateMux.Unlock()
+	ws.validateMux.Lock()
+	defer ws.validateMux.Unlock()
 
-	if time.Since(website.dnsLastChecked) >= VALIDATE_DNS_EVERY {
-		ipAddresses, err := customresolver.GetIPs(website.host)
-		website.dnsLastChecked = time.Now()
+	if !ws.paused() {
+		ipAddresses, err := customresolver.GetIPs(ws.host)
 
 		if err != nil {
 			errStr := err.Error()
 			switch {
 			case strings.HasSuffix(errStr, "Temporary failure in name resolution") || strings.HasSuffix(errStr, "connection refused"):
-				website.SchedulePause(1*time.Second, "Your DNS servers unreachable or returned an error: "+errStr)
-				return
+				ws.setPause(time.Second, "Your DNS servers unreachable or returned an error: "+errStr)
+				return false
 			case strings.HasSuffix(errStr, "no such host"):
-				website.SchedulePause(5*time.Minute, "Domain does not exist: "+errStr)
-				return
+				ws.setPause(5*time.Minute, "Domain does not exist: "+errStr)
+				return false
 			case strings.HasSuffix(errStr, "No address associated with hostname"):
-				website.SchedulePause(5*time.Minute, "Domain does not have any IPs assigned: "+errStr)
-				return
+				ws.setPause(5*time.Minute, "Domain does not have any IPs assigned: "+errStr)
+				return false
 			default:
-				website.SchedulePause(10*time.Second, errStr)
-				return
+				ws.setPause(10*time.Second, errStr)
+				return false
 			}
 		}
 
-		nonpublicerr := resolvefix.CheckNonPublicIP(ipAddresses)
-		if nonpublicerr != nil {
-			website.SchedulePause(5*time.Minute, nonpublicerr.Error())
-			return
+		if err = resolvefix.CheckNonPublicIP(ipAddresses); err != nil {
+			ws.setPause(5*time.Minute, err.Error())
+			return false
 		}
+		return true
 	}
+	return false
 }
 
 func runWebsiteWorker(c chan *Website) {
@@ -509,36 +483,26 @@ func runWebsiteWorker(c chan *Website) {
 	resp := fasthttp.AcquireResponse()
 
 	for {
-		website := <-c
-		if !website.ShouldRun() {
+		ws := <-c
+		if !ws.allowedToRun() {
 			continue
-		}
-		website.ValidateDNS()
-		// Check again after DNS validated
-		if website.IsPausedMutex() {
-			continue
-		}
-		{
-			website.mux.Lock()
-			website.Status.Status = "Running"
-			website.mux.Unlock()
 		}
 
-		website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
+		ws.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
 
 		// Perform request
 		err := httpClient.DoTimeout(req, resp, *flagTimeout)
 		if err != nil {
-			website.mux.Lock()
-			website.Status.IncreaseCountersErr("httpClient.Do: " + err.Error())
-			website.mux.Unlock()
+			ws.mux.Lock()
+			ws.Status.IncreaseCountersErr("httpClient.Do: " + err.Error())
+			ws.mux.Unlock()
 			continue
 		}
 		responseCode := resp.StatusCode()
 
 		// Increase counters
-		website.mux.Lock()
-		website.Status.IncreaseCounters(responseCode)
-		website.mux.Unlock()
+		ws.mux.Lock()
+		ws.Status.IncreaseCounters(responseCode)
+		ws.mux.Unlock()
 	}
 }

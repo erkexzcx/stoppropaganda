@@ -15,29 +15,27 @@ func CustomLookupIP(host string) ([]net.IP, error) {
 	if err != nil {
 		return nil, err
 	}
-	ips := make([]net.IP, len(addrs))
-	for i, ia := range addrs {
-		ips[i] = ia.IP
+	ips := make([]net.IP, 0, len(addrs))
+	for _, ia := range addrs {
+		ips = append(ips, ia.IP)
 	}
 	return ips, nil
 }
 
 func GetIPs(host string) (ips []net.IP, err error) {
-
-	ipAddresses := make([]net.IP, 0, 1)
 	addr := net.ParseIP(host)
 	if addr == nil {
 		ips, err := CustomLookupIP(host)
 		if err != nil {
 			return nil, err
 		}
+		ipAddresses := make([]net.IP, 0, len(ips))
 		for _, ip := range ips {
 			if ipv4 := ip.To4(); ipv4 != nil {
 				ipAddresses = append(ipAddresses, ipv4)
 			}
 		}
-	} else {
-		ipAddresses = append(ipAddresses, addr)
+		return ipAddresses, nil
 	}
-	return ipAddresses, nil
+	return []net.IP{addr}, nil
 }

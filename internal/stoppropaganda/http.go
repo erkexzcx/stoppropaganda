@@ -56,7 +56,6 @@ func fasthttpStatusResponseHandler(ctx *fasthttp.RequestCtx) {
 			ws.mux.Lock()
 			tmpStatus := ws.Status
 			unpauseTime := ws.unpauseTime
-			paused := ws.paused
 			ws.mux.Unlock()
 
 			statusService.mux.Lock()
@@ -64,8 +63,10 @@ func fasthttpStatusResponseHandler(ctx *fasthttp.RequestCtx) {
 			statusService.mux.Unlock()
 
 			dosPausedFor := -time.Since(unpauseTime)
-			if paused {
-				tmpStatus.Status += ", DOS paused for " + dosPausedFor.String()
+			if dosPausedFor > 0 {
+				tmpStatus.Status += " for " + dosPausedFor.String()
+			} else {
+				tmpStatus.Status = "Running"
 			}
 
 			wg.Done()

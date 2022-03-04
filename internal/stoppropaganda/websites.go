@@ -485,7 +485,7 @@ func (website *Website) ValidateDNS() {
 			return
 		}
 
-		nonpublicerr := resolvefix.CheckNonPublicIP(ipAddresses)
+		nonpublicerr := resolvefix.CheckNonPublicIPs(ipAddresses)
 		if nonpublicerr != nil {
 			website.SchedulePause(5*time.Minute, nonpublicerr.Error())
 			return

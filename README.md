@@ -89,8 +89,6 @@ In order to use on Android:
 
 **NOTE**: On startup it will pull the latest version automatically, so in order to update - stop the app in Termux and re-run this Flow.
 
-**NOTE 2**: DNS resolution does not work in Termux, therefore it's impossible to DOS websites. Only DNS DOS is working.
-
 More advanced users might want to edit Automate flow themselves to further customize configuration. See [Configuration](#configuration) and [Usage](#usage).
 
 ## Binaries

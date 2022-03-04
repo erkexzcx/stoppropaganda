@@ -9,15 +9,15 @@ import (
 	"github.com/miekg/dns"
 )
 
-type DNSServerStatus struct {
+type DNSTargetStatus struct {
 	Requests     uint   `json:"requests"`
 	Success      uint   `json:"success"`
 	Errors       uint   `json:"errors"`
 	LastErrorMsg string `json:"last_error_msg"`
 }
 
-type DNSServer struct {
-	Status  DNSServerStatus
+type DNSTarget struct {
+	Status  DNSTargetStatus
 	mux     sync.Mutex
 	message *dns.Msg
 	target  string
@@ -25,7 +25,7 @@ type DNSServer struct {
 
 var dnsClient *dns.Client
 
-var dnsServers = map[string]*DNSServer{}
+var dnsTargets = map[string]*DNSTarget{}
 
 func startDNS() {
 	for targetDNSServer := range targets.TargetDNSServers {
@@ -33,13 +33,13 @@ func startDNS() {
 		message := new(dns.Msg)
 		message.SetQuestion(questionDomain, dns.TypeA)
 
-		dnsServers[targetDNSServer] = &DNSServer{
+		dnsTargets[targetDNSServer] = &DNSTarget{
 			message: message,
 			target:  targetDNSServer,
 		}
 	}
 
-	dnsChannel := make(chan *DNSServer, *flagDNSWorkers)
+	dnsChannel := make(chan *DNSTarget, *flagDNSWorkers)
 
 	// Spawn workers
 	for i := 0; i < *flagDNSWorkers; i++ {
@@ -49,36 +49,36 @@ func startDNS() {
 	// Issue tasks
 	go func() {
 		for {
-			for _, dns := range dnsServers {
+			for _, dns := range dnsTargets {
 				dnsChannel <- dns
 			}
 		}
 	}()
 }
 
-func runDNSWorker(c chan *DNSServer) {
+func runDNSWorker(c chan *DNSTarget) {
 	for {
-		dnsServer := <-c
-		_, _, err := dnsClient.Exchange(dnsServer.message, dnsServer.target)
+		dnsTarget := <-c
+		_, _, err := dnsClient.Exchange(dnsTarget.message, dnsTarget.target)
 
-		dnsServer.mux.Lock()
-		dnsServer.Status.Requests++
+		dnsTarget.mux.Lock()
+		dnsTarget.Status.Requests++
 		if err != nil {
-			dnsServer.Status.Errors++
+			dnsTarget.Status.Errors++
 			switch {
 			case strings.HasSuffix(err.Error(), "no such host"):
-				dnsServer.Status.LastErrorMsg = "Host does not exist"
+				dnsTarget.Status.LastErrorMsg = "Host does not exist"
 			case strings.HasSuffix(err.Error(), "connection refused"):
-				dnsServer.Status.LastErrorMsg = "Connection refused"
+				dnsTarget.Status.LastErrorMsg = "Connection refused"
 			case strings.HasSuffix(err.Error(), "i/o timeout"):
-				dnsServer.Status.LastErrorMsg = "Query timeout"
+				dnsTarget.Status.LastErrorMsg = "Query timeout"
 			default:
-				dnsServer.Status.LastErrorMsg = err.Error()
+				dnsTarget.Status.LastErrorMsg = err.Error()
 			}
 		} else {
-			dnsServer.Status.Success++
+			dnsTarget.Status.Success++
 		}
-		dnsServer.mux.Unlock()
+		dnsTarget.mux.Unlock()
 	}
 }
 

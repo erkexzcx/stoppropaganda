@@ -15,7 +15,7 @@ func fasthttpRequestHandler(ctx *fasthttp.RequestCtx) {
 }
 
 type StatusStruct struct {
-	DNS      map[string]*DNSServerStatus `json:"DNS"`
+	DNS      map[string]*DNSTargetStatus `json:"DNS"`
 	Websites map[string]*WebsiteStatus   `json:"Websites"`
 }
 type StatusService struct {
@@ -27,17 +27,17 @@ type StatusService struct {
 func fasthttpStatusResponseHandler(ctx *fasthttp.RequestCtx) {
 	statusService := StatusService{
 		AllStatus: StatusStruct{
-			DNS:      make(map[string]*DNSServerStatus, len(dnsServers)),
+			DNS:      make(map[string]*DNSTargetStatus, len(dnsTargets)),
 			Websites: make(map[string]*WebsiteStatus, len(websites)),
 		},
 	}
 
 	wg := sync.WaitGroup{}
-	wg.Add(len(dnsServers))
+	wg.Add(len(dnsTargets))
 	wg.Add(len(websites))
 
-	for endpoint, ds := range dnsServers {
-		go func(endpoint string, ds *DNSServer) {
+	for endpoint, ds := range dnsTargets {
+		go func(endpoint string, ds *DNSTarget) {
 			ds.mux.Lock()
 			dnsStatus := ds.Status
 			ds.mux.Unlock()

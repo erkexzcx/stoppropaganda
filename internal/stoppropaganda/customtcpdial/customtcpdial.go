@@ -168,6 +168,8 @@ func (d *CustomTCPDialer) DialDualStackTimeout(addr string, timeout time.Duratio
 	return d.dial(addr, true, timeout)
 }
 
+var ErrTooFastDialSpam = errors.New("too fast TCP SYN (dial spam)")
+
 func (d *CustomTCPDialer) dial(addr string, dualStack bool, timeout time.Duration) (net.Conn, error) {
 	d.once.Do(func() {
 		if d.Concurrency > 0 {
@@ -199,7 +201,7 @@ func (d *CustomTCPDialer) dial(addr string, dualStack bool, timeout time.Duratio
 		select {
 		case <-ticketC:
 		case <-time.After(1 * time.Second):
-			return nil, errors.New("too fast TCP SYN (dial spam)")
+			return nil, ErrTooFastDialSpam
 		}
 	}
 

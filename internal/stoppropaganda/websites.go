@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customresolver"
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customtcpdial"
 	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/resolvefix"
 	"github.com/valyala/fasthttp"
 )
@@ -363,8 +364,10 @@ func (ws *WebsiteStatus) IncreateCounters(responseCode int) {
 }
 func (ws *WebsiteStatus) IncreateCountersErr(err error) {
 	ws.Requests++
-	ws.Errors++
-	ws.LastErrorMsg = err.Error()
+	if !strings.Contains(err.Error(), customtcpdial.ErrTooFastDialSpam.Error()) {
+		ws.Errors++
+		ws.LastErrorMsg = err.Error()
+	}
 }
 
 type Website struct {

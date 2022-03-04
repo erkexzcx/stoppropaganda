@@ -445,6 +445,7 @@ func (ws *Website) ShouldRun() (shouldRun bool) {
 	ws.mux.Unlock()
 	return
 }
+
 func (ws *Website) IsPausedMutex() (paused bool) {
 	ws.mux.Lock()
 	paused = ws.paused
@@ -478,24 +479,18 @@ func (website *Website) ValidateDNS() {
 
 		if err != nil {
 			errStr := err.Error()
-			if strings.HasSuffix(errStr, "Temporary failure in name resolution") || strings.HasSuffix(errStr, "connection refused") {
+			switch {
+			case strings.HasSuffix(errStr, "Temporary failure in name resolution") || strings.HasSuffix(errStr, "connection refused"):
 				website.SchedulePause(1*time.Second, "Your DNS servers unreachable or returned an error: "+errStr)
 				return
-			}
-
-			reason := errStr
-			switch {
-			case strings.HasSuffix(err.Error(), "Temporary failure in name resolution"):
-				reason = "Your DNS servers unreachable or returned an error"
-			case strings.HasSuffix(err.Error(), "connection refused"):
-				reason = "Your DNS servers reachable, but refusing connections"
 			case strings.HasSuffix(errStr, "no such host"):
-				reason = "Domain does not exist: " + errStr
+				website.SchedulePause(5*time.Minute, "Domain does not exist: "+errStr)
+				return
 			case strings.HasSuffix(errStr, "No address associated with hostname"):
-				reason = "Domain does not have any IPs assigned: " + errStr
+				website.SchedulePause(5*time.Minute, "Domain does not have any IPs assigned: "+errStr)
+				return
 			}
-
-			website.SchedulePause(10*time.Second, reason)
+			website.SchedulePause(10*time.Second, errStr)
 			return
 		}
 

@@ -123,6 +123,11 @@ var targetWebsites = map[string]struct{}{
 	"https://www.avito.ru":                      {},
 	"https://www.dns-shop.ru":                   {},
 	"https://aliexpress.ru":                     {},
+	"https://privetmir.ru":                      {},
+	"https://mironline.ru":                      {},
+	"https://sbp.nspk.ru":                       {},
+	"https://nspk.ru":                           {},
+	"https://nspk.com":                          {},
 
 	// Banks
 	"https://www.sberbank.ru":                           {},

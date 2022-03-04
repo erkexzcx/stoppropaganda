@@ -76,7 +76,7 @@ func initWebsites() {
 func makeDialFunc() fasthttp.DialFunc {
 	masterDialer := sockshttp.Initialize(*flagProxy, *flagProxyBypass)
 	myResolver := &customresolver.CustomResolver{
-		ParentResolver: net.DefaultResolver,
+		ParentResolver: customresolver.InjectionGoResolver,
 	}
 	dial := (&customtcpdial.CustomTCPDialer{
 		DialTicketsC:     newConnTicketC,

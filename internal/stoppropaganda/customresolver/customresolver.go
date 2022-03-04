@@ -8,7 +8,7 @@ import (
 	"github.com/patrickmn/go-cache"
 )
 
-var dnscache *cache.Cache
+var DnsCache *cache.Cache
 
 type CustomResolver struct {
 	ParentResolver *net.Resolver
@@ -19,17 +19,17 @@ type Resolver interface {
 }
 
 func (cr *CustomResolver) LookupIPAddr(ctx context.Context, host string) (names []net.IPAddr, err error) {
-	if c, found := dnscache.Get(host); found {
+	if c, found := DnsCache.Get(host); found {
 		return c.([]net.IPAddr), nil
 	}
 
 	names, err = cr.ParentResolver.LookupIPAddr(ctx, host)
 	if err == nil {
-		dnscache.SetDefault(host, names)
+		DnsCache.SetDefault(host, names)
 	}
 	return
 }
 
 func init() {
-	dnscache = cache.New(5*time.Minute, 10*time.Minute)
+	DnsCache = cache.New(5*time.Minute, 10*time.Minute)
 }

@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/miekg/dns v1.1.46
 	github.com/peterbourgon/ff/v3 v3.1.2
+	github.com/valyala/fastrand v1.1.0
 )
 
 require (

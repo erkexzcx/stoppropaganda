@@ -121,17 +121,21 @@ func startWebsites() {
 		websites[websiteUrl] = NewWebsite(websiteUrl)
 	}
 
-	useRoundRobinAlgorithm := *flagRoundRobin
-	if useRoundRobinAlgorithm {
+	switch *flagAlgorithm {
+	case "rr":
+		log.Println("Selected algorithm:", *flagAlgorithm)
 		startWebsitesRoundRobin()
-	} else {
+	case "fair":
+		log.Println("Selected algorithm:", *flagAlgorithm)
 		startWebsitesParallel()
+	default:
+		log.Fatalln("unknown algorithm:", *flagAlgorithm)
 	}
-
 }
+
 func startWebsitesRoundRobin() {
 	websitesChannel := make(chan *Website, *flagWorkers)
-	log.Printf("Spawning %d round-robin workers", *flagWorkers)
+	log.Printf("Spawning %d workers", *flagWorkers)
 
 	// Spawn workers
 	for i := 0; i < *flagWorkers; i++ {

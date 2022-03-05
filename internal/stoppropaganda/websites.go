@@ -241,18 +241,7 @@ func runPerWebsiteWorker(website *Website) {
 			<-website.pausedC
 			continue
 		}
-
 		doSingleRequest(website, req, resp, withTimeout)
-		// Because doSingleRequest(...) can return instantly
-		// we have to add sleep here :(
-		//
-		// for example:
-		// "httpClient.Do: CustomTCPDialer: Non public IP detected: 127.0.0.1"
-		// would loop forever
-
-		// TODO: detect instant-return automatically since Windows 10
-		// and other systems can have different error messages
-		time.Sleep(50 * time.Millisecond)
 	}
 }
 
@@ -268,7 +257,6 @@ func runRoundRobinWorker(websitesC chan *Website) {
 			// Instantly skip to another website
 			continue
 		}
-
 		doSingleRequest(website, req, resp, withTimeout)
 	}
 }

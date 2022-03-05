@@ -133,7 +133,7 @@ func (r *SPResolver) goLookupIPCNAME(ctx context.Context, network, name string) 
 	}
 	var queryFn func(fqdn string, qtype dnsmessage.Type)
 	var responseFn func(fqdn string, qtype dnsmessage.Type) result
-	if conf.singleRequest {
+	if conf.SingleRequest {
 		queryFn = func(fqdn string, qtype dnsmessage.Type) {}
 		responseFn = func(fqdn string, qtype dnsmessage.Type) result {
 			dnsWaitGroup.Add(1)
@@ -276,7 +276,7 @@ func (r *SPResolver) goLookupIPCNAME(ctx context.Context, network, name string) 
 func (r *SPResolver) tryOneName(ctx context.Context, cfg *SPDNSConfig, name string, qtype dnsmessage.Type) (dnsmessage.Parser, string, error) {
 	var lastErr error
 	serverOffset := cfg.serverOffset()
-	sLen := uint32(len(cfg.servers))
+	sLen := uint32(len(cfg.Servers))
 
 	n, err := dnsmessage.NewName(name)
 	if err != nil {
@@ -288,11 +288,11 @@ func (r *SPResolver) tryOneName(ctx context.Context, cfg *SPDNSConfig, name stri
 		Class: dnsmessage.ClassINET,
 	}
 
-	for i := 0; i < cfg.attempts; i++ {
+	for i := 0; i < cfg.Attempts; i++ {
 		for j := uint32(0); j < sLen; j++ {
-			server := cfg.servers[(serverOffset+j)%sLen]
+			server := cfg.Servers[(serverOffset+j)%sLen]
 
-			p, h, err := r.exchange(ctx, server, q, cfg.timeout, cfg.useTCP)
+			p, h, err := r.exchange(ctx, server, q, cfg.Timeout, cfg.UseTCP)
 			if err != nil {
 				dnsErr := &net.DNSError{
 					Err:    err.Error(),

@@ -22,19 +22,19 @@ var (
 )
 
 type SPDNSConfig struct {
-	servers       []string      // server addresses (in host:port form) to use
-	search        []string      // rooted suffixes to append to local name
-	ndots         int           // number of dots in name to trigger absolute lookup
-	timeout       time.Duration // wait before giving up on a query, including retries
-	attempts      int           // lost packets before giving up on server
-	rotate        bool          // round robin among servers
-	unknownOpt    bool          // anything unknown was encountered
-	lookup        []string      // OpenBSD top-level database "lookup" order
-	err           error         // any error that occurs during open of resolv.conf
-	mtime         time.Time     // time of resolv.conf modification
-	soffset       uint32        // used by serverOffset
-	singleRequest bool          // use sequential A and AAAA queries instead of parallel queries
-	useTCP        bool          // force usage of TCP for DNS resolutions
+	Servers       []string      // server addresses (in host:port form) to use
+	Search        []string      // rooted suffixes to append to local name
+	Ndots         int           // number of dots in name to trigger absolute lookup
+	Timeout       time.Duration // wait before giving up on a query, including retries
+	Attempts      int           // lost packets before giving up on server
+	Rotate        bool          // round robin among servers
+	UnknownOpt    bool          // anything unknown was encountered
+	Lookup        []string      // OpenBSD top-level database "lookup" order
+	Err           error         // any error that occurs during open of resolv.conf
+	Mtime         time.Time     // time of resolv.conf modification
+	Soffset       uint32        // used by serverOffset
+	SingleRequest bool          // use sequential A and AAAA queries instead of parallel queries
+	UseTCP        bool          // force usage of TCP for DNS resolutions
 }
 
 // See resolv.conf(5) on a Linux machine.
@@ -164,8 +164,8 @@ func dnsReadConfig(filename string) *SPDNSConfig {
 // When the rotate option is enabled, this offset increases.
 // Otherwise it is always 0.
 func (c *SPDNSConfig) serverOffset() uint32 {
-	if c.rotate {
-		return atomic.AddUint32(&c.soffset, 1) - 1 // return 0 to start
+	if c.Rotate {
+		return atomic.AddUint32(&c.Soffset, 1) - 1 // return 0 to start
 	}
 	return 0
 }
@@ -188,18 +188,18 @@ func (conf *SPDNSConfig) nameList(name string) []string {
 		return []string{name}
 	}
 
-	hasNdots := count(name, '.') >= conf.ndots
+	hasNdots := count(name, '.') >= conf.Ndots
 	name += "."
 	l++
 
 	// Build list of search choices.
-	names := make([]string, 0, 1+len(conf.search))
+	names := make([]string, 0, 1+len(conf.Search))
 	// If name has enough dots, try unsuffixed first.
 	if hasNdots {
 		names = append(names, name)
 	}
 	// Try suffixes that are not too long (see isDomainName).
-	for _, suffix := range conf.search {
+	for _, suffix := range conf.Search {
 		if l+len(suffix) <= 254 {
 			names = append(names, name+suffix)
 		}

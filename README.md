@@ -293,7 +293,6 @@ Reason 2: Work in progress. Always check if (a) Russians are still invading Ukra
 * Increase `workers`/`dnsworkers` count for a greater effect. For example, `-workers 1000000` worked great with 1GBPS internet.
 * Adjust `dnstimeout` based on your location. Change to something like `200ms` and see how it behaves. If "success" queries are low and thus "timeout errors" increase - increase timeout.
 * Change `useragent` to yours (used for websites only). See [this](https://www.whatismybrowser.com/detect/what-is-my-user-agent/).
-* Set your DNS to [russian ones](https://github.com/erkexzcx/stoppropaganda/blob/main/internal/stoppropaganda/targets/dns.go#L6-L13). This will add extra pressure on those russian DNS servers.
 * General recommendation is to use VPN, but this is not necessary. Remember - DOS/DDOS is **illegal**.
 
 # Inspiration

@@ -223,9 +223,16 @@ Available algorithms:
 
 # Web UI
 
-As of now there is no fancy web interface, only a JSON pre-formatted output. You can access it using URL http://127.0.0.1:8049/status
+As of now there is no fancy web interface, only a JSON pre-formatted output.
 
-For Linux users, you can see status nicely in terminal using `jq` formatter. Examples:
+The following endpoints are available:
+```
+http://127.0.0.1:8049/status
+http://127.0.0.1:8049/dnscache
+http://127.0.0.1:8049/downloaded
+```
+
+Example usage on Linux:
 ```bash
 # Simple:
 curl http://127.0.0.1:8049/status

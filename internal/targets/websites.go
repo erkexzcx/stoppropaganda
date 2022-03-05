@@ -291,7 +291,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.belapb.by":               {},
 	"https://bankdabrabyt.by":             {},
 	"https://belinvestbank.by/individual": {},
-	"https://api.belinvestbank.by/":       {},
+	"https://api.belinvestbank.by":        {},
 	"https://belpost.by":                  {},
 
 	// by business

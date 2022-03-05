@@ -7,6 +7,10 @@ BINARY_NAME=stoppropaganda
 mkdir -p ./dist
 rm -rf ./dist/*
 
+# Run tests
+go test ./...
+
+# Build binaries
 env CGO_ENABLED=0 GOOS=linux GOARCH=386 go build -ldflags="-s -w" -o "dist/${BINARY_NAME}_v${VERSION}_linux_i386" cmd/stoppropaganda/main.go             # Linux i386
 env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o "dist/${BINARY_NAME}_v${VERSION}_linux_x86_64" cmd/stoppropaganda/main.go         # Linux 64bit
 env CGO_ENABLED=0 GOOS=linux GOARCH=arm GOARM=5 go build -ldflags="-s -w" -o "dist/${BINARY_NAME}_v${VERSION}_linux_arm" cmd/stoppropaganda/main.go      # Linux armv5/armel/arm (it also works on armv6)

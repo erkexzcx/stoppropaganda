@@ -26,7 +26,7 @@ var (
 	flagDNSWorkers      = fs.Int("dnsworkers", 100, "DOS each DNS server with this amount of workers")
 	flagDNSTimeout      = fs.Duration("dnstimeout", time.Second, "timeout of DNS request")
 	flagUserAgent       = fs.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
-	flagDialsPerSecond  = fs.Int("dialspersecond", 2500, "maximum amount of TCP SYN packets sent per second from fasthttp")
+	flagDialsPerSecond  = fs.Int("dialspersecond", 2500, "maximum amount of TCP SYN packets sent per second (from fasthttp)")
 	flagDialConcurrency = fs.Int("dialconcurrency", 2000, "number of cuncurrent dial at any moment (from fasthttp)")
 	flagProxy           = fs.String("proxy", "", "list of comma separated proxies to be used for websites DOS")
 	flagProxyBypass     = fs.String("proxybypass", "", "list of comma separated IP addresses, CIDR ranges, zones (*.example.com) or a hostnames (e.g. localhost) that needs to bypass used proxy")

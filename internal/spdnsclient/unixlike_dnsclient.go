@@ -10,12 +10,6 @@ import (
 	"golang.org/x/net/dns/dnsmessage"
 )
 
-const (
-// to be used as a useTCP parameter to exchange
-//useTCPOnly  = true
-//useUDPOrTCP = false
-)
-
 var (
 	errLameReferral              = errors.New("[SP] lame referral")
 	errCannotUnmarshalDNSMessage = errors.New("[SP] cannot unmarshal DNS message")
@@ -72,7 +66,6 @@ func (r *SPResolver) GoLookupHost(ctx context.Context, name string) (addrs []str
 // goLookupIP is the native Go implementation of LookupIP.
 // The libc versions are in cgo_*.go.
 func (r *SPResolver) goLookupIP(ctx context.Context, network, host string) (addrs []net.IPAddr, err error) {
-	//order := systemConf().hostLookupOrder(r, host)
 	addrs, _, err = r.goLookupIPCNAME(ctx, network, host)
 	return
 }
@@ -231,9 +224,6 @@ func (r *SPResolver) goLookupIPCNAME(ctx context.Context, network, name string) 
 	}
 	sortByRFC6724(addrs)
 	if len(addrs) == 0 {
-		// if order == hostLookupDNSFiles {
-		// 	addrs = goLookupIPFiles(name)
-		// }
 		if len(addrs) == 0 && lastErr != nil {
 			return nil, dnsmessage.Name{}, lastErr
 		}

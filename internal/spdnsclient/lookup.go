@@ -45,9 +45,6 @@ type SPResolver struct {
 }
 
 func (r *SPResolver) getLookupGroup() *singleflight.Group {
-	// if r == nil {
-	// 	return &DefaultLookupGroup
-	// }
 	return &r.lookupGroup
 }
 
@@ -79,14 +76,6 @@ func (r *SPResolver) LookupHost(ctx context.Context, host string) (addrs []strin
 }
 
 func (r *SPResolver) lookupHost(ctx context.Context, host string) (addrs []string, err error) {
-	//order := systemConf().hostLookupOrder(r, host)
-	// if !r.preferGo() && order == hostLookupCgo {
-	// 	if addrs, err, ok := cgoLookupHost(ctx, host); ok {
-	// 		return addrs, err
-	// 	}
-	// 	// cgo not available (or netgo); fall back to Go's DNS resolver
-	// 	order = hostLookupFilesDNS
-	// }
 	return r.GoLookupHost(ctx, host)
 }
 
@@ -94,14 +83,7 @@ func (r *SPResolver) lookupIP(ctx context.Context, network, host string) (addrs 
 	if true {
 		return r.goLookupIP(ctx, network, host)
 	}
-	// order := systemConf().hostLookupOrder(r, host)
-	// if order == hostLookupCgo {
-	// 	if addrs, err, ok := cgoLookupIP(ctx, network, host); ok {
-	// 		return addrs, err
-	// 	}
-	// 	// cgo not available (or netgo); fall back to Go's DNS resolver
-	// 	order = hostLookupFilesDNS
-	// }
+
 	ips, _, err := r.goLookupIPCNAME(ctx, network, host)
 	return ips, err
 }

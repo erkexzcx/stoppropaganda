@@ -304,5 +304,4 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 	ws.statusMux.Lock()
 	ws.status.IncreaseCounters(downloaded, resp.StatusCode())
 	ws.statusMux.Unlock()
-	return
 }

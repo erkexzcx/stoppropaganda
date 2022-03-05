@@ -16,7 +16,7 @@ func CheckNonPublicTCPEndpoints(addrs []net.TCPAddr) error {
 func CheckNonPublicIP(ips []net.IP) error {
 	for _, ip := range ips {
 		if IsNonPublic(ip) {
-			return errors.New("Non public IP detected: " + ip.String())
+			return errors.New(ip.String() + " - Non public IP detected")
 		}
 	}
 	return nil

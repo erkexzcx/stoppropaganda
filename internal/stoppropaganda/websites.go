@@ -47,10 +47,24 @@ func (ws *WebsiteStatus) IncreaseCounters(downloaded int, responseCode int) {
 	}
 }
 
+func (ws *Website) IncreaseCountersErr(errMsg string) {
+	ws.statusMux.Lock()
+	ws.status.IncreaseCountersErr(errMsg)
+	ws.statusMux.Unlock()
+
+	if strings.HasSuffix(errMsg, "Non public IP detected") {
+		ws.setPaused(30*time.Second, errMsg)
+	}
+	if strings.HasSuffix(errMsg, "couldn't find DNS entries for the given domain. Try using DialDualStack") {
+		ws.setPaused(30*time.Second, errMsg)
+	}
+}
+
 func (ws *WebsiteStatus) IncreaseCountersErr(errMsg string) {
 	ws.Requests++
 	ws.Errors++
 	ws.LastErrorMsg = errMsg
+
 }
 
 type Website struct {
@@ -66,7 +80,7 @@ type Website struct {
 	checksPauseMux sync.Mutex
 	dnsLastChecked time.Time
 	pausedUntil    time.Time
-	pausedTimer    *time.Timer
+	pausedC        chan struct{}
 
 	// optimizations
 	helperIPBuf []net.IP
@@ -160,7 +174,12 @@ func (ws *Website) setPaused(duration time.Duration, reason string) {
 	ws.status.Status = "Paused: " + reason
 	ws.statusMux.Unlock()
 	ws.pausedUntil = time.Now().Add(duration)
-	ws.pausedTimer = time.NewTimer(duration)
+	pausedC := make(chan struct{})
+	ws.pausedC = pausedC
+	go func() {
+		<-time.After(duration)
+		close(pausedC)
+	}()
 }
 
 func (ws *Website) allowedToRun() bool {
@@ -215,11 +234,21 @@ func runPerWebsiteWorker(website *Website) {
 	for {
 		if !website.allowedToRun() {
 			// Wait for unpause
-			<-website.pausedTimer.C
+			<-website.pausedC
 			continue
 		}
 
 		doSingleRequest(website, req, resp, withTimeout)
+		// Because doSingleRequest(...) can return instantly
+		// we have to add sleep here :(
+		//
+		// for example:
+		// "httpClient.Do: CustomTCPDialer: Non public IP detected: 127.0.0.1"
+		// would loop forever
+
+		// TODO: detect instant-return automatically since Windows 10
+		// and other systems can have different error messages
+		time.Sleep(50 * time.Millisecond)
 	}
 }
 
@@ -257,9 +286,7 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 		err = httpClient.Do(req, resp)
 	}
 	if err != nil {
-		ws.statusMux.Lock()
-		ws.status.IncreaseCountersErr("httpClient.Do: " + err.Error())
-		ws.statusMux.Unlock()
+		ws.IncreaseCountersErr("httpClient.Do: " + err.Error())
 		return
 	}
 

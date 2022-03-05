@@ -5,14 +5,10 @@ import (
 	"net"
 )
 
-var getIPcachedResolver = &CustomResolver{
-	ParentResolver: InjectionGoResolver,
-}
-
 // Modified to use stoppropaganda's CustomResolver
 // so that it caches DNS records
 func CustomLookupIP(host string, helperIPBuf []net.IP) ([]net.IP, error) {
-	addrs, err := getIPcachedResolver.LookupIPAddr(context.Background(), host)
+	addrs, err := MasterStopPropagandaResolver.LookupIPAddr(context.Background(), host)
 	if err != nil {
 		return nil, err
 	}

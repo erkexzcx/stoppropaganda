@@ -29,6 +29,7 @@ Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of 
   * [dialconcurrency](#dialconcurrency)
   * [proxy](#proxy)
   * [proxybypass](#proxybypass)
+  * [algorithm](#algorithm)
 - [Web UI](#web-ui)
 - [Building from source](#building-from-source)
 - [Troubleshooting](#troubleshooting)
@@ -202,11 +203,36 @@ For example `-proxybypass "localhost"`.
 
 This parameter is only applicable when used with [proxy](#proxy) parameter.
 
+## algorithm
+
+Configuration via command line argument `-algorithm rr` or via environment variable `SP_ALGORITHM="rr"`.
+
+The algorithm defines in what manner you want websites to be DOS'ed. It directly impacts resource usage and performance of this application.
+
+Available algorithms:
+- `fair` (Default)
+  - Known as "workers per website" (specified amount of workers will be divided equally for each website).
+  - Specifying less workers than websites will result in some websites without workers.
+  - Uses less CPU and RAM.
+  - By nature it wastes more traffic and generally has bigger impact.
+- `rr`
+  - Known as "pool of workers" (each worker will take the next pending website from the queue).
+  - Can be used with as low as 1 worker.
+  - Uses more CPU and RAM.
+  - By nature it prioritizes slower websites.
+
 # Web UI
 
-As of now there is no fancy web interface, only a JSON pre-formatted output. You can access it using URL http://127.0.0.1:8049/status
+As of now there is no fancy web interface, only a JSON pre-formatted output.
 
-For Linux users, you can see status nicely in terminal using `jq` formatter. Examples:
+The following endpoints are available:
+```
+http://127.0.0.1:8049/status
+http://127.0.0.1:8049/dnscache
+http://127.0.0.1:8049/downloaded
+```
+
+Example usage on Linux:
 ```bash
 # Simple:
 curl http://127.0.0.1:8049/status

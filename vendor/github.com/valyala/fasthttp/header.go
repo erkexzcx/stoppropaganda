@@ -59,9 +59,10 @@ type ResponseHeader struct {
 type RequestHeader struct {
 	noCopy noCopy //nolint:unused,structcheck
 
-	disableNormalizing bool
-	noHTTP11           bool
-	connectionClose    bool
+	disableNormalizing   bool
+	noHTTP11             bool
+	connectionClose      bool
+	noDefaultContentType bool
 
 	// These two fields have been moved close to other bool fields
 	// for reducing RequestHeader object size.
@@ -943,9 +944,15 @@ func (h *ResponseHeader) resetSkipNormalize() {
 	h.trailer = h.trailer[:0]
 }
 
+// SetNoDefaultContentType allows you to control if a default Content-Type header will be set (false) or not (true).
+func (h *RequestHeader) SetNoDefaultContentType(noDefaultContentType bool) {
+	h.noDefaultContentType = noDefaultContentType
+}
+
 // Reset clears request header.
 func (h *RequestHeader) Reset() {
 	h.disableNormalizing = false
+	h.SetNoDefaultContentType(false)
 	h.resetSkipNormalize()
 }
 
@@ -2273,7 +2280,7 @@ func (h *RequestHeader) AppendBytes(dst []byte) []byte {
 	}
 
 	contentType := h.ContentType()
-	if len(contentType) == 0 && !h.ignoreBody() {
+	if !h.noDefaultContentType && len(contentType) == 0 && !h.ignoreBody() {
 		contentType = strDefaultContentType
 	}
 	if len(contentType) > 0 {
@@ -2435,6 +2442,10 @@ func (h *RequestHeader) parseTrailer(buf []byte) (int, error) {
 }
 
 func isBadTrailer(key []byte) bool {
+	if len(key) == 0 {
+		return true
+	}
+
 	switch key[0] | 0x20 {
 	case 'a':
 		return caseInsensitiveCompare(key, strAuthorization)

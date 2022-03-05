@@ -1,15 +1,16 @@
 package stoppropaganda
 
 import (
+	"log"
 	"net"
 	"net/url"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customresolver"
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/resolvefix"
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/targets"
+	"github.com/erkexzcx/stoppropaganda/internal/customresolver"
+	"github.com/erkexzcx/stoppropaganda/internal/resolvefix"
+	"github.com/erkexzcx/stoppropaganda/internal/targets"
 	"github.com/valyala/fasthttp"
 )
 
@@ -18,6 +19,7 @@ const VALIDATE_DNS_EVERY = 5 * time.Minute
 type WebsiteStatus struct {
 	Requests     uint   `json:"requests"`
 	Errors       uint   `json:"errors"`
+	Downloaded   uint64 `json:"downloaded"`
 	LastErrorMsg string `json:"last_error_msg"`
 	Status       string `json:"status"`
 
@@ -28,8 +30,9 @@ type WebsiteStatus struct {
 	Counter_code500 uint `json:"status_500"`
 }
 
-func (ws *WebsiteStatus) IncreaseCounters(responseCode int) {
+func (ws *WebsiteStatus) IncreaseCounters(downloaded int, responseCode int) {
 	ws.Requests++
+	ws.Downloaded += uint64(downloaded)
 	switch {
 	case responseCode < 200:
 		ws.Counter_code100++
@@ -44,10 +47,24 @@ func (ws *WebsiteStatus) IncreaseCounters(responseCode int) {
 	}
 }
 
+func (ws *Website) IncreaseCountersErr(errMsg string) {
+	ws.statusMux.Lock()
+	ws.status.IncreaseCountersErr(errMsg)
+	ws.statusMux.Unlock()
+
+	if strings.HasSuffix(errMsg, "Non public IP detected") {
+		ws.setPaused(30*time.Second, errMsg)
+	}
+	if strings.HasSuffix(errMsg, "couldn't find DNS entries for the given domain. Try using DialDualStack") {
+		ws.setPaused(30*time.Second, errMsg)
+	}
+}
+
 func (ws *WebsiteStatus) IncreaseCountersErr(errMsg string) {
 	ws.Requests++
 	ws.Errors++
 	ws.LastErrorMsg = errMsg
+
 }
 
 type Website struct {
@@ -63,6 +80,7 @@ type Website struct {
 	checksPauseMux sync.Mutex
 	dnsLastChecked time.Time
 	pausedUntil    time.Time
+	pausedC        chan struct{}
 
 	// optimizations
 	helperIPBuf []net.IP
@@ -103,21 +121,55 @@ func startWebsites() {
 		websites[websiteUrl] = NewWebsite(websiteUrl)
 	}
 
+	switch *flagAlgorithm {
+	case "rr":
+		log.Println("Selected algorithm:", *flagAlgorithm)
+		startWebsitesRoundRobin()
+	case "fair":
+		log.Println("Selected algorithm:", *flagAlgorithm)
+		startWebsitesParallel()
+	default:
+		log.Fatalln("unknown algorithm:", *flagAlgorithm)
+	}
+}
+
+func startWebsitesRoundRobin() {
 	websitesChannel := make(chan *Website, *flagWorkers)
+	log.Printf("Spawning %d workers", *flagWorkers)
 
 	// Spawn workers
 	for i := 0; i < *flagWorkers; i++ {
-		go runWebsiteWorker(websitesChannel)
+		go runRoundRobinWorker(websitesChannel)
 	}
 
 	// Issue tasks
 	go func() {
 		for {
+			// Round robin algorithm
 			for _, website := range websites {
 				websitesChannel <- website
 			}
 		}
 	}()
+}
+
+func startWebsitesParallel() {
+	websitesArr := make([]*Website, 0, len(websites))
+	for _, website := range websites {
+		websitesArr = append(websitesArr, website)
+	}
+	// Spawn few workers for each website
+	numWorkers := *flagWorkers
+	perWebsite := float64(numWorkers) / float64(len(websitesArr))
+	log.Printf("Spawning %d workers for %d websites = %.1f workers/website", numWorkers, len(websitesArr), perWebsite)
+	for i := 0; i < numWorkers; i++ {
+		idx := i % len(websitesArr)
+		website := websitesArr[idx]
+		go runPerWebsiteWorker(website)
+	}
+	if perWebsite < 1.0 {
+		log.Printf("Warn: Some websites have 0 workers, websites choosen randomly")
+	}
 }
 
 // checksPauseMux must be locked prior calling this func
@@ -126,6 +178,12 @@ func (ws *Website) setPaused(duration time.Duration, reason string) {
 	ws.status.Status = "Paused: " + reason
 	ws.statusMux.Unlock()
 	ws.pausedUntil = time.Now().Add(duration)
+	pausedC := make(chan struct{})
+	ws.pausedC = pausedC
+	go func() {
+		<-time.After(duration)
+		close(pausedC)
+	}()
 }
 
 func (ws *Website) allowedToRun() bool {
@@ -171,35 +229,71 @@ func (ws *Website) allowedToRun() bool {
 	return true
 }
 
-func runWebsiteWorker(c chan *Website) {
+func runPerWebsiteWorker(website *Website) {
 	// Each worker has it's own response
 	req := fasthttp.AcquireRequest()
+	resp := fasthttp.AcquireResponse()
+	withTimeout := false
 
 	for {
-		ws := <-c
-		if !ws.allowedToRun() {
+		if !website.allowedToRun() {
+			// Wait for unpause
+			<-website.pausedC
 			continue
 		}
-		ws.statusMux.Lock()
-		ws.status.Status = "Running"
-		ws.statusMux.Unlock()
-
-		ws.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
-
-		resp := fasthttp.AcquireResponse()
-		// Perform request
-		err := httpClient.DoTimeout(req, resp, *flagTimeout)
-		if err != nil {
-			ws.statusMux.Lock()
-			ws.status.IncreaseCountersErr("httpClient.Do: " + err.Error())
-			ws.statusMux.Unlock()
-			continue
-		}
-		fasthttp.ReleaseResponse(resp)
-
-		// Increase counters
-		ws.statusMux.Lock()
-		ws.status.IncreaseCounters(resp.StatusCode())
-		ws.statusMux.Unlock()
+		doSingleRequest(website, req, resp, withTimeout)
 	}
+}
+
+func runRoundRobinWorker(websitesC chan *Website) {
+	// Each worker has it's own response
+	req := fasthttp.AcquireRequest()
+	resp := fasthttp.AcquireResponse()
+	withTimeout := true
+
+	for {
+		website := <-websitesC
+		if !website.allowedToRun() {
+			// Instantly skip to another website
+			continue
+		}
+		doSingleRequest(website, req, resp, withTimeout)
+	}
+}
+
+func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response, withTimeout bool) {
+	ws.statusMux.Lock()
+	ws.status.Status = "Running"
+	ws.statusMux.Unlock()
+
+	ws.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
+
+	resp.ShouldDiscardBody = true
+
+	// Perform request
+	var err error
+	if withTimeout {
+		err = httpClient.DoTimeout(req, resp, *flagTimeout)
+	} else {
+		err = httpClient.Do(req, resp)
+	}
+	if err != nil {
+		ws.IncreaseCountersErr("httpClient.Do: " + err.Error())
+		return
+	}
+
+	downloaded := resp.LastDiscarded
+	if !resp.ShouldDiscardBody {
+		downloaded = len(resp.Body())
+	}
+
+	// Prevent site memory leaking us with 32+ MB (uno reverso)
+	if len(resp.Body()) > 32*1024*1024 {
+		resp.ResetBody()
+	}
+
+	// Increase counters
+	ws.statusMux.Lock()
+	ws.status.IncreaseCounters(downloaded, resp.StatusCode())
+	ws.statusMux.Unlock()
 }

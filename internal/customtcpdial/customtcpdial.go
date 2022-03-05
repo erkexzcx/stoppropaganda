@@ -10,8 +10,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/resolvefix"
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/sockshttp"
+	"github.com/erkexzcx/stoppropaganda/internal/resolvefix"
+	"github.com/erkexzcx/stoppropaganda/internal/sockshttp"
 	"github.com/valyala/fasthttp"
 )
 

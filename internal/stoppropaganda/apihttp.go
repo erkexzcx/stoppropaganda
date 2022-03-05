@@ -7,7 +7,7 @@ import (
 	"sort"
 	"sync"
 
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customresolver"
+	"github.com/erkexzcx/stoppropaganda/internal/customresolver"
 	"github.com/valyala/fasthttp"
 )
 

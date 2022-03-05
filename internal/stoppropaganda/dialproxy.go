@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/sockshttp"
+	"github.com/erkexzcx/stoppropaganda/internal/sockshttp"
 )
 
 const (

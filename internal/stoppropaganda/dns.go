@@ -4,7 +4,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/targets"
+	"github.com/erkexzcx/stoppropaganda/internal/targets"
 	"github.com/miekg/dns"
 	"github.com/valyala/fastrand"
 )

@@ -5,7 +5,7 @@ import (
 	"net"
 	"sync"
 
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/spdnsclient/singleflight"
+	"github.com/erkexzcx/stoppropaganda/internal/spdnsclient/singleflight"
 )
 
 // dnsWaitGroup can be used by tests to wait for all DNS goroutines to

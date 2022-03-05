@@ -10,9 +10,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customresolver"
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customtcpdial"
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/sockshttp"
+	"github.com/erkexzcx/stoppropaganda/internal/customresolver"
+	"github.com/erkexzcx/stoppropaganda/internal/customtcpdial"
+	"github.com/erkexzcx/stoppropaganda/internal/sockshttp"
 	"github.com/miekg/dns"
 	"github.com/peterbourgon/ff/v3"
 	"github.com/valyala/fasthttp"

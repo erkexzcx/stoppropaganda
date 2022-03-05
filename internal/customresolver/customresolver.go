@@ -5,8 +5,8 @@ import (
 	"net"
 	"time"
 
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/spdnsclient"
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/targets"
+	"github.com/erkexzcx/stoppropaganda/internal/spdnsclient"
+	"github.com/erkexzcx/stoppropaganda/internal/targets"
 	"github.com/patrickmn/go-cache"
 )
 

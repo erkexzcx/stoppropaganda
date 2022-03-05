@@ -8,9 +8,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/customresolver"
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/resolvefix"
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/targets"
+	"github.com/erkexzcx/stoppropaganda/internal/customresolver"
+	"github.com/erkexzcx/stoppropaganda/internal/resolvefix"
+	"github.com/erkexzcx/stoppropaganda/internal/targets"
 	"github.com/valyala/fasthttp"
 )
 

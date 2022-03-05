@@ -73,6 +73,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://foros.miranda-media.ru":         {},
 	"https://chernomorskoe.miranda-media.ru": {},
 	"https://kirovskoe.miranda-media.ru":     {},
+	"https://savelife.pw":                    {},
 
 	// Business corporations
 	"https://www.gazprom.ru":                    {},

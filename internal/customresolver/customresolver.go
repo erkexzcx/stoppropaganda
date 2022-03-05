@@ -20,9 +20,6 @@ func MakeDNSConfig() (conf *spdnsclient.SPDNSConfig) {
 	}
 	conf.Servers = targets.ReferenceDNSServersForHTTP
 
-	if len(conf.Search) == 0 {
-		conf.Search = spdnsclient.DnsDefaultSearch()
-	}
 	return
 }
 

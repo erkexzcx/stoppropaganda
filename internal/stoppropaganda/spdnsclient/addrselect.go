@@ -301,7 +301,7 @@ func mustCIDR(s string) *net.IPNet {
 		panic(err.Error())
 	}
 	if len(ip) != net.IPv6len {
-		panic("unexpected IP length")
+		panic("[SP] unexpected IP length")
 	}
 	return ipNet
 }

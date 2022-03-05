@@ -17,17 +17,17 @@ const (
 )
 
 var (
-	errLameReferral              = errors.New("lame referral")
-	errCannotUnmarshalDNSMessage = errors.New("cannot unmarshal DNS message")
-	errCannotMarshalDNSMessage   = errors.New("cannot marshal DNS message")
-	errServerMisbehaving         = errors.New("server misbehaving")
-	errInvalidDNSResponse        = errors.New("invalid DNS response")
-	errNoAnswerFromDNSServer     = errors.New("no answer from DNS server")
+	errLameReferral              = errors.New("[SP] lame referral")
+	errCannotUnmarshalDNSMessage = errors.New("[SP] cannot unmarshal DNS message")
+	errCannotMarshalDNSMessage   = errors.New("[SP] cannot marshal DNS message")
+	errServerMisbehaving         = errors.New("[SP] server misbehaving")
+	errInvalidDNSResponse        = errors.New("[SP] invalid DNS response")
+	errNoAnswerFromDNSServer     = errors.New("[SP] no answer from DNS server")
 
 	// errServerTemporarilyMisbehaving is like errServerMisbehaving, except
 	// that when it gets translated to a DNSError, the IsTemporary field
 	// gets set to true.
-	errServerTemporarilyMisbehaving = errors.New("server misbehaving")
+	errServerTemporarilyMisbehaving = errors.New("[SP] server misbehaving")
 )
 
 func newRequest(q dnsmessage.Question) (id uint16, udpReq, tcpReq []byte, err error) {
@@ -195,7 +195,7 @@ func (r *SPResolver) goLookupIPCNAME(ctx context.Context, network, name string) 
 				h, err := result.p.AnswerHeader()
 				if err != nil && err != dnsmessage.ErrSectionDone {
 					lastErr = &net.DNSError{
-						Err:    "cannot marshal DNS message",
+						Err:    "[SP] cannot marshal DNS message",
 						Name:   name,
 						Server: result.server,
 					}
@@ -208,7 +208,7 @@ func (r *SPResolver) goLookupIPCNAME(ctx context.Context, network, name string) 
 					a, err := result.p.AResource()
 					if err != nil {
 						lastErr = &net.DNSError{
-							Err:    "cannot marshal DNS message",
+							Err:    "[SP] cannot marshal DNS message",
 							Name:   name,
 							Server: result.server,
 						}
@@ -220,7 +220,7 @@ func (r *SPResolver) goLookupIPCNAME(ctx context.Context, network, name string) 
 					aaaa, err := result.p.AAAAResource()
 					if err != nil {
 						lastErr = &net.DNSError{
-							Err:    "cannot marshal DNS message",
+							Err:    "[SP] cannot marshal DNS message",
 							Name:   name,
 							Server: result.server,
 						}
@@ -231,7 +231,7 @@ func (r *SPResolver) goLookupIPCNAME(ctx context.Context, network, name string) 
 				default:
 					if err := result.p.SkipAnswer(); err != nil {
 						lastErr = &net.DNSError{
-							Err:    "cannot marshal DNS message",
+							Err:    "[SP] cannot marshal DNS message",
 							Name:   name,
 							Server: result.server,
 						}

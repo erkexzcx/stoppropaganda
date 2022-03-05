@@ -8,11 +8,11 @@ import (
 
 // Various errors contained in DNSError.
 var (
-	errNoSuchHost = errors.New("no such host")
+	errNoSuchHost = errors.New("[SP] no such host")
 
 	// For both read and write operations.
-	errCanceled         = errors.New("operation was canceled")
-	ErrWriteToConnected = errors.New("use of WriteTo with pre-connected connection")
+	errCanceled         = errors.New("[SP] operation was canceled")
+	ErrWriteToConnected = errors.New("[SP] use of WriteTo with pre-connected connection")
 )
 
 // errTimeout exists to return the historical "i/o timeout" string
@@ -26,7 +26,7 @@ var errTimeout error = &timeoutError{}
 
 type timeoutError struct{}
 
-func (e *timeoutError) Error() string   { return "i/o timeout" }
+func (e *timeoutError) Error() string   { return "[SP] i/o timeout" }
 func (e *timeoutError) Timeout() bool   { return true }
 func (e *timeoutError) Temporary() bool { return true }
 

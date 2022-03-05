@@ -235,6 +235,9 @@ func runPerWebsiteWorker(website *Website) {
 	resp := fasthttp.AcquireResponse()
 	withTimeout := false
 
+	// Copy once
+	website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
+
 	for {
 		if !website.allowedToRun() {
 			// Wait for unpause
@@ -257,6 +260,10 @@ func runRoundRobinWorker(websitesC chan *Website) {
 			// Instantly skip to another website
 			continue
 		}
+		// Last request could've been for another website
+		// so we have to copy
+		website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
+
 		doSingleRequest(website, req, resp, withTimeout)
 	}
 }
@@ -265,8 +272,6 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 	ws.statusMux.Lock()
 	ws.status.Status = "Running"
 	ws.statusMux.Unlock()
-
-	ws.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
 
 	resp.ShouldDiscardBody = true
 

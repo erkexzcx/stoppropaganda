@@ -13,7 +13,7 @@ var TargetDNSServers = map[string]struct{}{
 	"95.173.148.50:53":  {},
 }
 
-// We need to get reliable IP address
+// We need reliable IP addresses
 // just like we would've been in Russia/Belarus
 var ReferenceDNSServersForHTTP = []string{
 	// https://dns.yandex.com/

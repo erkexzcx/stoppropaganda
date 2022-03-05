@@ -258,17 +258,18 @@ var TargetWebsites = map[string]struct{}{
 	"http://cfmc.ru":              {},
 
 	// Oil and gas trading companies
-	"https://transneft.ru":      {},
-	"https://tektorg.ru":        {},
-	"https://rosneft.com":       {},
-	"https://lukoil.com":        {},
-	"https://gazprom.ru":        {},
-	"https://b2b.sibur.ru":      {},
-	"https://onlinecontract.ru": {},
-	"https://eurochemgroup.com": {},
-	"https://uralchem.com":      {},
-	"https://tatneft.ru":        {},
-	"https://acron.ru":          {},
+	"https://transneft.ru":            {},
+	"https://tektorg.ru":              {},
+	"https://rosneft.com":             {},
+	"https://lukoil.com":              {},
+	"https://aaa-srt-apps.lukoil.com": {},
+	"https://gazprom.ru":              {},
+	"https://b2b.sibur.ru":            {},
+	"https://onlinecontract.ru":       {},
+	"https://eurochemgroup.com":       {},
+	"https://uralchem.com":            {},
+	"https://tatneft.ru":              {},
+	"https://acron.ru":                {},
 
 	/* BELARUS */
 

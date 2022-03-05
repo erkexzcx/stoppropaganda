@@ -82,7 +82,34 @@ type SPResolver struct {
 
 func (r *SPResolver) strictErrors() bool { return r != nil && r.StrictErrors }
 
-func (r *SPResolver) GoLookupIPCNAMEOrder(ctx context.Context, network, name string) (addrs []net.IPAddr, cname dnsmessage.Name, err error) {
+// goLookupHost is the native Go implementation of LookupHost.
+// Used only if cgoLookupHost refuses to handle the request
+// (that is, only if cgoLookupHost is the stub in cgo_stub.go).
+// Normally we let cgo use the C library resolver instead of
+// depending on our lookup code, so that Go and C get the same
+// answers.
+func (r *SPResolver) GoLookupHost(ctx context.Context, name string) (addrs []string, err error) {
+
+	ips, _, err := r.goLookupIPCNAME(ctx, "ip", name)
+	if err != nil {
+		return
+	}
+	addrs = make([]string, 0, len(ips))
+	for _, ip := range ips {
+		addrs = append(addrs, ip.String())
+	}
+	return
+}
+
+// goLookupIP is the native Go implementation of LookupIP.
+// The libc versions are in cgo_*.go.
+func (r *SPResolver) goLookupIP(ctx context.Context, network, host string) (addrs []net.IPAddr, err error) {
+	//order := systemConf().hostLookupOrder(r, host)
+	addrs, _, err = r.goLookupIPCNAME(ctx, network, host)
+	return
+}
+
+func (r *SPResolver) goLookupIPCNAME(ctx context.Context, network, name string) (addrs []net.IPAddr, cname dnsmessage.Name, err error) {
 
 	if !isDomainName(name) {
 		// See comment in func lookup above about use of errNoSuchHost.

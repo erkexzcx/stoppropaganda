@@ -23,6 +23,48 @@ func ipVersion(network string) byte {
 	return n
 }
 
+// LookupHost looks up the given host using the local resolver.
+// It returns a slice of that host's addresses.
+func (r *SPResolver) LookupHost(ctx context.Context, host string) (addrs []string, err error) {
+	// Make sure that no matter what we do later, host=="" is rejected.
+	// parseIP, for example, does accept empty strings.
+	if host == "" {
+		return nil, &net.DNSError{Err: errNoSuchHost.Error(), Name: host, IsNotFound: true}
+	}
+	if ip, _ := parseIPZone(host); ip != nil {
+		return []string{host}, nil
+	}
+	return r.lookupHost(ctx, host)
+}
+
+func (r *SPResolver) lookupHost(ctx context.Context, host string) (addrs []string, err error) {
+	//order := systemConf().hostLookupOrder(r, host)
+	// if !r.preferGo() && order == hostLookupCgo {
+	// 	if addrs, err, ok := cgoLookupHost(ctx, host); ok {
+	// 		return addrs, err
+	// 	}
+	// 	// cgo not available (or netgo); fall back to Go's DNS resolver
+	// 	order = hostLookupFilesDNS
+	// }
+	return r.GoLookupHost(ctx, host)
+}
+
+func (r *SPResolver) lookupIP(ctx context.Context, network, host string) (addrs []net.IPAddr, err error) {
+	if true {
+		return r.goLookupIP(ctx, network, host)
+	}
+	// order := systemConf().hostLookupOrder(r, host)
+	// if order == hostLookupCgo {
+	// 	if addrs, err, ok := cgoLookupIP(ctx, network, host); ok {
+	// 		return addrs, err
+	// 	}
+	// 	// cgo not available (or netgo); fall back to Go's DNS resolver
+	// 	order = hostLookupFilesDNS
+	// }
+	ips, _, err := r.goLookupIPCNAME(ctx, network, host)
+	return ips, err
+}
+
 func (r *SPResolver) dial(ctx context.Context, network, server string) (net.Conn, error) {
 	// Calling Dial here is scary -- we have to be sure not to
 	// dial a name that will require a DNS lookup, or Dial will

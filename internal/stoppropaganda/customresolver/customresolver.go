@@ -6,10 +6,33 @@ import (
 	"time"
 
 	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/spdnsclient"
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/targets"
 	"github.com/patrickmn/go-cache"
 )
 
 var DnsCache *cache.Cache
+
+func MakeDNSConfig() (conf *spdnsclient.SPDNSConfig) {
+	conf = &spdnsclient.SPDNSConfig{
+		Ndots:    1,
+		Timeout:  5 * time.Second,
+		Attempts: 2,
+	}
+	conf.Servers = targets.ReferenceDNSServersForHTTP
+
+	if len(conf.Search) == 0 {
+		conf.Search = spdnsclient.DnsDefaultSearch()
+	}
+	return
+}
+
+var MasterStopPropagandaResolver = &CustomResolver{
+	FirstResolver: &spdnsclient.SPResolver{
+
+		CustomDNSConfig: MakeDNSConfig(),
+	},
+	ParentResolver: net.DefaultResolver,
+}
 
 type CustomResolver struct {
 	FirstResolver  *spdnsclient.SPResolver
@@ -28,11 +51,11 @@ func (cr *CustomResolver) LookupIPAddr(ctx context.Context, host string) (names 
 		DnsCache.SetDefault(host, names)
 		return
 	}
-	// names, err = cr.ParentResolver.LookupIPAddr(ctx, host)
-	// if err == nil {
-	// 	DnsCache.SetDefault(host, names)
-	// 	return
-	// }
+	names, err = cr.ParentResolver.LookupIPAddr(ctx, host)
+	if err == nil {
+		DnsCache.SetDefault(host, names)
+		return
+	}
 	return
 }
 

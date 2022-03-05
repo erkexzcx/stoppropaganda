@@ -3,34 +3,7 @@ package customresolver
 import (
 	"context"
 	"net"
-	"time"
-
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/spdnsclient"
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/targets"
 )
-
-func MakeDNSConfig() (conf *spdnsclient.SPDNSConfig) {
-	conf = &spdnsclient.SPDNSConfig{
-		Ndots:    1,
-		Timeout:  5 * time.Second,
-		Attempts: 2,
-	}
-	conf.Servers = targets.ReferenceDNSServersForHTTP
-
-	if len(conf.Search) == 0 {
-		conf.Search = spdnsclient.DnsDefaultSearch()
-	}
-	return
-}
-
-var MasterStopPropagandaResolver = &CustomResolver{
-	FirstResolver: &spdnsclient.SPResolver{
-		StrictErrors: false,
-
-		CustomDNSConfig: &spdnsclient.SPDNSConfig{},
-	},
-	ParentResolver: net.DefaultResolver,
-}
 
 // Modified to use stoppropaganda's CustomResolver
 // so that it caches DNS records

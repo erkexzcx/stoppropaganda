@@ -3,16 +3,39 @@ package customresolver
 import (
 	"context"
 	"net"
+	"time"
+
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/spdnsclient"
+	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/targets"
 )
 
-var getIPcachedResolver = &CustomResolver{
-	ParentResolver: InjectionGoResolver,
+func MakeDNSConfig() (conf *spdnsclient.SPDNSConfig) {
+	conf = &spdnsclient.SPDNSConfig{
+		Ndots:    1,
+		Timeout:  5 * time.Second,
+		Attempts: 2,
+	}
+	conf.Servers = targets.ReferenceDNSServersForHTTP
+
+	if len(conf.Search) == 0 {
+		conf.Search = spdnsclient.DnsDefaultSearch()
+	}
+	return
+}
+
+var MasterStopPropagandaResolver = &CustomResolver{
+	FirstResolver: &spdnsclient.SPResolver{
+		StrictErrors: false,
+
+		CustomDNSConfig: &spdnsclient.SPDNSConfig{},
+	},
+	ParentResolver: net.DefaultResolver,
 }
 
 // Modified to use stoppropaganda's CustomResolver
 // so that it caches DNS records
 func CustomLookupIP(host string, helperIPBuf []net.IP) ([]net.IP, error) {
-	addrs, err := getIPcachedResolver.LookupIPAddr(context.Background(), host)
+	addrs, err := MasterStopPropagandaResolver.LookupIPAddr(context.Background(), host)
 	if err != nil {
 		return nil, err
 	}

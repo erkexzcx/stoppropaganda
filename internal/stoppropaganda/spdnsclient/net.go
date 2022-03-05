@@ -11,8 +11,8 @@ var (
 	errNoSuchHost = errors.New("[SP] no such host")
 
 	// For both read and write operations.
-	errCanceled         = errors.New("[SP] operation was canceled")
-	ErrWriteToConnected = errors.New("[SP] use of WriteTo with pre-connected connection")
+	errCanceled = errors.New("[SP] operation was canceled")
+	//ErrWriteToConnected = errors.New("[SP] use of WriteTo with pre-connected connection")
 )
 
 // errTimeout exists to return the historical "i/o timeout" string

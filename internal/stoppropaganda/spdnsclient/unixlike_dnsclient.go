@@ -48,38 +48,6 @@ func newRequest(q dnsmessage.Question) (id uint16, udpReq, tcpReq []byte, err er
 	return id, udpReq, tcpReq, err
 }
 
-type SPResolver struct {
-	// StrictErrors controls the behavior of temporary errors
-	// (including timeout, socket errors, and SERVFAIL) when using
-	// Go's built-in resolver. For a query composed of multiple
-	// sub-queries (such as an A+AAAA address lookup, or walking the
-	// DNS search list), this option causes such errors to abort the
-	// whole query instead of returning a partial result. This is
-	// not enabled by default because it may affect compatibility
-	// with resolvers that process AAAA queries incorrectly.
-	StrictErrors bool
-
-	// Dial optionally specifies an alternate dialer for use by
-	// Go's built-in DNS resolver to make TCP and UDP connections
-	// to DNS services. The host in the address parameter will
-	// always be a literal IP address and not a host name, and the
-	// port in the address parameter will be a literal port number
-	// and not a service name.
-	// If the Conn returned is also a PacketConn, sent and received DNS
-	// messages must adhere to RFC 1035 section 4.2.1, "UDP usage".
-	// Otherwise, DNS messages transmitted over Conn must adhere
-	// to RFC 7766 section 5, "Transport Protocol Selection".
-	// If nil, the default dialer is used.
-	Dial func(ctx context.Context, network, address string) (net.Conn, error)
-
-	// lookupGroup merges LookupIPAddr calls together for lookups for the same
-	// host. The lookupGroup key is the LookupIPAddr.host argument.
-	// The return values are ([]IPAddr, error).
-	//lookupGroup singleflight.Group
-
-	CustomDNSConfig *SPDNSConfig
-}
-
 func (r *SPResolver) strictErrors() bool { return r != nil && r.StrictErrors }
 
 // goLookupHost is the native Go implementation of LookupHost.
@@ -195,7 +163,7 @@ func (r *SPResolver) goLookupIPCNAME(ctx context.Context, network, name string) 
 				h, err := result.p.AnswerHeader()
 				if err != nil && err != dnsmessage.ErrSectionDone {
 					lastErr = &net.DNSError{
-						Err:    "[SP] cannot marshal DNS message",
+						Err:    "[SP] cannot marshal DNS message: " + err.Error(),
 						Name:   name,
 						Server: result.server,
 					}
@@ -208,7 +176,7 @@ func (r *SPResolver) goLookupIPCNAME(ctx context.Context, network, name string) 
 					a, err := result.p.AResource()
 					if err != nil {
 						lastErr = &net.DNSError{
-							Err:    "[SP] cannot marshal DNS message",
+							Err:    "[SP] cannot marshal DNS message TypeA",
 							Name:   name,
 							Server: result.server,
 						}
@@ -220,7 +188,7 @@ func (r *SPResolver) goLookupIPCNAME(ctx context.Context, network, name string) 
 					aaaa, err := result.p.AAAAResource()
 					if err != nil {
 						lastErr = &net.DNSError{
-							Err:    "[SP] cannot marshal DNS message",
+							Err:    "[SP] cannot marshal DNS message TypeAAAA",
 							Name:   name,
 							Server: result.server,
 						}
@@ -231,7 +199,7 @@ func (r *SPResolver) goLookupIPCNAME(ctx context.Context, network, name string) 
 				default:
 					if err := result.p.SkipAnswer(); err != nil {
 						lastErr = &net.DNSError{
-							Err:    "[SP] cannot marshal DNS message",
+							Err:    "[SP] cannot marshal DNS message [default]",
 							Name:   name,
 							Server: result.server,
 						}

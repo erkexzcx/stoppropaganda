@@ -1,13 +1,6 @@
 package customresolver
 
-import (
-	"context"
-	"net"
-	"time"
-
-	"github.com/erkexzcx/stoppropaganda/internal/stoppropaganda/targets"
-)
-
+/*
 var InjectionGoResolver = &net.Resolver{
 	PreferGo: true,
 	Dial: func(ctx context.Context, network, address string) (conn net.Conn, err error) {
@@ -28,3 +21,4 @@ var InjectionGoResolver = &net.Resolver{
 		return d.DialContext(ctx, network, address)
 	},
 }
+*/

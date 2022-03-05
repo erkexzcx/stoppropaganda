@@ -10,8 +10,8 @@
 package spdnsclient
 
 import (
-	"internal/bytealg"
 	"os"
+	"strings"
 	"sync/atomic"
 	"time"
 )
@@ -211,13 +211,13 @@ func (conf *SPDNSConfig) nameList(name string) []string {
 	return names
 }
 
-func dnsDefaultSearch() []string {
+func DnsDefaultSearch() []string {
 	hn, err := getHostname()
 	if err != nil {
 		// best effort
 		return nil
 	}
-	if i := bytealg.IndexByteString(hn, '.'); i >= 0 && i < len(hn)-1 {
+	if i := strings.IndexByte(hn, '.'); i >= 0 && i < len(hn)-1 {
 		return []string{ensureRooted(hn[i+1:])}
 	}
 	return nil

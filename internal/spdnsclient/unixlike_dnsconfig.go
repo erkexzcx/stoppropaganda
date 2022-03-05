@@ -12,7 +12,6 @@ import (
 )
 
 var (
-	defaultNS   = []string{"127.0.0.1:53", "[::1]:53"}
 	getHostname = os.Hostname // variable for testing
 )
 
@@ -216,10 +215,6 @@ func DnsDefaultSearch() []string {
 		return []string{ensureRooted(hn[i+1:])}
 	}
 	return nil
-}
-
-func hasPrefix(s, prefix string) bool {
-	return len(s) >= len(prefix) && s[:len(prefix)] == prefix
 }
 
 func ensureRooted(s string) string {

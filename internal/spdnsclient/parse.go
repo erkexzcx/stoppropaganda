@@ -16,11 +16,6 @@ func stringsHasSuffixFold(s, suffix string) bool {
 	return len(s) >= len(suffix) && stringsEqualFold(s[len(s)-len(suffix):], suffix)
 }
 
-// stringsHasPrefix is strings.HasPrefix. It reports whether s begins with prefix.
-func stringsHasPrefix(s, prefix string) bool {
-	return len(s) >= len(prefix) && s[:len(prefix)] == prefix
-}
-
 // stringsEqualFold is strings.EqualFold, ASCII only. It reports whether s and t
 // are equal, ASCII-case-insensitively.
 func stringsEqualFold(s, t string) bool {

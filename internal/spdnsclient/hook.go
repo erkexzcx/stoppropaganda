@@ -7,15 +7,10 @@ package spdnsclient
 import (
 	"context"
 	"net"
-	"time"
 )
 
 var (
-	// if non-nil, overrides dialTCP.
-	testHookDialTCP func(ctx context.Context, net string, laddr, raddr *net.TCPAddr) (*net.TCPConn, error)
-
-	testHookHostsPath = "/etc/hosts"
-	testHookLookupIP  = func(
+	testHookLookupIP = func(
 		ctx context.Context,
 		fn func(context.Context, string, string) ([]net.IPAddr, error),
 		network string,
@@ -23,5 +18,4 @@ var (
 	) ([]net.IPAddr, error) {
 		return fn(ctx, network, host)
 	}
-	testHookSetKeepAlive = func(time.Duration) {}
 )

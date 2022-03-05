@@ -175,6 +175,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://proverki.gov.ru":        {},
 	"https://shop-rt.com":            {},
 	"https://www.glonass-iac.ru":     {},
+	"https://savelife.pw":            {},
 
 	// Exchanges connected to russian banks
 	"https://cleanbtc.ru":         {},
@@ -255,6 +256,19 @@ var TargetWebsites = map[string]struct{}{
 	"http://ca.kamgov.ru":         {},
 	"http://mascom-it.ru":         {},
 	"http://cfmc.ru":              {},
+
+	// Oil and gas trading companies
+	"https://transneft.ru":      {},
+	"https://tektorg.ru":        {},
+	"https://rosneft.com":       {},
+	"https://lukoil.com":        {},
+	"https://gazprom.ru":        {},
+	"https://b2b.sibur.ru":      {},
+	"https://onlinecontract.ru": {},
+	"https://eurochemgroup.com": {},
+	"https://uralchem.com":      {},
+	"https://tatneft.ru":        {},
+	"https://acron.ru":          {},
 
 	/* BELARUS */
 

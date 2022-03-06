@@ -139,6 +139,10 @@ var TargetWebsites = map[string]struct{}{
 	"https://acs6.sbrf.ru":                              {},
 	"https://acs7.sbrf.ru":                              {},
 	"https://acs8.sbrf.ru":                              {},
+	"https://my.bank-hlynov.ru":                         {},
+	"https://link.centrinvest.ru":                       {},
+	"https://chbrr.crimea.com":                          {},
+	"https://enter.unicredit.ru":                        {},
 
 	//The state
 	"https://gosuslugi.ru":           {},
@@ -176,6 +180,10 @@ var TargetWebsites = map[string]struct{}{
 	"https://shop-rt.com":            {},
 	"https://www.glonass-iac.ru":     {},
 	"https://savelife.pw":            {},
+	// former russian project with russian founders, that are being used as navigational service for russian army
+	// has marked military objects
+	"https://wikimapia.org":          {},
+	"https://dme.ru":                 {},
 
 	// Exchanges connected to russian banks
 	"https://cleanbtc.ru":         {},

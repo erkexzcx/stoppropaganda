@@ -166,9 +166,10 @@ var TargetWebsites = map[string]struct{}{
 	"https://ca.vks.rosguard.gov.ru": {},
 
 	// Embassies
-	"https://montreal.mid.ru":     {},
-	"https://belarus.mid.ru":      {},
-        
+	// Do not duplicate the IPs: https://github.com/erkexzcx/stoppropaganda/pull/110#issuecomment-1059960305
+	"https://montreal.mid.ru": {},
+	"https://belarus.mid.ru":  {},
+
 	// Others
 	"https://109.207.1.118":          {},
 	"https://109.207.1.97":           {},
@@ -183,8 +184,8 @@ var TargetWebsites = map[string]struct{}{
 	"https://savelife.pw":            {},
 	// former russian project with russian founders, that are being used as navigational service for russian army
 	// has marked military objects
-	"https://wikimapia.org":          {},
-	"https://dme.ru":                 {},
+	"https://wikimapia.org": {},
+	"https://dme.ru":        {},
 
 	// Exchanges connected to russian banks
 	"https://cleanbtc.ru":         {},

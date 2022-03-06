@@ -165,9 +165,10 @@ var TargetWebsites = map[string]struct{}{
 	"http://crimea-post.ru":          {},
 	"https://ca.vks.rosguard.gov.ru": {},
 
-	// Embassy
-	"https://montreal.mid.ru": {},
-
+	// Embassies
+	"https://montreal.mid.ru":     {},
+	"https://belarus.mid.ru":      {},
+        
 	// Others
 	"https://109.207.1.118":          {},
 	"https://109.207.1.97":           {},

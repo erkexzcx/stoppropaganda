@@ -38,6 +38,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://zakupki.gov.ru":                 {},
 	"https://er.ru":                          {},
 	"https://www.rzd.ru":                     {},
+	"https://eng.rzd.ru":                     {},
 	"https://rzdlog.ru":                      {},
 	"https://vgtrk.ru":                       {},
 	"https://www.interfax.ru":                {},
@@ -280,6 +281,9 @@ var TargetWebsites = map[string]struct{}{
 	"https://uralchem.com":            {},
 	"https://tatneft.ru":              {},
 	"https://acron.ru":                {},
+
+        // Assholes
+	"https://novo-sibirsk.ru":  {},  // city of Novosibirsk issue #113
 
 	/* BELARUS */
 

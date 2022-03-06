@@ -19,10 +19,10 @@ var BypassIPs = []BypassWebsite{
 	*/
 }
 
-func mustResolveIPAddr(address string) (ip *net.IPAddr) {
-	ip, err := net.ResolveIPAddr("ip", address)
-	if err != nil {
-		panic(err)
-	}
-	return
-}
+// func mustResolveIPAddr(address string) (ip *net.IPAddr) {
+// 	ip, err := net.ResolveIPAddr("ip", address)
+// 	if err != nil {
+// 		panic(err)
+// 	}
+// 	return
+// }

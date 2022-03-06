@@ -161,8 +161,25 @@ var TargetWebsites = map[string]struct{}{
 	"http://crimea-post.ru":          {},
 	"https://ca.vks.rosguard.gov.ru": {},
 
-	// Embassy
-	"https://montreal.mid.ru": {},
+	// Embassies
+	"https://montreal.mid.ru":     {},
+	"https://afghanistan.mid.ru":  {},
+        "https://armenia.mid.ru":      {},
+        "https://azerbaijan.mid.ru":   {},
+        "https://beijing.mid.ru":      {},
+	"https://belarus.mid.ru":      {},
+        "https://cuba.mid.ru":         {},
+        "https://georgia.mid.ru":      {},
+        "https://helsinki.mid.ru":     {},
+        "https://india.mid.ru":        {},
+        "https://iran.mid.ru":         {},
+        "https://mexico.mid.ru":       {},
+        "https://moldova.mid.ru":      {},
+        "https://mongolia.mid.ru":     {},
+        "https://syria.mid.ru":        {},
+        "https://sweden.mid.ru":       {},
+        "https://turkmenistan.mid.ru": {},
+        "https://uzbekistan.mid.ru":   {},
 
 	// Others
 	"https://109.207.1.118":          {},

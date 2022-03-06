@@ -62,8 +62,9 @@ func runDNSWorker(c chan *DNSTarget) {
 	for {
 		dnsTarget := <-c
 		questionDomain := getRandomDomain(rng) + "."
-		dnsTarget.message.SetQuestion(questionDomain, dns.TypeA)
-		_, _, err := dnsClient.Exchange(dnsTarget.message, dnsTarget.target)
+		messageCopy := *dnsTarget.message
+		messageCopy.SetQuestion(questionDomain, dns.TypeA)
+		_, _, err := dnsClient.Exchange(&messageCopy, dnsTarget.target)
 
 		dnsTarget.mux.Lock()
 		dnsTarget.Status.Requests++

@@ -20,9 +20,6 @@ func MakeDNSConfig() (conf *spdnsclient.SPDNSConfig) {
 	}
 	conf.Servers = targets.ReferenceDNSServersForHTTP
 
-	if len(conf.Search) == 0 {
-		conf.Search = spdnsclient.DnsDefaultSearch()
-	}
 	return
 }
 
@@ -35,8 +32,9 @@ var MasterStopPropagandaResolver = &CustomResolver{
 }
 
 type CustomResolver struct {
-	FirstResolver  *spdnsclient.SPResolver
-	ParentResolver *net.Resolver
+	BypassGuardResolver *BypassGuardResolver
+	FirstResolver       *spdnsclient.SPResolver
+	ParentResolver      *net.Resolver
 }
 type Resolver interface {
 	LookupIPAddr(context.Context, string) (names []net.IPAddr, err error)
@@ -46,14 +44,23 @@ func (cr *CustomResolver) LookupIPAddr(ctx context.Context, host string) (names 
 	if c, found := DnsCache.Get(host); found {
 		return c.([]net.IPAddr), nil
 	}
-	names, err = cr.FirstResolver.LookupIPAddr(ctx, host)
+	names, err = cr.LookupIPAddrNoCache(ctx, host)
 	if err == nil {
 		DnsCache.SetDefault(host, names)
+	}
+	return
+}
+func (cr *CustomResolver) LookupIPAddrNoCache(ctx context.Context, host string) (names []net.IPAddr, err error) {
+	names, err = cr.BypassGuardResolver.LookupIPAddr(ctx, host)
+	if err == nil {
+		return
+	}
+	names, err = cr.FirstResolver.LookupIPAddr(ctx, host)
+	if err == nil {
 		return
 	}
 	names, err = cr.ParentResolver.LookupIPAddr(ctx, host)
 	if err == nil {
-		DnsCache.SetDefault(host, names)
 		return
 	}
 	return

@@ -1,15 +1,5 @@
 package spdnsclient
 
-// import "os"
-
-// func open(name string) (*file, error) {
-// 	fd, err := os.Open(name)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &file{fd, make([]byte, 0, 64*1024), false}, nil
-// }
-
 // stringsHasSuffixFold reports whether s ends in suffix,
 // ASCII-case-insensitively.
 func stringsHasSuffixFold(s, suffix string) bool {

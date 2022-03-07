@@ -73,6 +73,18 @@ var TargetWebsites = map[string]struct{}{
 	"https://foros.miranda-media.ru":         {},
 	"https://chernomorskoe.miranda-media.ru": {},
 	"https://kirovskoe.miranda-media.ru":     {},
+	"https://www.astrobl.ru":                 {},
+	"https://www.volgograd.ru":               {},
+	"https://www.admoblkaluga.ru":            {},
+	"https://apparat.lenobl.ru":              {},
+	"https://mosreg.ru":                      {},
+	"https://orel-region.ru":                 {},
+	"http://midural.ru":                      {},
+	"http://www.tula.ru":                     {},
+	"https://ulgov.ru":                       {},
+	"https://cheladmin.ru":                   {},
+	"https://krd.ru":                         {},
+	"https://www.stavregion.ru":              {},
 
 	// Business corporations
 	"https://www.gazprom.ru":                    {},

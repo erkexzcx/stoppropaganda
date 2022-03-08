@@ -148,6 +148,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://monopoly.ru":                       {},
 	"https://ul.su":                             {},
 	"http://gruzovozkin.pro":                    {},
+	"http://www.yemelya.ru":                     {},
 
 	// Banks
 	"https://www.sberbank.ru":                           {},

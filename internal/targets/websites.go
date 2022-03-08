@@ -126,6 +126,16 @@ var TargetWebsites = map[string]struct{}{
 	"https://sbp.nspk.ru":                       {},
 	"https://nspk.ru":                           {},
 	"https://nspk.com":                          {},
+	"https://advego.com":                        {},
+        "https://kwork.ru":                          {},
+        "https://www.freelance.ru":                  {},
+        "https://copylancer.ru":                     {},
+        "https://www.etxt.ru":                       {},
+        "https://fl.ru":                             {},
+        "https://www.turbotext.ru":                  {},
+        "https://hh.ru":                             {},
+        "https://www.miralinks.ru":                  {},
+        "https://gogetlinks.net":                    {},
 
 	// Banks
 	"https://www.sberbank.ru":                           {},

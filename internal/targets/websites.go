@@ -136,6 +136,18 @@ var TargetWebsites = map[string]struct{}{
 	"https://hh.ru":                             {},
 	"https://www.miralinks.ru":                  {},
 	"https://gogetlinks.net":                    {},
+	"https://sberfn.ru":                         {},
+        "https://sber-am.ru":                        {},
+        "https://www.vtbcapital-pr.ru":              {},
+        "https://region-am.ru":                      {},
+        "https://www.ingosinvest.ru":                {},
+        "https://goszakaz.ru":                       {},
+        "https://star-pro.ru":                       {},
+        "http://ati.su":                             {},
+        "https://region.ru":                         {},
+        "https://monopoly.ru":                       {},
+        "https://ul.su":                             {},
+        "http://gruzovozkin.pro":                    {},
 
 	// Banks
 	"https://www.sberbank.ru":                           {},

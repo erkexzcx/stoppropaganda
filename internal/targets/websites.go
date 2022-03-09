@@ -88,8 +88,8 @@ var TargetWebsites = map[string]struct{}{
 	"https://sputnik.com":                    {},
 
 	// DOS directed against Ukraine
-	"https://norussians.xyz/": {},
-	"https://stopnazi.xyz/":   {},
+	"https://norussians.xyz": {},
+	"https://stopnazi.xyz":   {},
 
 	// Business corporations
 	"https://www.gazprom.ru":                    {},

@@ -85,6 +85,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://cheladmin.ru":                   {},
 	"https://krd.ru":                         {},
 	"https://www.stavregion.ru":              {},
+	"https://sputnik.com":                    {},
 
 	// DOS directed against Ukraine
 	"https://norussians.xyz/": {},

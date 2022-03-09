@@ -149,10 +149,10 @@ var TargetWebsites = map[string]struct{}{
 	"https://ul.su":                             {},
 	"http://gruzovozkin.pro":                    {},
 	"https://ok.ru":                             {},
-        "http://5.61.23.11":                         {},
+	"http://5.61.23.11":                         {},
 	"http://217.20.155.13":                      {},
-        "http://217.20.147.1":                       {},
-	
+	"http://217.20.147.1":                       {},
+
 	// Banks
 	"https://www.sberbank.ru":                           {},
 	"https://online.sberbank.ru":                        {},

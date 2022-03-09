@@ -85,6 +85,10 @@ var TargetWebsites = map[string]struct{}{
 	"https://cheladmin.ru":                   {},
 	"https://krd.ru":                         {},
 	"https://www.stavregion.ru":              {},
+	
+	// DOS directed against Ukraine
+	"https://norussians.xyz/":              {},
+	"https://stopnazi.xyz/":              {},
 
 	// Business corporations
 	"https://www.gazprom.ru":                    {},
@@ -121,11 +125,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.avito.ru":                      {},
 	"https://www.dns-shop.ru":                   {},
 	"https://aliexpress.ru":                     {},
-	"https://privetmir.ru":                      {},
-	"https://mironline.ru":                      {},
-	"https://sbp.nspk.ru":                       {},
-	"https://nspk.ru":                           {},
-	"https://nspk.com":                          {},
 	"https://advego.com":                        {},
 	"https://kwork.ru":                          {},
 	"https://www.freelance.ru":                  {},
@@ -228,12 +227,19 @@ var TargetWebsites = map[string]struct{}{
 	"https://dme.ru":        {},
 
 	// Payments
-	"https://www.nspk.ru":   {},
-	"http://195.208.109.58": {},
-	"http://185.170.2.7":    {},
-	"http://185.170.3.7":    {},
-	"http://185.170.2.9":    {},
-	"http://185.170.3.9":    {},
+	"https://www.nspk.ru":    {},
+	"http://195.208.109.58":  {},
+	"http://185.170.2.7":     {},
+	"http://185.170.3.7":     {},
+	"http://185.170.2.9":     {},
+	"http://185.170.3.9":     {},
+	"https://privetmir.ru":   {},
+	"https://mironline.ru":   {},
+	"https://sbp.nspk.ru":    {},
+	"https://nspk.ru":        {},
+	"https://nspk.com":       {},
+	"https://server.nspk.ru": {},
+	"https://sip.nspk.ru":    {},
 
 	// Exchanges connected to russian banks
 	"https://cleanbtc.ru":         {},

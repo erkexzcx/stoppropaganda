@@ -152,6 +152,7 @@ var TargetWebsites = map[string]struct{}{
 	"http://5.61.23.11":                         {},
 	"http://217.20.155.13":                      {},
 	"http://217.20.147.1":                       {},
+	"http://www.yemelya.ru":                     {},
 
 	// Banks
 	"https://www.sberbank.ru":                           {},

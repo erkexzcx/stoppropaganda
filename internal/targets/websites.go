@@ -227,6 +227,14 @@ var TargetWebsites = map[string]struct{}{
 	"https://wikimapia.org": {},
 	"https://dme.ru":        {},
 
+	// Payments
+	"https://www.nspk.ru":   {},
+	"http://195.208.109.58": {},
+	"http://185.170.2.7":    {},
+	"http://185.170.3.7":    {},
+	"http://185.170.2.9":    {},
+	"http://185.170.3.9":    {},
+
 	// Exchanges connected to russian banks
 	"https://cleanbtc.ru":         {},
 	"https://api.cleanbtc.ru":     {},

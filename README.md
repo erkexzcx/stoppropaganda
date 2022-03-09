@@ -205,7 +205,7 @@ This parameter is only applicable when used with [proxy](#proxy) parameter.
 
 ## algorithm
 
-Configuration via command line argument `-algorithm rr` or via environment variable `SP_ALGORITHM="rr"`.
+Configuration via command line argument `-algorithm fair` or via environment variable `SP_ALGORITHM="fair"`.
 
 The algorithm defines in what manner you want websites to be DOS'ed. It directly impacts resource usage and performance of this application.
 

@@ -85,7 +85,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://cheladmin.ru":                   {},
 	"https://krd.ru":                         {},
 	"https://www.stavregion.ru":              {},
-
+	"https://sputnik.com":{},
 	// Business corporations
 	"https://www.gazprom.ru":                    {},
 	"https://lukoil.ru":                         {},

@@ -23,6 +23,10 @@ func TestWebsitesLinks(t *testing.T) {
 			t.Errorf("unknown or missing scheme '%v':", err)
 		}
 
+		if parsedURL.Host != strings.ToLower(parsedURL.Host) {
+			t.Errorf("only lowercase characters allowed in URL host '%v':", k)
+		}
+
 		// Find duplicates
 		if strings.Contains(k, "://www.") {
 			newStr := strings.Replace(k, "://www.", "://", 1) // Treat www.example.com and example.com as duplicates
@@ -32,10 +36,11 @@ func TestWebsitesLinks(t *testing.T) {
 			_, fhttp := TargetWebsites[newStrHTTP]
 			_, fhttps := TargetWebsites[newStrHTTPS]
 
-			if fhttp {
+			if fhttp && fhttps {
+				t.Errorf("duplicate websites '%v' and '%v'", newStrHTTP, newStrHTTPS)
+			} else if fhttp {
 				t.Errorf("duplicate websites '%v' and '%v'", k, newStrHTTP)
-			}
-			if fhttps {
+			} else if fhttps {
 				t.Errorf("duplicate websites '%v' and '%v'", k, newStrHTTPS)
 			}
 		}

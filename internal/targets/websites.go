@@ -92,10 +92,8 @@ var TargetWebsites = map[string]struct{}{
 	"https://stopnazi.xyz":   {},
 
 	// Business corporations
-	"https://www.gazprom.ru":                    {},
 	"https://lukoil.ru":                         {},
 	"https://magnit.ru":                         {},
-	"https://www.tatneft.ru":                    {},
 	"https://www.evraz.com/ru":                  {},
 	"https://nlmk.com":                          {},
 	"https://www.sibur.ru":                      {},
@@ -155,7 +153,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.nornickel.com":                 {},
 	"https://www.surgutneftegas.ru":             {},
 	"https://www.evraz.com":                     {},
-	"https://www.nlmk.com":                      {},
 	"https://www.metalloinvest.com":             {},
 
 	// Banks
@@ -199,7 +196,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://customs.gov.ru":         {},
 	"https://pfr.gov.ru":             {},
 	"https://rkn.gov.ru":             {},
-	"https://www.gosuslugi.ru":       {},
 	"https://gosuslugi41.ru":         {},
 	"https://uslugi27.ru":            {},
 	"https://gosuslugi29.ru":         {},
@@ -231,7 +227,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://dme.ru":        {},
 
 	// Payments
-	"https://www.nspk.ru":    {},
 	"http://195.208.109.58":  {},
 	"http://185.170.2.7":     {},
 	"http://185.170.3.7":     {},

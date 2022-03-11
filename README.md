@@ -217,6 +217,16 @@ Available algorithms:
   - Uses more CPU and RAM.
   - By nature it prioritizes slower websites.
 
+
+## maxprocs
+
+Configuration via command line argument `-maxprocs 1` or via environment variable `SP_MAXPROCS=1`.
+
+Defines amount of system threads used by the program.
+
+Default value of 1 provides some optimization, because Golang doesn't have to use mutexes, atomics 
+and inter-process synchronization mechanisms.
+
 # Web UI
 
 As of now there is no fancy web interface, only a JSON pre-formatted output.

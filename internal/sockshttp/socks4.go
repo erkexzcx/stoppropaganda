@@ -8,8 +8,8 @@ import (
 	"time"
 )
 
-func SOCKS4(network, addr string, auth *Auth, forward Dialer) (Dialer, error) {
-	s := &Socks4{
+func SOCKS4(network, addr string, auth *Auth, forward Dialer) (*Socks4Proxier, error) {
+	s := &Socks4Proxier{
 		Host:   addr,
 		Auth:   auth,
 		Dialer: forward,
@@ -24,7 +24,7 @@ const (
 	TypeSOCKS4A
 )
 
-type Socks4 struct {
+type Socks4Proxier struct {
 	Proto   int
 	Host    string
 	Auth    *Auth
@@ -32,7 +32,7 @@ type Socks4 struct {
 	Dialer  Dialer
 }
 
-func (cfg *Socks4) Dial(network, forwardAddr string) (net.Conn, error) {
+func (cfg *Socks4Proxier) Dial(network, forwardAddr string) (net.Conn, error) {
 	socksType := cfg.Proto
 	proxyAddr := cfg.Host
 
@@ -96,7 +96,7 @@ func (cfg *Socks4) Dial(network, forwardAddr string) (net.Conn, error) {
 	return conn, nil
 }
 
-func (c *Socks4) sendReceive(conn net.Conn, req []byte) (resp []byte, err error) {
+func (c *Socks4Proxier) sendReceive(conn net.Conn, req []byte) (resp []byte, err error) {
 	if c.Timeout > 0 {
 		if err := conn.SetWriteDeadline(time.Now().Add(c.Timeout)); err != nil {
 			return nil, err
@@ -109,7 +109,7 @@ func (c *Socks4) sendReceive(conn net.Conn, req []byte) (resp []byte, err error)
 	resp, err = c.readAll(conn)
 	return
 }
-func (c *Socks4) readAll(conn net.Conn) (resp []byte, err error) {
+func (c *Socks4Proxier) readAll(conn net.Conn) (resp []byte, err error) {
 	resp = make([]byte, 512)
 	if c.Timeout > 0 {
 		if err := conn.SetReadDeadline(time.Now().Add(c.Timeout)); err != nil {

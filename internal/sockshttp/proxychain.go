@@ -20,21 +20,21 @@ func MakeDialerThrough(parentDialer Dialer, proxyChain ProxyChain, proxyTimeout 
 	for _, proxy := range proxyChain {
 		proxyaddr := proxy.Addr
 		method := proxy.Method
+		auth := proxy.Auth
 		if method == ProxyMethodDirect {
 			// direct
 		} else if method == ProxyMethodHttp {
 			httpd, _ := HTTP("tcp", proxyaddr, dialer)
+			httpd.Timeout = proxyTimeout
 			dialer = httpd
-			httpd.(*Http).Timeout = proxyTimeout
 		} else if method == ProxyMethodSocks5 {
-			socks5d, _ := SOCKS5("tcp", proxyaddr, nil, dialer)
+			socks5d, _ := SOCKS5("tcp", proxyaddr, &auth, dialer)
+			socks5d.Timeout = proxyTimeout
 			dialer = socks5d
-			socks5d.(*Socks5).Timeout = proxyTimeout
 		} else if method == ProxyMethodSocks4 {
-			socks4d, _ := SOCKS4("tcp", proxyaddr, nil, dialer)
+			socks4d, _ := SOCKS4("tcp", proxyaddr, &auth, dialer)
+			socks4d.Timeout = proxyTimeout
 			dialer = socks4d
-			socks4d.(*Socks4).Timeout = proxyTimeout
-
 		}
 	}
 

@@ -13,8 +13,8 @@ import (
 	"time"
 )
 
-func HTTP(network, addr string, forward Dialer) (Dialer, error) {
-	s := &Http{
+func HTTP(network, addr string, forward Dialer) (*HttpProxier, error) {
+	s := &HttpProxier{
 		network: network,
 		addr:    addr,
 		forward: forward,
@@ -23,13 +23,13 @@ func HTTP(network, addr string, forward Dialer) (Dialer, error) {
 	return s, nil
 }
 
-type Http struct {
+type HttpProxier struct {
 	network, addr string
 	forward       Dialer
 	Timeout       time.Duration
 }
 
-func (s *Http) Dial(network, addr string) (net.Conn, error) {
+func (s *HttpProxier) Dial(network, addr string) (net.Conn, error) {
 	host, portStr, err := net.SplitHostPort(addr)
 	if err != nil {
 		return nil, err

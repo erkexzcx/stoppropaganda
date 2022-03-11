@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/erkexzcx/stoppropaganda/internal/customresolver"
@@ -31,11 +32,13 @@ var (
 	flagProxy           = fs.String("proxy", "", "list of comma separated proxies to be used for websites DOS")
 	flagProxyBypass     = fs.String("proxybypass", "", "list of comma separated IP addresses, CIDR ranges, zones (*.example.com) or a hostnames (e.g. localhost) that needs to bypass used proxy")
 	flagAlgorithm       = fs.String("algorithm", "fair", "allowed algorithms are 'fair' and 'rr' (refer to README.md documentation)")
+	flagMaxProcs        = fs.Int("maxprocs", 1, "amount of threads used by Golang (runtime.GOMAXPROCS)")
 )
 
 func Start() {
 	ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("SP"))
 	log.Println("Starting...")
+	runtime.GOMAXPROCS(*flagMaxProcs)
 
 	initWebsites()
 	initDNS()

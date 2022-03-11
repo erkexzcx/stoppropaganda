@@ -5,6 +5,12 @@ import (
 )
 
 func TestProxyChains(t *testing.T) {
+	// Simple chain of addresses:
+	// 1.2.3.4:9050
+	// 5.6.7.8:8080
+	// 7.7.7.7:1080
+	// 3.3.3.3:9051
+
 	generatedChain := ParseProxyChain("direct,socks5://1.2.3.4:9050,http://user:pass@5.6.7.8:8080,socks4://7.7.7.7:1080,3.3.3.3:9051,direct")
 	{
 		generated := generatedChain[0]
@@ -27,7 +33,7 @@ func TestProxyChains(t *testing.T) {
 			},
 		}
 		if generated != expected {
-			t.Errorf("Generated[0] chain does not equal expected: \n%v != %v", generated, expected)
+			t.Errorf("Generated[1] chain does not equal expected: \n%v != %v", generated, expected)
 		}
 	}
 	{
@@ -37,7 +43,7 @@ func TestProxyChains(t *testing.T) {
 			Method: ProxyMethodSocks4,
 		}
 		if generated != expected {
-			t.Errorf("Generated[1] chain does not equal expected: \n%v != %v", generated, expected)
+			t.Errorf("Generated[2] chain does not equal expected: \n%v != %v", generated, expected)
 		}
 	}
 	{
@@ -47,7 +53,7 @@ func TestProxyChains(t *testing.T) {
 			Method: ProxyMethodSocks5,
 		}
 		if generated != expected {
-			t.Errorf("Generated[2] chain does not equal expected: \n%v != %v", generated, expected)
+			t.Errorf("Generated[3] chain does not equal expected: \n%v != %v", generated, expected)
 		}
 	}
 

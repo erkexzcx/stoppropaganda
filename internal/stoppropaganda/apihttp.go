@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net"
 	"sort"
 	"sync"
 
@@ -19,6 +20,8 @@ func fasthttpRequestHandler(ctx *fasthttp.RequestCtx) {
 		fasthttpDnsCacheResponseHandler(ctx)
 	case "/downloaded":
 		fasthttpDownloadedResponseHandler(ctx)
+	case "/total":
+		fasthttpTotalResponseHandler(ctx)
 	}
 }
 
@@ -89,7 +92,10 @@ func fasthttpDnsCacheResponseHandler(ctx *fasthttp.RequestCtx) {
 
 	cache := customresolver.DnsCache
 
-	dnsCacheItems := cache.Items()
+	dnsCacheItems := make(map[string][]net.IPAddr)
+	for k, v := range cache.Items() {
+		dnsCacheItems[k] = v.Object.([]net.IPAddr)
+	}
 	content, err := json.MarshalIndent(dnsCacheItems, "", "    ")
 	if err != nil {
 		ctx.SetStatusCode(500)
@@ -149,4 +155,20 @@ func fasthttpDownloadedResponseHandler(ctx *fasthttp.RequestCtx) {
 	}
 
 	ctx.Write(buf.Bytes())
+}
+
+func fasthttpTotalResponseHandler(ctx *fasthttp.RequestCtx) {
+	downloaded := uint64(0)
+	for _, website := range websites {
+		website.statusMux.Lock()
+		downloaded += website.status.Downloaded
+		website.statusMux.Unlock()
+	}
+
+	if ctx.URI().QueryArgs().Has("raw") {
+		fmt.Fprintf(ctx, "%d", downloaded)
+	} else {
+		downloadedGB := float64(downloaded) / float64(1024*1024*1024)
+		fmt.Fprintf(ctx, "%.3f GB", downloadedGB)
+	}
 }

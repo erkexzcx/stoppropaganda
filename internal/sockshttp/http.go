@@ -6,18 +6,24 @@ package sockshttp
 
 import (
 	"bytes"
+	"encoding/base64"
 	"errors"
+	"fmt"
 	"net"
 	"strconv"
 	"strings"
 	"time"
 )
 
-func HTTP(network, addr string, forward Dialer) (*HttpProxier, error) {
+func HTTP(network, addr string, auth *Auth, forward Dialer) (*HttpProxier, error) {
 	s := &HttpProxier{
 		network: network,
 		addr:    addr,
 		forward: forward,
+	}
+	if auth != nil {
+		s.user = auth.User
+		s.password = auth.Password
 	}
 
 	return s, nil
@@ -27,6 +33,9 @@ type HttpProxier struct {
 	network, addr string
 	forward       Dialer
 	Timeout       time.Duration
+	Auth          Auth
+
+	user, password string
 }
 
 func (s *HttpProxier) Dial(network, addr string) (net.Conn, error) {
@@ -56,10 +65,18 @@ func (s *HttpProxier) Dial(network, addr string) (net.Conn, error) {
 		return nil, errors.New("proxy_http: port number out of range: " + portStr)
 	}
 
+	authHeaderStr := ""
+	if len(s.user) > 0 || len(s.password) > 0 {
+		authStr := fmt.Sprintf("%s:%s", s.user, s.password)
+		authBase64 := base64.StdEncoding.EncodeToString([]byte(authStr))
+		authHeaderStr = fmt.Sprintf("Proxy-Authorization: Basic %s\r\n", authBase64)
+	}
+
 	buf := make([]byte, 0, 6+len(host))
 	buf = append(buf, "CONNECT "...)
 	buf = append(buf, addr...)
 	buf = append(buf, " HTTP 1.1\r\n"...)
+	buf = append(buf, authHeaderStr...)
 	buf = append(buf, "User-agent: Mozilla/4.0\r\n\r\n"...)
 
 	if _, err := conn.Write(buf); err != nil {

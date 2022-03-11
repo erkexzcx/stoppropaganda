@@ -25,8 +25,10 @@ const (
 )
 
 type Socks4Proxier struct {
-	Proto   int
-	Host    string
+	Proto int
+	Host  string
+
+	// Unused
 	Auth    *Auth
 	Timeout time.Duration
 	Dialer  Dialer

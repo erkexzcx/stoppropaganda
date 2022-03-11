@@ -24,7 +24,7 @@ func MakeDialerThrough(parentDialer Dialer, proxyChain ProxyChain, proxyTimeout 
 		if method == ProxyMethodDirect {
 			// direct
 		} else if method == ProxyMethodHttp {
-			httpd, _ := HTTP("tcp", proxyaddr, dialer)
+			httpd, _ := HTTP("tcp", proxyaddr, &auth, dialer)
 			httpd.Timeout = proxyTimeout
 			dialer = httpd
 		} else if method == ProxyMethodSocks5 {

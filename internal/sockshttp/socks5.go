@@ -14,8 +14,8 @@ import (
 
 // SOCKS5 returns a Dialer that makes SOCKSv5 connections to the given address
 // with an optional username and password. See RFC 1928.
-func SOCKS5(network, addr string, auth *Auth, forward Dialer) (Dialer, error) {
-	s := &Socks5{
+func SOCKS5(network, addr string, auth *Auth, forward Dialer) (*Socks5Proxier, error) {
+	s := &Socks5Proxier{
 		network: network,
 		addr:    addr,
 		forward: forward,
@@ -28,7 +28,7 @@ func SOCKS5(network, addr string, auth *Auth, forward Dialer) (Dialer, error) {
 	return s, nil
 }
 
-type Socks5 struct {
+type Socks5Proxier struct {
 	user, password string
 	network, addr  string
 	forward        Dialer
@@ -63,12 +63,12 @@ var socks5Errors = []string{
 	"address type not supported",
 }
 
-func (s *Socks5) BindAddr() string {
+func (s *Socks5Proxier) BindAddr() string {
 	return s.bindaddr
 }
 
 // Dial connects to the address addr on the network net via the SOCKS5 proxy.
-func (s *Socks5) Dial(network, addr string) (net.Conn, error) {
+func (s *Socks5Proxier) Dial(network, addr string) (net.Conn, error) {
 	host, portStr, err := net.SplitHostPort(addr)
 	if err != nil {
 		return nil, err

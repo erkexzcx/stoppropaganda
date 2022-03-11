@@ -1,12 +1,10 @@
-package stoppropaganda
+package sockshttp
 
 import (
 	"bytes"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/erkexzcx/stoppropaganda/internal/sockshttp"
 )
 
 const (
@@ -14,28 +12,29 @@ const (
 	ProxyMethodSocks4
 	ProxyMethodHttp
 	ProxyMethodDirect
+	ProxyMethodUnknown
 )
 
-func MakeDialerThrough(parentDialer sockshttp.Dialer, proxyChain ProxyChain, proxyTimeout time.Duration) (dialer sockshttp.Dialer) {
+func MakeDialerThrough(parentDialer Dialer, proxyChain ProxyChain, proxyTimeout time.Duration) (dialer Dialer) {
 	dialer = parentDialer
 	for _, proxy := range proxyChain {
 		proxyaddr := proxy.Addr
 		method := proxy.Method
+		auth := proxy.Auth
 		if method == ProxyMethodDirect {
 			// direct
 		} else if method == ProxyMethodHttp {
-			httpd, _ := sockshttp.HTTP("tcp", proxyaddr, dialer)
+			httpd, _ := HTTP("tcp", proxyaddr, &auth, dialer)
+			httpd.Timeout = proxyTimeout
 			dialer = httpd
-			httpd.(*sockshttp.Http).Timeout = proxyTimeout
 		} else if method == ProxyMethodSocks5 {
-			socks5d, _ := sockshttp.SOCKS5("tcp", proxyaddr, nil, dialer)
+			socks5d, _ := SOCKS5("tcp", proxyaddr, &auth, dialer)
+			socks5d.Timeout = proxyTimeout
 			dialer = socks5d
-			socks5d.(*sockshttp.Socks5).Timeout = proxyTimeout
 		} else if method == ProxyMethodSocks4 {
-			socks4d, _ := sockshttp.SOCKS4("tcp", proxyaddr, nil, dialer)
+			socks4d, _ := SOCKS4("tcp", proxyaddr, &auth, dialer)
+			socks4d.Timeout = proxyTimeout
 			dialer = socks4d
-			socks4d.(*sockshttp.Socks4).Timeout = proxyTimeout
-
 		}
 	}
 
@@ -52,7 +51,7 @@ func MethodName2ID(name string) byte {
 	if name == "socks4" || name == "4" {
 		return ProxyMethodSocks4
 	}
-	return ProxyMethodDirect
+	return ProxyMethodUnknown
 }
 func MethodID2Name(id byte) string {
 	if id == ProxyMethodSocks5 {
@@ -73,10 +72,11 @@ func MethodID2Name(id byte) string {
 type Proxy struct {
 	Addr   string
 	Method byte
+	Auth   Auth
 }
 
 func (p Proxy) String() string {
-	return p.Addr
+	return MethodID2Name(p.Method) + ":" + p.Addr
 }
 
 type ProxyChain []Proxy
@@ -87,7 +87,7 @@ func (pc ProxyChain) String() string {
 		if i != 0 {
 			b.WriteByte(',')
 		}
-		b.WriteString(p.Addr)
+		b.WriteString(p.String())
 	}
 	return b.String()
 }
@@ -110,33 +110,28 @@ func ExtractProxyMethod(proxyDesc []byte) (proxyAddr []byte, method byte) {
 		return proxyDesc, ProxyMethodDirect
 	}
 
-	var ok bool
-	if ok, proxyAddr, method = MaybeExtract(proxyDesc, []byte("4:"), ProxyMethodSocks4); ok {
-		return
+	index := bytes.IndexByte(proxyDesc, byte(':'))
+	if index != -1 {
+		method = MethodName2ID(string(proxyDesc[:index]))
+		if method != ProxyMethodUnknown {
+			proxyAddr = proxyDesc[index+1:]
+		} else {
+			// Proxy didn't have prefix like "socks4://"
+			// so let's default it to socks5
+			method = ProxyMethodSocks5
+			proxyAddr = proxyDesc
+		}
+	} else {
+		proxyAddr = proxyDesc
 	}
-	if ok, proxyAddr, method = MaybeExtract(proxyDesc, []byte("socks4:"), ProxyMethodSocks4); ok {
-		return
-	}
-	if ok, proxyAddr, method = MaybeExtract(proxyDesc, []byte("h:"), ProxyMethodHttp); ok {
-		return
-	}
-	if ok, proxyAddr, method = MaybeExtract(proxyDesc, []byte("http:"), ProxyMethodHttp); ok {
-		return
-	}
-	if ok, proxyAddr, method = MaybeExtract(proxyDesc, []byte("socks5:"), ProxyMethodSocks5); ok {
-		return
-	}
-	if ok, proxyAddr, method = MaybeExtract(proxyDesc, []byte("5:"), ProxyMethodSocks5); ok {
-		return
-	}
-	proxyAddr = proxyDesc
-
 	return
 }
 func ParseProxy(proxyDesc string) (proxy Proxy) {
+
 	proxyaddrBytes, method := ExtractProxyMethod([]byte(proxyDesc))
 	proxyaddr := string(proxyaddrBytes)
-	proxy = Proxy{Addr: proxyaddr, Method: method}
+	auth, remaining := parseAuthority(proxyaddr)
+	proxy = Proxy{Addr: remaining, Method: method, Auth: auth}
 	return
 }
 
@@ -157,4 +152,67 @@ func ParseProxyChain(proxyChain string) (chain ProxyChain) {
 		}
 	}
 	return
+}
+
+func parseAuthority(authority string) (auth Auth, remaining string) {
+	i := strings.LastIndex(authority, "@")
+	if i < 0 {
+		remaining = authority
+		return
+	} else {
+		remaining = authority[i+1:]
+	}
+
+	userinfo := authority[:i]
+	if !validUserinfo(userinfo) {
+		return
+	}
+	if !strings.Contains(userinfo, ":") {
+		auth = Auth{
+			User:     userinfo,
+			Password: "",
+		}
+	} else {
+		splitted := strings.SplitN(userinfo, ":", 2)
+		username := splitted[0]
+		password := ""
+		if len(splitted) > 1 {
+			password = splitted[1]
+		}
+		auth = Auth{
+			User:     username,
+			Password: password,
+		}
+	}
+	return
+}
+
+// validUserinfo reports whether s is a valid userinfo string per RFC 3986
+// Section 3.2.1:
+//     userinfo    = *( unreserved / pct-encoded / sub-delims / ":" )
+//     unreserved  = ALPHA / DIGIT / "-" / "." / "_" / "~"
+//     sub-delims  = "!" / "$" / "&" / "'" / "(" / ")"
+//                   / "*" / "+" / "," / ";" / "="
+//
+// It doesn't validate pct-encoded. The caller does that via func unescape.
+func validUserinfo(s string) bool {
+	for _, r := range s {
+		if 'A' <= r && r <= 'Z' {
+			continue
+		}
+		if 'a' <= r && r <= 'z' {
+			continue
+		}
+		if '0' <= r && r <= '9' {
+			continue
+		}
+		switch r {
+		case '-', '.', '_', ':', '~', '!', '$', '&', '\'',
+			'(', ')', '*', '+', ',', ';', '=', '%', '@':
+			continue
+		default:
+			return false
+		}
+	}
+	return true
 }

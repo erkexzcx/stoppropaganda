@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/erkexzcx/stoppropaganda/internal/customresolver"
@@ -27,15 +28,17 @@ var (
 	flagDNSTimeout      = fs.Duration("dnstimeout", time.Second, "timeout of DNS request")
 	flagUserAgent       = fs.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
 	flagDialsPerSecond  = fs.Int("dialspersecond", 2500, "maximum amount of TCP SYN packets sent per second (from fasthttp)")
-	flagDialConcurrency = fs.Int("dialconcurrency", 2000, "number of cuncurrent dial at any moment (from fasthttp)")
+	flagDialConcurrency = fs.Int("dialconcurrency", 10000, "number of cuncurrent dial at any moment (from fasthttp)")
 	flagProxy           = fs.String("proxy", "", "list of comma separated proxies to be used for websites DOS")
 	flagProxyBypass     = fs.String("proxybypass", "", "list of comma separated IP addresses, CIDR ranges, zones (*.example.com) or a hostnames (e.g. localhost) that needs to bypass used proxy")
 	flagAlgorithm       = fs.String("algorithm", "fair", "allowed algorithms are 'fair' and 'rr' (refer to README.md documentation)")
+	flagMaxProcs        = fs.Int("maxprocs", 1, "amount of threads used by Golang (runtime.GOMAXPROCS)")
 )
 
 func Start() {
 	ff.Parse(fs, os.Args[1:], ff.WithEnvVarPrefix("SP"))
 	log.Println("Starting...")
+	runtime.GOMAXPROCS(*flagMaxProcs)
 
 	initWebsites()
 	initDNS()
@@ -75,16 +78,19 @@ func initWebsites() {
 }
 
 func makeDialFunc() fasthttp.DialFunc {
-	masterDialer := sockshttp.Initialize(*flagProxy, *flagProxyBypass)
+	proxyChain, masterDialer := sockshttp.Initialize(*flagProxy, *flagProxyBypass, *flagTimeout)
+	if len(proxyChain) > 0 {
+		log.Printf("Proxy chain: %s", proxyChain)
+	}
 	myResolver := customresolver.MasterStopPropagandaResolver
 	dial := (&customtcpdial.CustomTCPDialer{
-		DialTicketsC:     newConnTicketC,
 		Concurrency:      *flagDialConcurrency,
 		DNSCacheDuration: 5 * time.Minute,
 
 		// stoppropaganda's implementation
 		ParentDialer: masterDialer,
 		Resolver:     myResolver,
+		DialTicketsC: newConnTicketC,
 	}).Dial
 	return dial
 }

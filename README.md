@@ -179,13 +179,11 @@ Default value of `2500` means that there will be maximum of 2500 TCP SYN packets
 
 ## dialconcurrency
 
-Configuration via command line argument `-dialconcurrency 2000` or via environment variable `SP_DIALCONCURRENCY=2000`.
+Configuration via command line argument `-dialconcurrency 10000` or via environment variable `SP_DIALCONCURRENCY=2000`.
 
-Default value of `2000` means that there will be maximum of 2000 concurrent dials from fasthttp.
+Default value of `10000` means that there will be maximum of 10000 concurrent dials from fasthttp.
 
 ## proxy
-
-WARNING - proxy feature is not yet ready. See [#98](https://github.com/erkexzcx/stoppropaganda/issues/98).
 
 Configuration via command line argument `-proxy ""` or via environment variable `SP_PROXY=""`.
 
@@ -194,8 +192,6 @@ Proxy supports SOCKS4, SOCKS5 and HTTP proxies (or comma separated proxy chains)
 Usage of this parameter can be combined with `proxybypass` parameter.
 
 ## proxybypass
-
-WARNING - proxy feature is not yet ready. See [#98](https://github.com/erkexzcx/stoppropaganda/issues/98).
 
 Configuration via command line argument `-proxybypass ""` or via environment variable `SP_PROXYBYPASS=""`.
 
@@ -220,6 +216,16 @@ Available algorithms:
   - Can be used with as low as 1 worker.
   - Uses more CPU and RAM.
   - By nature it prioritizes slower websites.
+
+
+## maxprocs
+
+Configuration via command line argument `-maxprocs 1` or via environment variable `SP_MAXPROCS=1`.
+
+Defines amount of system threads (`runtime.GOMAXPROCS`) used by the program.
+
+Default value of 1 provides some optimization, because Golang doesn't have to use mutexes, atomics 
+and inter-process synchronization mechanisms.
 
 # Web UI
 

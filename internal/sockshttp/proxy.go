@@ -7,9 +7,9 @@
 package sockshttp
 
 import (
-	"errors"
 	"net"
 	"net/url"
+	"time"
 )
 
 // A Dialer is a means to establish a connection.
@@ -25,27 +25,21 @@ type Auth struct {
 
 // FromEnvironment returns the dialer specified by the proxy related variables in
 // the environment.
-func Initialize(proxyParam, proxyBypassParam string) Dialer {
+func Initialize(proxyParam, proxyBypassParam string, proxyTimeout time.Duration) (ProxyChain, Dialer) {
 	if len(proxyParam) == 0 {
-		return Direct
+		return nil, Direct
 	}
 
-	proxyURL, err := url.Parse(proxyParam)
-	if err != nil {
-		return Direct
-	}
-	proxy, err := FromURL(proxyURL, Direct)
-	if err != nil {
-		return Direct
-	}
+	proxyChain := ParseProxyChain(proxyParam)
+	proxy := MakeDialerThrough(Direct, proxyChain, proxyTimeout)
 
 	if len(proxyBypassParam) == 0 {
-		return proxy
+		return proxyChain, proxy
 	}
 
 	perHost := NewPerHost(proxy, Direct)
 	perHost.AddFromString(proxyBypassParam)
-	return perHost
+	return proxyChain, perHost
 }
 
 // proxySchemes is a map from URL schemes to a function that creates a Dialer
@@ -60,36 +54,4 @@ func RegisterDialerType(scheme string, f func(*url.URL, Dialer) (Dialer, error))
 		proxySchemes = make(map[string]func(*url.URL, Dialer) (Dialer, error))
 	}
 	proxySchemes[scheme] = f
-}
-
-// FromURL returns a Dialer given a URL specification and an underlying
-// Dialer for it to make network requests.
-func FromURL(u *url.URL, forward Dialer) (Dialer, error) {
-	var auth *Auth
-	if u.User != nil {
-		auth = new(Auth)
-		auth.User = u.User.Username()
-		if p, ok := u.User.Password(); ok {
-			auth.Password = p
-		}
-	}
-
-	switch u.Scheme {
-	case "socks5":
-		return SOCKS5("tcp", u.Host, auth, forward)
-	case "socks4":
-		return SOCKS4("tcp", u.Host, auth, forward)
-	case "http":
-		return HTTP("tcp", u.Host, forward)
-	}
-
-	// If the scheme doesn't match any of the built-in schemes, see if it
-	// was registered by another package.
-	if proxySchemes != nil {
-		if f, ok := proxySchemes[u.Scheme]; ok {
-			return f(u, forward)
-		}
-	}
-
-	return nil, errors.New("proxy: unknown scheme: " + u.Scheme)
 }

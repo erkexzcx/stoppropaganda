@@ -179,9 +179,9 @@ Default value of `2500` means that there will be maximum of 2500 TCP SYN packets
 
 ## dialconcurrency
 
-Configuration via command line argument `-dialconcurrency 2000` or via environment variable `SP_DIALCONCURRENCY=2000`.
+Configuration via command line argument `-dialconcurrency 10000` or via environment variable `SP_DIALCONCURRENCY=2000`.
 
-Default value of `2000` means that there will be maximum of 2000 concurrent dials from fasthttp.
+Default value of `10000` means that there will be maximum of 10000 concurrent dials from fasthttp.
 
 ## proxy
 

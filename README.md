@@ -222,7 +222,7 @@ Available algorithms:
 
 Configuration via command line argument `-maxprocs 1` or via environment variable `SP_MAXPROCS=1`.
 
-Defines amount of system threads used by the program.
+Defines amount of system threads (`runtime.GOMAXPROCS`) used by the program.
 
 Default value of 1 provides some optimization, because Golang doesn't have to use mutexes, atomics 
 and inter-process synchronization mechanisms.

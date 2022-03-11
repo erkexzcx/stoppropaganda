@@ -273,8 +273,9 @@ type tcpAddrEntry struct {
 	addrs    []net.TCPAddr
 	addrsIdx uint32
 
-	pending     int32
-	resolveTime time.Time
+	pending           int32
+	shouldResolveNext int32
+	resolveTime       time.Time
 }
 
 // DefaultDNSCacheDuration is the duration for caching resolved TCP addresses
@@ -284,12 +285,21 @@ const DefaultDNSCacheDuration = time.Minute
 func (d *CustomTCPDialer) tcpAddrsClean() {
 	expireDuration := 2 * d.DNSCacheDuration
 	for {
-		time.Sleep(time.Second)
+		time.Sleep(d.DNSCacheDuration / 4)
 		t := time.Now()
 		d.tcpAddrsMap.Range(func(k, v interface{}) bool {
-			if e, ok := v.(*tcpAddrEntry); ok && t.Sub(e.resolveTime) > expireDuration {
-				d.tcpAddrsMap.Delete(k)
+			if e, ok := v.(*tcpAddrEntry); ok {
+				elapsed := t.Sub(e.resolveTime)
+				if atomic.LoadInt32(&e.shouldResolveNext) == 0 {
+					if elapsed > d.DNSCacheDuration {
+						atomic.SwapInt32(&e.shouldResolveNext, 1)
+					}
+				}
+				if elapsed > expireDuration {
+					d.tcpAddrsMap.Delete(k)
+				}
 			}
+
 			return true
 		})
 
@@ -299,7 +309,7 @@ func (d *CustomTCPDialer) tcpAddrsClean() {
 func (d *CustomTCPDialer) getTCPAddrs(addr string, dualStack bool) ([]net.TCPAddr, uint32, error) {
 	item, exist := d.tcpAddrsMap.Load(addr)
 	e, ok := item.(*tcpAddrEntry)
-	if exist && ok && e != nil && time.Since(e.resolveTime) > d.DNSCacheDuration {
+	if exist && ok && e != nil && atomic.SwapInt32(&e.shouldResolveNext, 0) == 1 {
 		// Only let one goroutine re-resolve at a time.
 		if atomic.SwapInt32(&e.pending, 1) == 0 {
 			e = nil

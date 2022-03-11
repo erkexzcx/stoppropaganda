@@ -78,13 +78,13 @@ func makeDialFunc() fasthttp.DialFunc {
 	masterDialer := sockshttp.Initialize(*flagProxy, *flagProxyBypass)
 	myResolver := customresolver.MasterStopPropagandaResolver
 	dial := (&customtcpdial.CustomTCPDialer{
-		DialTicketsC:     newConnTicketC,
 		Concurrency:      *flagDialConcurrency,
 		DNSCacheDuration: 5 * time.Minute,
 
 		// stoppropaganda's implementation
 		ParentDialer: masterDialer,
 		Resolver:     myResolver,
+		DialTicketsC: newConnTicketC,
 	}).Dial
 	return dial
 }

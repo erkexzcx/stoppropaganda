@@ -75,7 +75,10 @@ func initWebsites() {
 }
 
 func makeDialFunc() fasthttp.DialFunc {
-	masterDialer := sockshttp.Initialize(*flagProxy, *flagProxyBypass)
+	proxyChain, masterDialer := sockshttp.Initialize(*flagProxy, *flagProxyBypass, *flagTimeout)
+	if len(proxyChain) > 0 {
+		log.Printf("Proxy chain: %s", proxyChain)
+	}
 	myResolver := customresolver.MasterStopPropagandaResolver
 	dial := (&customtcpdial.CustomTCPDialer{
 		Concurrency:      *flagDialConcurrency,

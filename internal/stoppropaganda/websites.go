@@ -298,7 +298,6 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 		// exclude query params and cookies some of the time (1 nth of randInt)
 		if randInt > 0 {
 			for i := 1; i < randInt; i++ {
-				log.Printf("adding")
 				qsKey := RandomNumberLetterString()
 				qsValue := RandomNumberLetterString()
 				ws.req.URI().QueryArgs().Add(qsKey, qsValue)

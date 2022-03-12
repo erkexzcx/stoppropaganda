@@ -162,6 +162,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://smi.rostec.ru/user":                {},
 	"http://v1.rostec.ru":                       {},
 	"https://vks3.rostec.ru":                    {},
+	"https://browser.yandex.com":                {},
 
 	// Banks
 	"https://www.sberbank.ru":                           {},
@@ -284,8 +285,10 @@ var TargetWebsites = map[string]struct{}{
 	"https://prostocash.com":      {},
 	"https://baksman.org":         {},
 	"https://kupibit.me":          {},
+	"https://yoomoney.ru":         {},
+        "https://yookassa.ru":         {},
 
-	// Electronic signature services
+	// Electronic signature services, certificate authorities, www domain names
 	"https://iecp.ru":                    {},
 	"https://api.iecp.ru":                {},
 	"https://uc-osnovanie.ru":            {},
@@ -341,7 +344,8 @@ var TargetWebsites = map[string]struct{}{
 	"https://iecp.ru/ep/uc-list":         {},
 	"https://www.roseltorg.ru":           {},
 	"https://www.center-inform.ru":       {},
-
+	"http://glovo.ru":                    {},
+	
 	// Oil and gas trading companies
 	"https://transneft.ru":            {},
 	"https://tektorg.ru":              {},
@@ -363,6 +367,8 @@ var TargetWebsites = map[string]struct{}{
 	"https://sbermarket.ru":        {},
 	"https://chibbis.ru":           {},
 	"https://lavka.yandex":         {},
+	"https://samokat.ru":           {},
+        "https://localkitchen.ru":      {},
 
 	/* BELARUS */
 

@@ -229,6 +229,15 @@ Defines amount of system threads (`runtime.GOMAXPROCS`) used by the program.
 Default value of 1 provides some optimization, because Golang doesn't have to use mutexes, atomics 
 and inter-process synchronization mechanisms.
 
+
+## usequeryparams
+
+Configuration via command line argument `-usequeryparams 1` or via environment variable `SP_USEQUERYPARAMS=1`.
+
+Defines whether randomly generated query strings and cookies should be added to the request. Keys and values are between 1 and 30 alpha-numeric, lowercase characters. They may be randomly excluded.
+
+Default value of 0 means that randomly generated query strings and cookies will not be added to the request.
+
 # Web UI
 
 As of now there is no fancy web interface, only a JSON pre-formatted output.

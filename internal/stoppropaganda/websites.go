@@ -1,7 +1,10 @@
 package stoppropaganda
 
 import (
+	"crypto/rand"
+	"fmt"
 	"log"
+	mrand "math/rand"
 	"net"
 	"net/url"
 	"strings"
@@ -65,6 +68,16 @@ func (ws *WebsiteStatus) IncreaseCountersErr(errMsg string) {
 	ws.Errors++
 	ws.LastErrorMsg = errMsg
 
+}
+
+func RandomNumberLetterString () string {
+	n := mrand.Intn(30 - 1) + 1
+	b := make([]byte, n)
+	if _, err := rand.Read(b); err != nil {
+		panic(err)
+	}
+	s := fmt.Sprintf("%x", b)
+	return s
 }
 
 type Website struct {
@@ -274,6 +287,28 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 	ws.statusMux.Unlock()
 
 	resp.ShouldDiscardBody = true
+
+	if *flagUseQueryParams == 1 {
+		// clean up query string and cookies from previous request
+		ws.req.URI().SetQueryString("")
+		ws.req.Header.DelAllCookies()
+
+		randInt := mrand.Intn(5)
+
+		// exclude query params and cookies some of the time (1 nth of randInt)
+		if randInt > 0 {
+			for i := 1; i < randInt; i++ {
+				log.Printf("adding")
+				qsKey := RandomNumberLetterString()
+				qsValue := RandomNumberLetterString()
+				ws.req.URI().QueryArgs().Add(qsKey, qsValue)
+
+				cookieKey := RandomNumberLetterString()
+				cookieValue := RandomNumberLetterString()
+				ws.req.Header.SetCookie(cookieKey, cookieValue)
+			}
+		}
+	}
 
 	// Perform request
 	var err error

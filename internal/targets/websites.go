@@ -86,6 +86,9 @@ var TargetWebsites = map[string]struct{}{
 	"https://krd.ru":                         {},
 	"https://www.stavregion.ru":              {},
 	"https://sputnik.com":                    {},
+	"https://www.mk.ru":                      {},
+	"https://rg.ru":                          {},
+	"https://aif.ru":                         {},
 
 	// DOS directed against Ukraine
 	"https://norussians.xyz": {},
@@ -370,6 +373,18 @@ var TargetWebsites = map[string]struct{}{
 	"https://lavka.yandex":         {},
 	"https://samokat.ru":           {},
 	"https://localkitchen.ru":      {},
+
+	// Cinemas
+	"https://mos-kino.ru":       {},
+	"https://cinemastar.ru":     {},
+	"https://kinoteatr.ru":      {},
+	"https://karofilm.ru":       {},
+	"https://kinosfera-imax.ru": {},
+	"https://kinomax.ru":        {},
+	"https://romanov-cinema.ru": {},
+	"https://pioner-cinema.ru":  {},
+	"https://premierzal.ru":     {},
+	"https://www.mirage.ru":     {},
 
 	/* BELARUS */
 

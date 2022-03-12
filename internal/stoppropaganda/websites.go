@@ -290,8 +290,8 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 
 	if *flagRandomQuery {
 		// clean up query string and cookies from previous request
-		ws.req.URI().SetQueryString("")
-		ws.req.Header.DelAllCookies()
+		req.URI().SetQueryString("")
+		req.Header.DelAllCookies()
 
 		randInt := mrand.Intn(5)
 
@@ -300,11 +300,11 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 			for i := 1; i < randInt; i++ {
 				qsKey := RandomNumberLetterString()
 				qsValue := RandomNumberLetterString()
-				ws.req.URI().QueryArgs().Add(qsKey, qsValue)
+				req.URI().QueryArgs().Add(qsKey, qsValue)
 
 				cookieKey := RandomNumberLetterString()
 				cookieValue := RandomNumberLetterString()
-				ws.req.Header.SetCookie(cookieKey, cookieValue)
+				req.Header.SetCookie(cookieKey, cookieValue)
 			}
 		}
 	}

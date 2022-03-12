@@ -287,7 +287,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://baksman.org":         {},
 	"https://kupibit.me":          {},
 	"https://yoomoney.ru":         {},
-        "https://yookassa.ru":         {},
+	"https://yookassa.ru":         {},
 
 	// Electronic signature services, certificate authorities, www domain names
 	"https://iecp.ru":                    {},
@@ -346,7 +346,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.roseltorg.ru":           {},
 	"https://www.center-inform.ru":       {},
 	"http://glovo.ru":                    {},
-	
+
 	// Oil and gas trading companies
 	"https://transneft.ru":            {},
 	"https://tektorg.ru":              {},
@@ -369,7 +369,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://chibbis.ru":           {},
 	"https://lavka.yandex":         {},
 	"https://samokat.ru":           {},
-        "https://localkitchen.ru":      {},
+	"https://localkitchen.ru":      {},
 
 	/* BELARUS */
 

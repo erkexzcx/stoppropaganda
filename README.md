@@ -34,8 +34,8 @@ Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of 
 - [Web UI](#web-ui)
 - [Building from source](#building-from-source)
 - [Troubleshooting](#troubleshooting)
-  * [too many open files](#too-many-open-files)
-  * [crashing](#crashing)
+  * [Too many open files](#too-many-open-files)
+  * [Crashing](#crashing)
 - [Recommendations](#recommendations)
 - [Inspiration](#inspiration)
 
@@ -283,13 +283,13 @@ You can also build for other architectures/platforms as well, see `build.sh` fil
 
 # Troubleshooting
 
-## too many open files
+## Too many open files
 
 Most Linux distributions have limits on how many files (connections) can be opened to prevents things like [fork bomb](https://en.wikipedia.org/wiki/Fork_bomb).
 
 More information on how to increase them [here](https://stackoverflow.com/questions/880557/socket-accept-too-many-open-files).
 
-## crashing
+## Crashing
 
 Reason 1: Make sure you have enough RAM. It is also wise to monitor RAM and CPU usage once application is started. Since March 3, with the latest release it was switched from workers per website/dns to pool of workers. Once you find a sweet spot resource-wise, there should be no need to change it with updates.
 

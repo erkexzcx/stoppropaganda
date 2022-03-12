@@ -36,6 +36,7 @@ Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of 
 - [Troubleshooting](#troubleshooting)
   * [Too many open files](#too-many-open-files)
   * [Crashing](#crashing)
+  * [Detected as virus](#detected-as-virus)
 - [Recommendations](#recommendations)
 - [Inspiration](#inspiration)
 
@@ -294,6 +295,16 @@ More information on how to increase them [here](https://stackoverflow.com/questi
 Reason 1: Make sure you have enough RAM. It is also wise to monitor RAM and CPU usage once application is started. Since March 3, with the latest release it was switched from workers per website/dns to pool of workers. Once you find a sweet spot resource-wise, there should be no need to change it with updates.
 
 Reason 2: Work in progress. Always check if (a) Russians are still invading Ukraine and (b) there is a new release available.
+
+## Detected as virus
+
+Some anti-virus applications detects this application as virus. This application is not a virus and it has no malicious code in it. In fact, this application is open source and by the nature - everyone is free to inspect the code, improve it and build their own binaries by themselves (if you don't trust my binaries).
+
+There are several reasons why this application might be tagged as virus:
+* Putin wants this application to be treated as virus. [Haters do exist](https://github.com/erkexzcx/stoppropaganda/issues?q=label%3AAsshole).
+* This application has hardcoded Yandex DNS servers (helps with some russian websites "geoblocking") that ignores your network settings.
+* At the moment this application has ~400 hardcoded targets, which is not common in regular applications.
+* Malware that is used to DDOS targets is usually working in pretty much the same manner as this application, so this application might be treated as such.
 
 # Recommendations
 

@@ -230,13 +230,13 @@ Default value of 1 provides some optimization, because Golang doesn't have to us
 and inter-process synchronization mechanisms.
 
 
-## usequeryparams
+## randomquery
 
-Configuration via command line argument `-usequeryparams 1` or via environment variable `SP_USEQUERYPARAMS=1`.
+Configuration via command line argument `-randomquery true` or via environment variable `SP_RANDOMQUERY=true`.
 
 Defines whether randomly generated query strings and cookies should be added to the request. Keys and values are between 1 and 30 alpha-numeric, lowercase characters. They may be randomly excluded.
 
-Default value of 0 means that randomly generated query strings and cookies will not be added to the request.
+Default value of false means that randomly generated query strings and cookies will not be added to the request.
 
 # Web UI
 

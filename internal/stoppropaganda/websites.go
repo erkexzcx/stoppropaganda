@@ -289,10 +289,6 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 	resp.ShouldDiscardBody = true
 
 	if *flagRandomQuery {
-		// clean up query string and cookies from previous request
-		req.URI().SetQueryString("")
-		req.Header.DelAllCookies()
-
 		randInt := mrand.Intn(5)
 
 		// exclude query params and cookies some of the time (1 nth of randInt)

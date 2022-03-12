@@ -196,6 +196,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://online.sberbank.ru/CSAFront/index.do":      {},
 	"https://online.gpb.ru/login":                       {},
 	"https://alfabank.ru/everyday/online":               {},
+	"https://rshb.ru":                                   {},
 	"https://online.rshb.ru":                            {},
 	"https://online.sovcombank.ru":                      {},
 	"https://online.mkb.ru":                             {},

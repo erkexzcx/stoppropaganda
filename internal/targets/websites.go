@@ -356,6 +356,14 @@ var TargetWebsites = map[string]struct{}{
 	"https://tatneft.ru":              {},
 	"https://acron.ru":                {},
 
+	// Food delivery services
+	"https://eda.yandex.ru":        {},
+	"https://www.delivery-club.ru": {},
+	"https://m-food.ru":            {},
+	"https://sbermarket.ru":        {},
+	"https://chibbis.ru":           {},
+	"https://lavka.yandex":         {},
+
 	/* BELARUS */
 
 	// by gov

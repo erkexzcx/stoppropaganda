@@ -30,6 +30,7 @@ Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of 
   * [proxy](#proxy)
   * [proxybypass](#proxybypass)
   * [algorithm](#algorithm)
+  * [maxprocs](#maxprocs)
 - [Web UI](#web-ui)
 - [Building from source](#building-from-source)
 - [Troubleshooting](#troubleshooting)

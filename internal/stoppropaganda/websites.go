@@ -70,8 +70,8 @@ func (ws *WebsiteStatus) IncreaseCountersErr(errMsg string) {
 
 }
 
-func RandomNumberLetterString () string {
-	n := mrand.Intn(30 - 1) + 1
+func RandomNumberLetterString() string {
+	n := mrand.Intn(30-1) + 1
 	b := make([]byte, n)
 	if _, err := rand.Read(b); err != nil {
 		panic(err)
@@ -289,19 +289,15 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 	resp.ShouldDiscardBody = true
 
 	if *flagRandomQuery {
-		randInt := mrand.Intn(5)
+		randInt := mrand.Intn(4) + 1
+		for i := 1; i < randInt; i++ {
+			qsKey := RandomNumberLetterString()
+			qsValue := RandomNumberLetterString()
+			req.URI().QueryArgs().Add(qsKey, qsValue)
 
-		// exclude query params and cookies some of the time (1 nth of randInt)
-		if randInt > 0 {
-			for i := 1; i < randInt; i++ {
-				qsKey := RandomNumberLetterString()
-				qsValue := RandomNumberLetterString()
-				req.URI().QueryArgs().Add(qsKey, qsValue)
-
-				cookieKey := RandomNumberLetterString()
-				cookieValue := RandomNumberLetterString()
-				req.Header.SetCookie(cookieKey, cookieValue)
-			}
+			cookieKey := RandomNumberLetterString()
+			cookieValue := RandomNumberLetterString()
+			req.Header.SetCookie(cookieKey, cookieValue)
 		}
 	}
 

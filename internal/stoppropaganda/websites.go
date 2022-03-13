@@ -279,13 +279,8 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 	resp.ShouldDiscardBody = true
 
 	if *flagRandomQuery {
-		qsKey := getRandomString(rng)
-		qsValue := getRandomString(rng)
-		req.URI().QueryArgs().Add(qsKey, qsValue)
-
-		cookieKey := getRandomString(rng)
-		cookieValue := getRandomString(rng)
-		req.Header.SetCookie(cookieKey, cookieValue)
+		req.URI().QueryArgs().Add(getRandomString(rng), getRandomString(rng))
+		req.Header.SetCookie(getRandomString(rng), getRandomString(rng))
 	}
 
 	// Perform request

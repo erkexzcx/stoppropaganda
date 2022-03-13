@@ -21,19 +21,19 @@ import (
 
 var fs = flag.NewFlagSet("stoppropaganda", flag.ExitOnError)
 var (
+	flagAlgorithm       = fs.String("algorithm", "fair", "allowed algorithms are 'fair' and 'rr' (refer to README.md documentation)")
+	flagAntiCache       = fs.Bool("anticache", true, "append randomly generated query and cookie to disrupt caching mechanisms")
 	flagBind            = fs.String("bind", ":8049", "bind on specific host:port")
-	flagWorkers         = fs.Int("workers", 1000, "DOS each website with this amount of workers")
-	flagTimeout         = fs.Duration("timeout", 120*time.Second, "timeout of HTTP request")
-	flagDNSWorkers      = fs.Int("dnsworkers", 100, "DOS each DNS server with this amount of workers")
-	flagDNSTimeout      = fs.Duration("dnstimeout", time.Second, "timeout of DNS request")
-	flagUserAgent       = fs.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
-	flagDialsPerSecond  = fs.Int("dialspersecond", 2500, "maximum amount of TCP SYN packets sent per second (from fasthttp)")
 	flagDialConcurrency = fs.Int("dialconcurrency", 10000, "number of cuncurrent dial at any moment (from fasthttp)")
+	flagDialsPerSecond  = fs.Int("dialspersecond", 2500, "maximum amount of TCP SYN packets sent per second (from fasthttp)")
+	flagDNSTimeout      = fs.Duration("dnstimeout", time.Second, "timeout of DNS request")
+	flagDNSWorkers      = fs.Int("dnsworkers", 100, "DOS each DNS server with this amount of workers")
+	flagMaxProcs        = fs.Int("maxprocs", 1, "amount of threads used by Golang (runtime.GOMAXPROCS)")
 	flagProxy           = fs.String("proxy", "", "list of comma separated proxies to be used for websites DOS")
 	flagProxyBypass     = fs.String("proxybypass", "", "list of comma separated IP addresses, CIDR ranges, zones (*.example.com) or a hostnames (e.g. localhost) that needs to bypass used proxy")
-	flagAlgorithm       = fs.String("algorithm", "fair", "allowed algorithms are 'fair' and 'rr' (refer to README.md documentation)")
-	flagMaxProcs        = fs.Int("maxprocs", 1, "amount of threads used by Golang (runtime.GOMAXPROCS)")
-	flagAntiCache       = fs.Bool("anticache", true, "append randomly generated query and cookie to disrupt caching mechanisms")
+	flagTimeout         = fs.Duration("timeout", 120*time.Second, "timeout of HTTP request")
+	flagUserAgent       = fs.String("useragent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36", "User agent used in HTTP requests")
+	flagWorkers         = fs.Int("workers", 1000, "DOS each website with this amount of workers")
 )
 
 func Start() {

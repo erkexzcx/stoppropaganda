@@ -19,19 +19,19 @@ Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of 
   * [Android](#android)
   * [Binaries](#binaries)
 - [Configuration](#configuration)
+  * [algorithm](#algorithm)
+  * [anticache](#anticache)
   * [bind](#bind)
-  * [workers](#workers)
-  * [timeout](#timeout)
-  * [useragent](#useragent)
-  * [dnsworkers](#dnsworkers)
-  * [dnstimeout](#dnstimeout)
-  * [dialspersecond](#dialspersecond)
   * [dialconcurrency](#dialconcurrency)
+  * [dialspersecond](#dialspersecond)
+  * [dnstimeout](#dnstimeout)
+  * [dnsworkers](#dnsworkers)
+  * [maxprocs](#maxprocs)
   * [proxy](#proxy)
   * [proxybypass](#proxybypass)
-  * [algorithm](#algorithm)
-  * [maxprocs](#maxprocs)
-  * [anticache](#anticache)
+  * [timeout](#timeout)
+  * [useragent](#useragent)
+  * [workers](#workers)
 - [Web UI](#web-ui)
 - [Building from source](#building-from-source)
 - [Troubleshooting](#troubleshooting)
@@ -138,70 +138,6 @@ Configuration can only be done in 2 ways:
 * Command line arguments
 * Environment variables
 
-## bind
-
-Configuration via command line argument `-bind ":8049"` or via environment variable `SP_BIND=":8049"`.
-
-Default value of `:8049` is the same as `0.0.0.0:8049` which means web interface is accessible externally on port `8049`. If you want to limit web interface to be accessible only from the same host, use `127.0.0.1:8049`.
-
-## workers
-
-Configuration via command line argument `-workers 1000` or via environment variable `SP_WORKERS=1000`.
-
-Default value of `1000` means that there will be a pool of 1000 workers that will DOS all the defined websites.
-
-## timeout
-
-Configuration via command line argument `-timeout 10s` or via environment variable `SP_TIMEOUT=10s`.
-
-Default value of `10s` means that worker will wait for a website response for `10s` until it gives up.
-
-## useragent
-
-Configuration via command line argument `-useragent "..."` or via environment variable `SP_USERAGENT="..."`.
-
-Default value is `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36`. User agent is sent with HTTP requests to defined websites.
-
-## dnsworkers
-
-Configuration via command line argument `-dnsworkers 100` or via environment variable `SP_DNSWORKERS=100`.
-
-Default value of `100` means that there will be a pool of 100 workers that will DOS all the defined DNS servers.
-
-## dnstimeout
-
-Configuration via command line argument `-dnstimeout 1s` or via environment variable `SP_DNSTIMEOUT=1s`.
-
-Default value of `1s` means that worker will wait for a DNS server response for `1s` until it gives up.
-
-## dialspersecond
-
-Configuration via command line argument `-dialspersecond 2500` or via environment variable `SP_DIALSPERSECOND=2500`.
-
-Default value of `2500` means that there will be maximum of 2500 TCP SYN packets sent per second from fasthttp.
-
-## dialconcurrency
-
-Configuration via command line argument `-dialconcurrency 10000` or via environment variable `SP_DIALCONCURRENCY=2000`.
-
-Default value of `10000` means that there will be maximum of 10000 concurrent dials from fasthttp.
-
-## proxy
-
-Configuration via command line argument `-proxy ""` or via environment variable `SP_PROXY=""`.
-
-Proxy supports SOCKS4, SOCKS5 and HTTP proxies (or comma separated proxy chains). For example `-proxy "socks5://tor:9050"`.
-
-Usage of this parameter can be combined with `proxybypass` parameter.
-
-## proxybypass
-
-Configuration via command line argument `-proxybypass ""` or via environment variable `SP_PROXYBYPASS=""`.
-
-For example `-proxybypass "localhost"`.
-
-This parameter is only applicable when used with [proxy](#proxy) parameter.
-
 ## algorithm
 
 Configuration via command line argument `-algorithm fair` or via environment variable `SP_ALGORITHM="fair"`.
@@ -220,6 +156,41 @@ Available algorithms:
   - Uses more CPU and RAM.
   - By nature it prioritizes slower websites.
 
+## anticache
+
+Configuration via command line argument `-anticache true` or via environment variable `SP_ANTICACHE=true`.
+
+Default value of `true` means that randomly generated query and cookie will be sent with each request.
+
+## bind
+
+Configuration via command line argument `-bind ":8049"` or via environment variable `SP_BIND=":8049"`.
+
+Default value of `:8049` is the same as `0.0.0.0:8049` which means web interface is accessible externally on port `8049`. If you want to limit web interface to be accessible only from the same host, use `127.0.0.1:8049`.
+
+## dialconcurrency
+
+Configuration via command line argument `-dialconcurrency 10000` or via environment variable `SP_DIALCONCURRENCY=2000`.
+
+Default value of `10000` means that there will be maximum of 10000 concurrent dials from fasthttp.
+
+## dialspersecond
+
+Configuration via command line argument `-dialspersecond 2500` or via environment variable `SP_DIALSPERSECOND=2500`.
+
+Default value of `2500` means that there will be maximum of 2500 TCP SYN packets sent per second from fasthttp.
+
+## dnstimeout
+
+Configuration via command line argument `-dnstimeout 1s` or via environment variable `SP_DNSTIMEOUT=1s`.
+
+Default value of `1s` means that worker will wait for a DNS server response for `1s` until it gives up.
+
+## dnsworkers
+
+Configuration via command line argument `-dnsworkers 100` or via environment variable `SP_DNSWORKERS=100`.
+
+Default value of `100` means that there will be a pool of 100 workers that will DOS all the defined DNS servers.
 
 ## maxprocs
 
@@ -230,12 +201,39 @@ Defines amount of system threads (`runtime.GOMAXPROCS`) used by the program.
 Default value of 1 provides some optimization, because Golang doesn't have to use mutexes, atomics 
 and inter-process synchronization mechanisms.
 
+## proxy
 
-## anticache
+Configuration via command line argument `-proxy ""` or via environment variable `SP_PROXY=""`.
 
-Configuration via command line argument `-anticache true` or via environment variable `SP_ANTICACHE=true`.
+Proxy supports SOCKS4, SOCKS5 and HTTP proxies (or comma separated proxy chains). For example `-proxy "socks5://tor:9050"`.
 
-Default value of `true` means that randomly generated query and cookie will be sent with each request.
+Usage of this parameter can be combined with `proxybypass` parameter.
+
+## proxybypass
+
+Configuration via command line argument `-proxybypass ""` or via environment variable `SP_PROXYBYPASS=""`.
+
+For example `-proxybypass "localhost"`.
+
+This parameter is only applicable when used with [proxy](#proxy) parameter.
+
+## timeout
+
+Configuration via command line argument `-timeout 10s` or via environment variable `SP_TIMEOUT=10s`.
+
+Default value of `10s` means that worker will wait for a website response for `10s` until it gives up.
+
+## useragent
+
+Configuration via command line argument `-useragent "..."` or via environment variable `SP_USERAGENT="..."`.
+
+Default value is `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36`. User agent is sent with HTTP requests to defined websites.
+
+## workers
+
+Configuration via command line argument `-workers 1000` or via environment variable `SP_WORKERS=1000`.
+
+Default value of `1000` means that there will be a pool of 1000 workers that will DOS all the defined websites.
 
 # Web UI
 

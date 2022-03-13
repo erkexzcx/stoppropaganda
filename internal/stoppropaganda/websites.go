@@ -12,6 +12,7 @@ import (
 	"github.com/erkexzcx/stoppropaganda/internal/resolvefix"
 	"github.com/erkexzcx/stoppropaganda/internal/targets"
 	"github.com/valyala/fasthttp"
+	"github.com/valyala/fastrand"
 )
 
 const VALIDATE_DNS_EVERY = 5 * time.Minute
@@ -234,6 +235,7 @@ func runPerWebsiteWorker(website *Website) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	withTimeout := false
+	rng := &fastrand.RNG{}
 
 	// Copy once
 	website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
@@ -244,7 +246,7 @@ func runPerWebsiteWorker(website *Website) {
 			<-website.pausedC
 			continue
 		}
-		doSingleRequest(website, req, resp, withTimeout)
+		doSingleRequest(website, req, resp, withTimeout, rng)
 	}
 }
 
@@ -253,6 +255,7 @@ func runRoundRobinWorker(websitesC chan *Website) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	withTimeout := true
+	rng := &fastrand.RNG{}
 
 	for {
 		website := <-websitesC
@@ -264,16 +267,21 @@ func runRoundRobinWorker(websitesC chan *Website) {
 		// so we have to copy
 		website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
 
-		doSingleRequest(website, req, resp, withTimeout)
+		doSingleRequest(website, req, resp, withTimeout, rng)
 	}
 }
 
-func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response, withTimeout bool) {
+func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response, withTimeout bool, rng *fastrand.RNG) {
 	ws.statusMux.Lock()
 	ws.status.Status = "Running"
 	ws.statusMux.Unlock()
 
 	resp.ShouldDiscardBody = true
+
+	if *flagAntiCache {
+		req.URI().QueryArgs().Add(getRandomString(rng), getRandomString(rng))
+		req.Header.SetCookie(getRandomString(rng), getRandomString(rng))
+	}
 
 	// Perform request
 	var err error

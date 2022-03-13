@@ -31,6 +31,7 @@ Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of 
   * [proxybypass](#proxybypass)
   * [algorithm](#algorithm)
   * [maxprocs](#maxprocs)
+  * [anticache](#anticache)
 - [Web UI](#web-ui)
 - [Building from source](#building-from-source)
 - [Troubleshooting](#troubleshooting)
@@ -228,6 +229,13 @@ Defines amount of system threads (`runtime.GOMAXPROCS`) used by the program.
 
 Default value of 1 provides some optimization, because Golang doesn't have to use mutexes, atomics 
 and inter-process synchronization mechanisms.
+
+
+## anticache
+
+Configuration via command line argument `-anticache true` or via environment variable `SP_ANTICACHE=true`.
+
+Default value of `true` means that randomly generated query and cookie will be sent with each request.
 
 # Web UI
 

@@ -1,10 +1,7 @@
 package stoppropaganda
 
 import (
-	"crypto/rand"
-	"fmt"
 	"log"
-	mrand "math/rand"
 	"net"
 	"net/url"
 	"strings"
@@ -15,6 +12,7 @@ import (
 	"github.com/erkexzcx/stoppropaganda/internal/resolvefix"
 	"github.com/erkexzcx/stoppropaganda/internal/targets"
 	"github.com/valyala/fasthttp"
+	"github.com/valyala/fastrand"
 )
 
 const VALIDATE_DNS_EVERY = 5 * time.Minute
@@ -68,16 +66,6 @@ func (ws *WebsiteStatus) IncreaseCountersErr(errMsg string) {
 	ws.Errors++
 	ws.LastErrorMsg = errMsg
 
-}
-
-func RandomNumberLetterString() string {
-	n := mrand.Intn(30-1) + 1
-	b := make([]byte, n)
-	if _, err := rand.Read(b); err != nil {
-		panic(err)
-	}
-	s := fmt.Sprintf("%x", b)
-	return s
 }
 
 type Website struct {
@@ -247,6 +235,7 @@ func runPerWebsiteWorker(website *Website) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	withTimeout := false
+	rng := &fastrand.RNG{}
 
 	// Copy once
 	website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
@@ -257,7 +246,7 @@ func runPerWebsiteWorker(website *Website) {
 			<-website.pausedC
 			continue
 		}
-		doSingleRequest(website, req, resp, withTimeout)
+		doSingleRequest(website, req, resp, withTimeout, rng)
 	}
 }
 
@@ -266,6 +255,7 @@ func runRoundRobinWorker(websitesC chan *Website) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	withTimeout := true
+	rng := &fastrand.RNG{}
 
 	for {
 		website := <-websitesC
@@ -277,11 +267,11 @@ func runRoundRobinWorker(websitesC chan *Website) {
 		// so we have to copy
 		website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
 
-		doSingleRequest(website, req, resp, withTimeout)
+		doSingleRequest(website, req, resp, withTimeout, rng)
 	}
 }
 
-func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response, withTimeout bool) {
+func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response, withTimeout bool, rng *fastrand.RNG) {
 	ws.statusMux.Lock()
 	ws.status.Status = "Running"
 	ws.statusMux.Unlock()
@@ -289,16 +279,13 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 	resp.ShouldDiscardBody = true
 
 	if *flagRandomQuery {
-		randInt := mrand.Intn(4) + 1
-		for i := 1; i < randInt; i++ {
-			qsKey := RandomNumberLetterString()
-			qsValue := RandomNumberLetterString()
-			req.URI().QueryArgs().Add(qsKey, qsValue)
+		qsKey := getRandomString(rng)
+		qsValue := getRandomString(rng)
+		req.URI().QueryArgs().Add(qsKey, qsValue)
 
-			cookieKey := RandomNumberLetterString()
-			cookieValue := RandomNumberLetterString()
-			req.Header.SetCookie(cookieKey, cookieValue)
-		}
+		cookieKey := getRandomString(rng)
+		cookieValue := getRandomString(rng)
+		req.Header.SetCookie(cookieKey, cookieValue)
 	}
 
 	// Perform request

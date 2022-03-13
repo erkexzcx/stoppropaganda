@@ -33,7 +33,7 @@ var (
 	flagProxyBypass     = fs.String("proxybypass", "", "list of comma separated IP addresses, CIDR ranges, zones (*.example.com) or a hostnames (e.g. localhost) that needs to bypass used proxy")
 	flagAlgorithm       = fs.String("algorithm", "fair", "allowed algorithms are 'fair' and 'rr' (refer to README.md documentation)")
 	flagMaxProcs        = fs.Int("maxprocs", 1, "amount of threads used by Golang (runtime.GOMAXPROCS)")
-	flagRandomQuery     = fs.Bool("randomquery", false, "append random query to URLs to disrupt caching mechanisms")
+	flagRandomQuery     = fs.Bool("randomquery", true, "append random query to URLs to disrupt caching mechanisms")
 )
 
 func Start() {

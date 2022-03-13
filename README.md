@@ -31,6 +31,7 @@ Mykhailo Federov (Vice Prime Minister and Minister of Digital Transformation of 
   * [proxybypass](#proxybypass)
   * [algorithm](#algorithm)
   * [maxprocs](#maxprocs)
+  * [anticache](#anticache)
 - [Web UI](#web-ui)
 - [Building from source](#building-from-source)
 - [Troubleshooting](#troubleshooting)
@@ -230,13 +231,11 @@ Default value of 1 provides some optimization, because Golang doesn't have to us
 and inter-process synchronization mechanisms.
 
 
-## randomquery
+## anticache
 
-Configuration via command line argument `-randomquery true` or via environment variable `SP_RANDOMQUERY=true`.
+Configuration via command line argument `-anticache true` or via environment variable `SP_ANTICACHE=true`.
 
-Defines whether randomly generated query strings and cookies should be added to the request. Keys and values are between 1 and 30 alpha-numeric, lowercase characters. They may be randomly excluded.
-
-Default value of false means that randomly generated query strings and cookies will not be added to the request.
+Default value of `true` means that randomly generated query and cookie will be sent with each request.
 
 # Web UI
 

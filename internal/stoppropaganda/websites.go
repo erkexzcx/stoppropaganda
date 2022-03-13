@@ -278,7 +278,7 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 
 	resp.ShouldDiscardBody = true
 
-	if *flagRandomQuery {
+	if *flagAntiCache {
 		req.URI().QueryArgs().Add(getRandomString(rng), getRandomString(rng))
 		req.Header.SetCookie(getRandomString(rng), getRandomString(rng))
 	}

@@ -1,6 +1,10 @@
 package customprng
 
-import "github.com/valyala/fastrand"
+import (
+	"time"
+
+	"github.com/valyala/fastrand"
+)
 
 /*
 THIS CODE IS NOT THREAD-SAFE
@@ -13,10 +17,12 @@ type RNG struct {
 }
 
 func New(maxStringLength int) *RNG {
-	return &RNG{
+	r := &RNG{
 		rng:  fastrand.RNG{},
 		buff: make([]byte, maxStringLength),
 	}
+	r.rng.Seed(uint32(time.Now().UnixNano()))
+	return r
 }
 
 var randomRunesList = []byte("abcdefghijklmnopqrstuvwxyz")

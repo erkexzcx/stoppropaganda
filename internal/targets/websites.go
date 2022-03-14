@@ -205,7 +205,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://online.mkb.ru":                             {},
 	"https://www.tinkoff.ru":                            {},
 	"http://178.248.236.218":                            {},
-	"http://92.223.84.84 80":                            {},
+	"http://92.223.84.84":                               {},
 	"http://91.194.226.50":                              {},
 	"http://78.46.94.184":                               {},
 	"http://46.4.106.111":                               {},

@@ -8,11 +8,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/erkexzcx/stoppropaganda/internal/customprng"
 	"github.com/erkexzcx/stoppropaganda/internal/customresolver"
 	"github.com/erkexzcx/stoppropaganda/internal/resolvefix"
 	"github.com/erkexzcx/stoppropaganda/internal/targets"
 	"github.com/valyala/fasthttp"
-	"github.com/valyala/fastrand"
 )
 
 const VALIDATE_DNS_EVERY = 5 * time.Minute
@@ -235,7 +235,7 @@ func runPerWebsiteWorker(website *Website) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	withTimeout := false
-	rng := &fastrand.RNG{}
+	rng := customprng.New(20)
 
 	// Copy once
 	website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
@@ -255,7 +255,7 @@ func runRoundRobinWorker(websitesC chan *Website) {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	withTimeout := true
-	rng := &fastrand.RNG{}
+	rng := customprng.New(20)
 
 	for {
 		website := <-websitesC
@@ -271,7 +271,7 @@ func runRoundRobinWorker(websitesC chan *Website) {
 	}
 }
 
-func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response, withTimeout bool, rng *fastrand.RNG) {
+func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response, withTimeout bool, rng *customprng.RNG) {
 	ws.statusMux.Lock()
 	ws.status.Status = "Running"
 	ws.statusMux.Unlock()
@@ -279,7 +279,7 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 	resp.ShouldDiscardBody = true
 
 	if *flagAntiCache {
-		randomString := getRandomString(rng)
+		randomString := rng.String(6, 20)
 		req.URI().QueryArgs().Add(randomString, randomString)
 		req.Header.SetCookie(randomString, randomString)
 	}

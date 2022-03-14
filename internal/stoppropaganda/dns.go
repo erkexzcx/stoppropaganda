@@ -79,5 +79,3 @@ func runDNSWorker(c chan *DNSTarget) {
 		dnsTarget.mux.Unlock()
 	}
 }
-
-var randomDomainRunes = []rune("abcdefghijklmnopqrstuvwxyz")

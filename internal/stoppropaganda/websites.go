@@ -279,6 +279,11 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 	resp.ShouldDiscardBody = true
 
 	if *flagAntiCache {
+		// Reused request could've stored previous randomString
+		// Let's clear it. This prevents memory leak:
+		req.URI().QueryArgs().Reset()
+		req.Header.DelAllCookies()
+
 		randomString := rng.String(6, 20)
 		req.URI().QueryArgs().Add(randomString, randomString)
 		req.Header.SetCookie(randomString, randomString)

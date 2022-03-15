@@ -283,6 +283,17 @@ var TargetWebsites = map[string]struct{}{
 	"https://geh.etpgpb.ru":       {},
 	"https://trade.etpgpb.ru":     {},
 	"https://gb.etpgpb.ru":        {},
+	"https://bki-okb.ru":          {},
+	"http://185.215.4.14":         {},
+	"http://185.215.4.10":         {},
+	"https://185.9.230.77":        {},
+	"https://www.nbki.ru":         {},
+	"https://195.10.198.201":      {},
+	"https://195.10.198.136":      {},
+	"https://195.10.198.243":      {},
+	"https://195.10.198.204":      {},
+	"http://195.10.198.130":       {},
+	"https://195.10.198.208":      {},
 
 	// Exchanges connected to russian banks
 	"https://cleanbtc.ru":             {},

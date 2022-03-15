@@ -238,7 +238,7 @@ func runPerWebsiteWorker(website *Website) {
 	rng := customprng.New(20)
 
 	// Copy once
-	website.req.CopyTo(req) // https://github.com/valyala/fasthttp/issues/53#issuecomment-185125823
+	website.req.CopyTo(req)
 
 	for {
 		if !website.allowedToRun() {
@@ -276,6 +276,8 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 	ws.status.Status = "Running"
 	ws.statusMux.Unlock()
 
+	// Custom fasthttp feature that allows us
+	// not to store the response in-memory
 	resp.ShouldDiscardBody = true
 
 	if *flagAntiCache {
@@ -292,23 +294,20 @@ func doSingleRequest(ws *Website, req *fasthttp.Request, resp *fasthttp.Response
 	// Perform request
 	var err error
 	if withTimeout {
+		// DoTimeout spawns a child goroutine
 		err = httpClient.DoTimeout(req, resp, *flagTimeout)
 	} else {
+		// Do does a request on the same thread
 		err = httpClient.Do(req, resp)
 	}
 	if err != nil {
 		ws.IncreaseCountersErr("httpClient.Do: " + err.Error())
 		return
 	}
-
+	// Custom fasthttp counter used when discarding body
 	downloaded := resp.LastDiscarded
 	if !resp.ShouldDiscardBody {
 		downloaded = len(resp.Body())
-	}
-
-	// Prevent site memory leaking us with 32+ MB (uno reverso)
-	if len(resp.Body()) > 32*1024*1024 {
-		resp.ResetBody()
 	}
 
 	// Increase counters

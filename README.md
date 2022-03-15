@@ -151,6 +151,7 @@ Available algorithms:
   - Uses less CPU and RAM.
   - By nature it wastes more traffic and generally has bigger impact.
 - `rr`
+  - Similar to slow loris, but more random.
   - Known as "pool of workers" (each worker will take the next pending website from the queue).
   - Can be used with as low as 1 worker.
   - Uses more CPU and RAM.
@@ -170,7 +171,7 @@ Default value of `:8049` is the same as `0.0.0.0:8049` which means web interface
 
 ## dialconcurrency
 
-Configuration via command line argument `-dialconcurrency 10000` or via environment variable `SP_DIALCONCURRENCY=2000`.
+Configuration via command line argument `-dialconcurrency 10000` or via environment variable `SP_DIALCONCURRENCY=10000`.
 
 Default value of `10000` means that there will be maximum of 10000 concurrent dials from fasthttp.
 

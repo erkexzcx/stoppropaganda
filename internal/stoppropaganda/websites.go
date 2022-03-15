@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 	"net/url"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -247,6 +248,10 @@ func runPerWebsiteWorker(website *Website) {
 			continue
 		}
 		doSingleRequest(website, req, resp, withTimeout, rng)
+
+		// Some websites are just too fast.
+		// Let's allow others to have fun
+		runtime.Gosched()
 	}
 }
 

@@ -166,6 +166,7 @@ var TargetWebsites = map[string]struct{}{
 	"http://v1.rostec.ru":                       {},
 	"https://vks3.rostec.ru":                    {},
 	"https://browser.yandex.com":                {},
+	"https://geltek-medica.ru":                  {},
 
 	// Banks
 	"https://www.sberbank.ru":                           {},

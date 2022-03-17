@@ -193,6 +193,7 @@ var TargetWebsites = map[string]struct{}{
 	"http://46.17.204.236":                      {},
 	"http://46.17.200.242":                      {},
 	"http://46.17.203.102":                      {},
+	"https://geltek-medica.ru":                  {},
 
 	// Banks
 	"https://www.sberbank.ru":                           {},

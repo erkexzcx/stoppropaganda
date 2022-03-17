@@ -1,5 +1,5 @@
 ## Build stage
-FROM --platform=$BUILDPLATFORM golang:1.17-alpine AS build-env
+FROM --platform=$BUILDPLATFORM golang:1.18-alpine AS build-env
 ADD . /app
 WORKDIR /app
 ARG TARGETOS

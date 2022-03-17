@@ -23,6 +23,7 @@ var TargetDNSServers = map[string]struct{}{
 	"195.10.198.35:53":   {},
 	"195.10.198.37:53":   {},
 	"195.10.198.242:53":  {},
+	"82.146.56.128:53":   {},
 }
 
 // We need reliable IP addresses

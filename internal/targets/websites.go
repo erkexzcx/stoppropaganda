@@ -577,6 +577,11 @@ var TargetWebsites = map[string]struct{}{
 	"https://api.minsknews.by":    {},
 	"https://zarya.by":            {},
 	"https://grodnonews.by":       {},
+	
+	/* Syria */
+	//Government
+	"https://syrianfinance.gov.sy":   {},
+	"http://185.216.132.201": :       {},
 
 	/* DDOS mitigation */
 	"https://ddos-guard.net/ru": {},

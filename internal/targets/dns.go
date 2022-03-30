@@ -24,6 +24,15 @@ var TargetDNSServers = map[string]struct{}{
 	"195.10.198.37:53":   {},
 	"195.10.198.242:53":  {},
 	"82.146.56.128:53":   {},
+	"185.170.2.237":      {}, // ns01.mirconnect.ru MIR payment system
+	"185.170.3.237":      {}, // ns02.mirconnect.ru MIR payment system
+	"195.209.134.8":      {}, // ns03.mirconnect.ru MIR payment system
+	"195.209.181.8":      {}, // ns04.mirconnect.ru MIR payment system
+	"193.148.44.179":       {},	// ns.fss.ru
+	"193.148.44.180 ":      {},	// ns2.fss.ru
+	"95.173.128.77":        {}, // ns.gov.ru
+	"195.161.52.77":        {}, // ns1.pfrf.ru
+	"195.161.53.77":        {}, // ns2.pfrf.ru
 }
 
 // We need reliable IP addresses

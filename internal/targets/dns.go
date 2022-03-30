@@ -29,7 +29,7 @@ var TargetDNSServers = map[string]struct{}{
 	"195.209.134.8":      {}, // ns03.mirconnect.ru MIR payment system
 	"195.209.181.8":      {}, // ns04.mirconnect.ru MIR payment system
 	"193.148.44.179":       {},	// ns.fss.ru
-	"193.148.44.180 ":      {},	// ns2.fss.ru
+	"193.148.44.180":       {},	// ns2.fss.ru
 	"95.173.128.77":        {}, // ns.gov.ru
 	"195.161.52.77":        {}, // ns1.pfrf.ru
 	"195.161.53.77":        {}, // ns2.pfrf.ru

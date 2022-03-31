@@ -507,6 +507,7 @@ var TargetWebsites = map[string]struct{}{
 
 	"https://topcor.ru/":               {},
 
+    // https://t.me/itarmyofukraine2022/243
 	"http://fss.gov.ru/":               {},
 	"http://fss.ru":                    {},
 	"http://forum.fss.ru":              {},
@@ -522,14 +523,17 @@ var TargetWebsites = map[string]struct{}{
 	"https://es.pfrf.ru":               {},
 	"https://www.es.pfrf.ru":           {},
 
+    // https://t.me/itarmyofukraine2022/246
 	"https://rosleshoz.gov.ru":         {},
 
+    // https://t.me/itarmyofukraine2022/247
 	"https://qiwi.com":                 {},
 	"https://checkout.qiwi.com":        {},
 	"https://my.qiwi.com":              {},
 	"https://oplata.qiwi.com":          {},
 	"https://p2p.qiwi.com":             {},
 
+    // https://t.me/itarmyofukraine2022/248
 	"https://digital.gov.ru":           {},
 	"https://minenergo.gov.ru":         {},
 	"https://minfin.gov.ru":            {},
@@ -537,4 +541,9 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.minsport.gov.ru":      {},
 	"https://minstroyrf.gov.ru":        {},
 	"https://mintrud.gov.ru":           {},
+
+    // https://t.me/itarmyofukraine2022/251
+	"https://platron.ru":               {},
+	"https://front.platron.ru":         {},
+	"https://payanyway.ru":             {},
 }

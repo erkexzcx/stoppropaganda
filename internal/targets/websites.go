@@ -119,7 +119,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.moex.com":                              {},
 	"https://iss.moex.com/iss/reference/": {},
 	"https://messaging.moex.com/init": {},
-	"https://passport.moex.com":                         {},
+	"https://passport.moex.com/login": {},
 	"http://www.fsb.ru":                                 {},
 	"https://scr.online.sberbank.ru/api/fl/idgib-w-3ds": {},
 	"https://3dsec.sberbank.ru/mportal3/auth/login":     {},
@@ -137,7 +137,8 @@ var TargetWebsites = map[string]struct{}{
 	"https://online.vtb.ru":                             {},
 	"https://online.sberbank.ru/CSAFront/index.do":      {},
 	"https://online.gpb.ru/login":                       {},
-	"https://alfabank.ru/everyday/online":               {},
+	"https://alfabank.ru": {},
+	"https://alfabank.ru/api/v1/geco-ip/": {}, // throws 500. flood their loggers
 	"https://rshb.ru":                                   {},
 	"https://online.rshb.ru/b1/ib6/wf2/retail/ib/loginretaildefault": {},
 	"https://online.sovcombank.ru":                      {},
@@ -475,7 +476,7 @@ var TargetWebsites = map[string]struct{}{
 
 	"https://belqi.net":            {},
 
-	"https://www.chechnya.online/ru/":  {},
+	"https://www.chechnya.online": {},
 	"https://vaynahavia.com":           {},
 	"https://grozmer.ru":               {},
 	"https://www.minfinchr.ru":         {},
@@ -490,7 +491,7 @@ var TargetWebsites = map[string]struct{}{
 	"http://fss.ru":                    {},
 	"http://forum.fss.ru":              {},
 	"http://wiki.fss.ru":               {},
-	"https://autodiscover.fss.ru":      {},
+	"https://autodiscover.fss.ru/owa": {},
 	"https://portal.fss.ru":            {},
 	"https://data.fss.ru/open": {},
 	"http://docs.fss.ru": {},
@@ -513,15 +514,13 @@ var TargetWebsites = map[string]struct{}{
     // https://t.me/itarmyofukraine2022/248
 	"https://digital.gov.ru":           {},
 	"https://minenergo.gov.ru":         {},
-	"https://minfin.gov.ru":            {},
+	"https://minfin.gov.ru/ru/": {},
 	"https://minjust.gov.ru":           {},
 	"https://www.minsport.gov.ru":      {},
 	"https://minstroyrf.gov.ru":        {},
 	"https://mintrud.gov.ru":           {},
 
     // https://t.me/itarmyofukraine2022/251
-	"https://platron.ru":               {},
-	"https://front.platron.ru":         {},
 	"https://payanyway.ru":             {},
 
 	// https://t.me/itarmyofukraine2022/253

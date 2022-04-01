@@ -84,13 +84,11 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.eurosib.ru":                    {},
 	"https://www.wildberries.ru":                {},
 	"https://www.ozon.ru":                       {},
-	"https://www.avito.ru":                      {},
 	"https://www.dns-shop.ru":                   {},
 	"https://aliexpress.ru":                     {},
 	"https://advego.com":                        {},
 	"https://www.freelance.ru":                  {},
 	"https://www.turbotext.ru":                  {},
-	"https://hh.ru":                             {},
 	"https://sberfn.ru":                         {},
 	"https://sber-am.ru":                        {},
 	"https://www.vtbcapital-pr.ru":              {},
@@ -165,7 +163,8 @@ var TargetWebsites = map[string]struct{}{
 	"http://91.194.226.32":                              {},
 
 	//The state
-	"https://gosuslugi.ru":           {},
+	"https://www.gosuslugi.ru":           {},
+	"https://www.gosuslugi.ru/api/mainpage/v4": {},
 	"https://www.mos.ru/uslugi":      {},
 	"https://api.mos.ru":             {},
 	"http://kremlin.ru":              {},
@@ -486,9 +485,16 @@ var TargetWebsites = map[string]struct{}{
 	"https://qrator.net/ru":     {},
 	"https://solidwall.ru":      {},
 
-	"https://www.auchan.ru":        {},
-	"https://www.leroymerlin.ru":   {},
-	"https://www.decathlon.ru":     {},
+    // Still operating in Russia
+	"https://www.auchan.ru":                {},
+	"https://www.leroymerlin.ru":           {},
+	"https://www.decathlon.ru":             {},
+	"https://burgerkingrus.ru":             {},
+	"https://mic.burgerking.ru/mifs/user/login.jsp": {},
+	"https://sd.burgerking.ru/HEAT/SaaSExternalSessionRenew.aspx": {},
+	"https://papajohns.ru/moscow":          {},
+	"https://api.papajohns.ru/slider/list": {},
+	"https://subway.ru":                    {},
 
 	"http://www.ved.gov.ru":        {},
 	"https://www.mid.ru":           {},
@@ -546,4 +552,13 @@ var TargetWebsites = map[string]struct{}{
 	"https://platron.ru":               {},
 	"https://front.platron.ru":         {},
 	"https://payanyway.ru":             {},
+
+	// https://t.me/itarmyofukraine2022/253
+	"https://hh.ru":                    {},
+	"https://www.superjob.ru":          {},
+	"https://www.zarplata.ru":          {},
+	"https://rabota.vk.com":            {},
+    "https://www.avito.ru:"             {},
+    "https://m.avito.ru":               {},
+    "https://avito.ru":                 {},
 }

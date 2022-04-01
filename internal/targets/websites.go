@@ -558,7 +558,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.superjob.ru":          {},
 	"https://www.zarplata.ru":          {},
 	"https://rabota.vk.com":            {},
-    "https://www.avito.ru:"             {},
+    "https://www.avito.ru":             {},
     "https://m.avito.ru":               {},
     "https://avito.ru":                 {},
 }

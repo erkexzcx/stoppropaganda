@@ -24,16 +24,16 @@ var TargetDNSServers = map[string]struct{}{
 	"195.10.198.37:53":   {},
 	"195.10.198.242:53":  {},
 	"82.146.56.128:53":   {},
-	"185.170.2.237:53":      {}, // ns01.mirconnect.ru MIR payment system
-	"185.170.3.237:53":      {}, // ns02.mirconnect.ru MIR payment system
-	"195.209.134.8:53":      {}, // ns03.mirconnect.ru MIR payment system
-	"195.209.181.8:53":      {}, // ns04.mirconnect.ru MIR payment system
-	"193.148.44.179:53":     {}, // ns.fss.ru
-	"193.148.44.180:53":     {}, // ns2.fss.ru
-	"95.173.128.77:53":      {}, // ns.gov.ru
-	"195.161.52.77:53":      {}, // ns1.pfrf.ru
-	"195.161.53.77:53":      {}, // ns2.pfrf.ru
-	"94.124.200.34:53":     {}, // ns.hh.ru
+	"185.170.2.237:53":   {}, // ns01.mirconnect.ru MIR payment system
+	"185.170.3.237:53":   {}, // ns02.mirconnect.ru MIR payment system
+	"195.209.134.8:53":   {}, // ns03.mirconnect.ru MIR payment system
+	"195.209.181.8:53":   {}, // ns04.mirconnect.ru MIR payment system
+	"193.148.44.179:53":  {}, // ns.fss.ru
+	"193.148.44.180:53":  {}, // ns2.fss.ru
+	"95.173.128.77:53":   {}, // ns.gov.ru
+	"195.161.52.77:53":   {}, // ns1.pfrf.ru
+	"195.161.53.77:53":   {}, // ns2.pfrf.ru
+	"94.124.200.34:53":   {}, // ns.hh.ru
 }
 
 // We need reliable IP addresses

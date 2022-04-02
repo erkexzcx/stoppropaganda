@@ -458,8 +458,8 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.decathlon.ru": {},
 	"https://ecco.ru": {},
 	"https://www.leroymerlin.ru": {},
-	"https://mega.ru/online/": {},
-	"https://mega.ru/online/rest/catalog/list/favourite/2557159/": {},  // Add to favs via get
+	"https://mega.ru/online/": {},  // Ingka
+	"https://mega.ru/online/rest/catalog/list/favourite/2557159/": {},  // Adds to favs via get
 	"https://papajohns.ru/moscow": {},
 	"https://api.papajohns.ru/slider/list": {},
 	"https://subway.ru": {},

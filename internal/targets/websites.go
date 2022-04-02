@@ -455,27 +455,36 @@ var TargetWebsites = map[string]struct{}{
 	"https://solidwall.ru":      {},
 
 	// Still operating in Russia
-	"https://www.auchan.ru":    {},
+	// https://yale.box.com/s/11lqy1d3yn1kf9xa3r96k9sb6w5m4qea
+	"https://www.auchan.ru": {},
+	"https://www.blablacar.ru": {},
+	"https://auth.blablacar.ru": {},
+	"https://edge.blablacar.ru/location/suggestions": {},
 	"https://burgerkingrus.ru": {},
 	"https://burgerkingrus.ru/api-web-front/api/v3/restaurant/list": {},
-	"https://mic.burgerking.ru/mifs/user/login.jsp":                 {},
-	"https://sd.burgerking.ru/HEAT/SaaSExternalSessionRenew.aspx":   {},
-	"https://www.decathlon.ru":                                      {},
-	"https://ecco.ru":                                               {},
-	"https://www.leroymerlin.ru":                                    {},
-	"https://papajohns.ru/moscow":                                   {},
-	"https://api.papajohns.ru/slider/list":                          {},
-	"https://www.renault.ru":                                        {},
-	"https://subway.ru":                                             {},
-	"https://www.yves-rocher.ru":                                    {},
+	"https://mic.burgerking.ru/mifs/user/login.jsp": {},
+	"https://sd.burgerking.ru/HEAT/SaaSExternalSessionRenew.aspx": {},
+	"https://www.decathlon.ru": {},
+	"https://ecco.ru": {},
+	"https://www.leroymerlin.ru": {},
+	"https://mega.ru/online/": {},
+	"https://mega.ru/online/rest/catalog/list/favourite/2557159/": {},  // Add to favs via get
+	"https://papajohns.ru/moscow": {},
+	"https://api.papajohns.ru/slider/list": {},
+	"https://www.renault.ru": {},
+	"https://subway.ru": {},
+	"https://www.yves-rocher.ru": {},
 
+    // https://t.me/itarmyofukraine2022/230
 	"http://www.ved.gov.ru":      {},
 	"https://www.mid.ru":         {},
 	"https://www.economy.gov.ru": {},
 	"https://minobrnauki.gov.ru": {},
 
+    // https://t.me/itarmyofukraine2022/216
 	"https://belqi.net": {},
 
+    // https://t.me/itarmyofukraine2022/215
 	"https://www.chechnya.online": {},
 	"https://vaynahavia.com":      {},
 	"https://grozmer.ru":          {},
@@ -484,6 +493,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://rostelecom.ru":     {},
 	"https://www.company.rt.ru": {},
 
+    // https://t.me/itarmyofukraine2022/211
 	"https://topcor.ru": {},
 
 	// https://t.me/itarmyofukraine2022/243

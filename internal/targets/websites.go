@@ -16,6 +16,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://api.viada.lt":      {},
 	"https://www.sber.kz":       {},
 	"https://www.sberbank.kz":   {},
+	"https://online.sberbank.kz": {},
 
 	/* Russia */
 
@@ -46,6 +47,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://pikabu.ru":                   {},
 	"https://api.pikabu.ru":               {},
 	"https://www.kommersant.ru":           {},
+	"https://i.kommersant.ru": {},
 	"https://omk.ru":                      {},
 	"https://regnum.ru":                   {},
 	"https://www.rambler.ru":              {},
@@ -59,7 +61,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://midural.ru":                  {},
 	"https://ulgov.ru":                    {},
 	"https://cheladmin.ru":                {},
-	"https://www.stavregion.ru":           {},
+	"https://stavregion.ru": {},
 	"https://www.mk.ru":                   {},
 	"https://rg.ru":                       {},
 
@@ -73,6 +75,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.eurosib.ru":             {},
 	"https://www.wildberries.ru":         {},
 	"https://www.ozon.ru":                {},
+	"https://www.ozon.ru/api/composer-api.bx/page/json/v2": {},  // see server-timing
 	"https://www.dns-shop.ru":            {},
 	"https://aliexpress.ru":              {},
 	"https://advego.com":                 {},
@@ -311,6 +314,10 @@ var TargetWebsites = map[string]struct{}{
 
 	// Oil and gas trading companies
 	"https://www.tektorg.ru": {},
+	"https://44.tektorg.ru/authentication/login": {},
+	"https://fin.tektorg.ru/bg": {},  // static
+	"https://fin.tektorg.ru/api/v2/reference/service_types": {},  // api pass
+	"https://zakupki.tektorg.ru": {},
 	"https://rosneft.com":    {},
 	"https://lukoil.com":     {},
 	"https://aaa-srt-cs.lukoil.com/logon/LogonPoint/tmindex.html": {},
@@ -342,21 +349,6 @@ var TargetWebsites = map[string]struct{}{
 
 	// Others
 	"http://217.12.104.100": {},
-	"http://172.217.0.179":  {},
-	"http://193.104.87.172": {},
-	"http://213.33.173.184": {},
-
-	// "Internet and thematic forums"
-	"https://www.eapteka.ru":    {},
-	"https://www.asna.ru":       {},
-	"https://366.ru":            {},
-	"https://aptekamos.ru":      {},
-	"https://vseapteki.ru":      {},
-	"https://www.rigla.ru":      {},
-	"https://planetazdorovo.ru": {},
-	"https://samson-pharma.ru":  {},
-	"https://zdorov.ru":         {},
-	"https://apteka.ru":         {},
 
 	// Various websites by ip
 	"https://46.28.16.112":   {},
@@ -429,7 +421,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.024.by":          {},
 	"https://www.belnovosti.by":   {},
 	"https://mogilevnews.by":      {},
-	"https://yandex.by":           {},
 	"https://www.slonves.by":      {},
 	"http://www.ctv.by":           {},
 	"https://radiobelarus.by":     {},
@@ -496,9 +487,8 @@ var TargetWebsites = map[string]struct{}{
 	"https://topcor.ru": {},
 
 	// https://t.me/itarmyofukraine2022/243
-	"http://fss.gov.ru":               {},
+	"https://fss.gov.ru":               {},
 	"http://fss.ru":                   {},
-	"http://forum.fss.ru":             {},
 	"http://wiki.fss.ru":              {},
 	"https://autodiscover.fss.ru/owa": {},
 	"https://portal.fss.ru":           {},

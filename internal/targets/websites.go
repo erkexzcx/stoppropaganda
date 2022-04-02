@@ -16,7 +16,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://api.viada.lt":      {},
 	"https://www.sber.kz":       {},
 	"https://www.sberbank.kz":   {},
-	"https://online.sberbank.kz": {},
+	"https://online.sberbank.kz/CSAFront/index.do": {},
 
 	/* Russia */
 

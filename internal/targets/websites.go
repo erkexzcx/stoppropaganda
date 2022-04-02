@@ -471,7 +471,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://mega.ru/online/rest/catalog/list/favourite/2557159/": {},  // Add to favs via get
 	"https://papajohns.ru/moscow": {},
 	"https://api.papajohns.ru/slider/list": {},
-	"https://www.renault.ru": {},
 	"https://subway.ru": {},
 	"https://www.yves-rocher.ru": {},
 

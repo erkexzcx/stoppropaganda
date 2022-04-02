@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=0.0.54
+VERSION=0.0.55
 BINARY_NAME=stoppropaganda
 
 # Remove old binaries (if any)

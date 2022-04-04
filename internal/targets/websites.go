@@ -111,7 +111,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://vks3.rostec.ru":             {},
 	"https://kontur.ru":                  {},
 	"https://help.kontur.ru/vnc":         {},
-	"https://geltek-medica.ru":           {},
 
 	// Banks
 	"https://www.sberbank.ru":                                        {},
@@ -195,10 +194,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://stroi.gov.ru":           {},
 	"https://proverki.gov.ru":        {},
 	"https://www.glonass-iac.ru":     {},
-	"https://savelife.pw":            {},
-	// former russian project with russian founders, that are being used as navigational service for russian army
-	// has marked military objects
-	"https://wikimapia.org": {},
 	"https://dme.ru":        {},
 	"https://market.dme.ru": {},
 	"https://rabota.dme.ru": {},

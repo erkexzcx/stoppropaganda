@@ -444,19 +444,26 @@ var TargetWebsites = map[string]struct{}{
 
 	// Still operating in Russia
 	// https://yale.box.com/s/11lqy1d3yn1kf9xa3r96k9sb6w5m4qea
+	"https://www.albane.ru": {},
 	"https://www.auchan.ru": {},
 	"https://www.blablacar.ru": {},
 	"https://auth.blablacar.ru": {},
 	"https://edge.blablacar.ru/location/suggestions": {},
+	"https://brw-shop.by": {},
 	"https://burgerkingrus.ru": {},
 	"https://burgerkingrus.ru/api-web-front/api/v3/restaurant/list": {},
+	"https://delonghi.ru": {},
 	"https://mic.burgerking.ru/mifs/user/login.jsp": {},
 	"https://sd.burgerking.ru/HEAT/SaaSExternalSessionRenew.aspx": {},
 	"https://www.decathlon.ru": {},
 	"https://ecco.ru": {},
 	"https://www.leroymerlin.ru": {},
+	"https://www.loccitane.ru": {},
+	"https://lladro.ru": {},
 	"https://mega.ru/online/": {},  // Ingka
-	"https://mega.ru/online/rest/catalog/list/favourite/2557159/": {},  // Adds to favs via get
+	"https://modshairrussia.ru": {},
+	"https://mymodshair.ru": {},
+	"https://natr.ru": {},
 	"https://papajohns.ru/moscow": {},
 	"https://api.papajohns.ru/slider/list": {},
 	"https://subway.ru": {},
@@ -524,4 +531,11 @@ var TargetWebsites = map[string]struct{}{
 	"https://rabota.vk.com":   {},
 	"https://www.avito.ru":    {},
 	"https://m.avito.ru":      {},
+
+    // https://t.me/itarmyofukraine2022/273
+    "https://cdek.by/ru/": {},
+	"https://www.cdek.ru/ru/": {},
+	"https://id.ds.cdek.ru": {},
+	"https://lk.cdek.ru/user/login": {},
+	"https://www.cdek.ru/graphql": {},
 }

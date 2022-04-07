@@ -36,7 +36,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://rzdlog.ru":                   {},
 	"https://vgtrk.ru":                    {},
 	"https://www.interfax.ru":             {},
-	"https://iz.ru":                       {},
 	"https://vz.ru":                       {},
 	"https://sputniknews.ru":              {},
 	"https://www.gazeta.ru":               {},
@@ -146,7 +145,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://online.gpb.ru/login":                                    {},
 	"https://alfabank.ru":                                            {},
 	"https://alfabank.ru/api/v1/geco-ip":                             {}, // throws 500. flood their loggers
-	"https://rshb.ru":                                                {},
+	"https://www.rshb.ru":                                            {},
 	"https://online.rshb.ru/b1/ib6/wf2/retail/ib/loginretaildefault": {},
 	"https://online.sovcombank.ru":                                   {},
 	"https://online.mkb.ru":                                          {},
@@ -230,19 +229,17 @@ var TargetWebsites = map[string]struct{}{
 	"https://trade.etpgpb.ru":             {},
 	"https://gb.etpgpb.ru":                {},
 	"https://bki-okb.ru":                  {},
-	"http://185.215.4.14":                 {},
-	"http://185.215.4.10":                 {},
 
 	// Exchanges connected to russian banks
 	"https://betatransfer.org":        {},
 	"https://bitokk.biz":              {},
 	"https://www.netex24.net":         {},
 	"https://flashobmen.com":          {},
-	"https://ychanger.net":            {},
-	"https://multichange.net":         {},
-	"https://royal.cash":              {},
-	"https://prostocash.com":          {},
-	"https://baksman.org":             {},
+	"https://ychanger.net":            {},  // recaptcha
+	"https://multichange.net":         {},  // recaptcha
+	"https://royal.cash":              {},  // recaptcha
+	"https://prostocash.com":          {},  // recaptcha
+	"https://baksman.org":             {},  // recaptcha
 	"https://yoomoney.ru":             {},
 	"https://yookassa.ru":             {},
 	"https://telemetry.koronapay.com": {},
@@ -273,7 +270,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://msp.roseltorg.ru":           {},
 	"https://vtb.roseltorg.ru":           {},
 	"https://rosinvoice.ru/auth":         {},
-	"https://astral.ru":                  {},
 	"http://www.nwudc.ru":                {},
 	"https://kk.bank":                    {},
 	"https://structure.mil.ru":           {},
@@ -285,8 +281,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.kartoteka.ru":           {},
 	"https://api.kartoteka.ru":           {},
 	"http://rsbis.ru":                    {},
-	"http://www.stv-it.ru":               {},
-	"https://crypset.ru":                 {},
 	"https://www.24ecp.ru": {},
 	"http://kraskript.com":               {},
 	"http://ca.ntssoft.ru":               {},
@@ -370,7 +364,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://185.58.223.206": {},
 	"https://178.248.238.15": {},
 	"https://92.53.98.191":   {},
-	"https://213.159.213.33": {},
 
 	/* BELARUS */
 
@@ -458,7 +451,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.decathlon.ru": {},
 	"https://ecco.ru": {},
 	"https://www.leroymerlin.ru": {},
-	"https://www.loccitane.ru": {},
+	"https://www.loccitane.ru": {},  // recaptcha
 	"https://lladro.ru": {},
 	"https://mega.ru/online/": {},  // Ingka
 	"https://modshairrussia.ru": {},
@@ -481,7 +474,6 @@ var TargetWebsites = map[string]struct{}{
     // https://t.me/itarmyofukraine2022/215
 	"https://www.chechnya.online": {},
 	"https://vaynahavia.com":      {},
-	"https://grozmer.ru":          {},
 	"https://www.minfinchr.ru":    {},
 
 	"https://rostelecom.ru":     {},
@@ -527,15 +519,33 @@ var TargetWebsites = map[string]struct{}{
 	// https://t.me/itarmyofukraine2022/253
 	"https://hh.ru":           {},
 	"https://www.superjob.ru": {},
-	"https://www.zarplata.ru": {},
 	"https://rabota.vk.com":   {},
 	"https://www.avito.ru":    {},
 	"https://m.avito.ru":      {},
 
-    // https://t.me/itarmyofukraine2022/273
+    // https://t.me/itarmyofukraine2022/269
     "https://cdek.by/ru/": {},
 	"https://www.cdek.ru/ru/": {},
 	"https://id.ds.cdek.ru": {},
 	"https://lk.cdek.ru/user/login": {},
 	"https://www.cdek.ru/graphql": {},
+
+    // https://t.me/itarmyofukraine2022/273
+    "https://www.doski.ru": {},
+    "https://www.farpost.ru": {},
+    "https://www.unibo.ru": {},
+	"https://youla.ru": {},
+	"https://api.youla.io/api/v1/search/suggestions": {},
+
+	// https://t.me/itarmyofukraine2022/275
+	"https://www.crpt.ru": {},
+	"https://ismp.crpt.ru": {},
+	"https://kb.crpt.ru": {},
+	"https://mail.crpt.ru/owa/auth/logon.aspx": {},
+	"https://markirovka.crpt.ru/login-kep": {},
+	"https://api.mdlp.crpt.ru": {},
+	"https://api.sb.mdlp.crpt.ru": {},
+	"https://nrz.api.sb.mdlp.crpt.ru": {},
+	"https://milk.crpt.ru": {},
+	"https://suzgrid.crpt.ru/login": {},
 }

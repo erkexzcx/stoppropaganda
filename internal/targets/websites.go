@@ -442,7 +442,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.blablacar.ru": {},
 	"https://auth.blablacar.ru": {},
 	"https://edge.blablacar.ru/location/suggestions": {},
-	"https://brw-shop.by": {},
 	"https://burgerkingrus.ru": {},
 	"https://burgerkingrus.ru/api-web-front/api/v3/restaurant/list": {},
 	"https://delonghi.ru": {},
@@ -479,9 +478,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://rostelecom.ru":     {},
 	"https://www.company.rt.ru": {},
 
-    // https://t.me/itarmyofukraine2022/211
-	"https://topcor.ru": {},
-
 	// https://t.me/itarmyofukraine2022/243
 	"https://fss.gov.ru":               {},
 	"https://wiki.fss.ru":              {},
@@ -514,7 +510,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://mintrud.gov.ru":      {},
 
 	// https://t.me/itarmyofukraine2022/251
-	"https://payanyway.ru": {},
+	"https://payanyway.ru/info/w/ru/public/welcome.htm": {},
 
 	// https://t.me/itarmyofukraine2022/253
 	"https://hh.ru":           {},
@@ -548,4 +544,10 @@ var TargetWebsites = map[string]struct{}{
 	"https://nrz.api.sb.mdlp.crpt.ru": {},
 	"https://milk.crpt.ru": {},
 	"https://suzgrid.crpt.ru/login": {},
+
+    // https://t.me/itarmyofukraine2022/287
+	"https://www.amediateka.ru": {},
+	"https://www.okko.tv": {},
+	"https://www.ontvtime.ru": {},
+	"https://wink.ru",
 }

@@ -9,7 +9,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://musutv.lt":         {},
 	"https://api.musutv.lt":     {},
 	"https://lt.baltnews.com":   {},
-	"https://lt.rubaltic.ru":    {},
 	"http://sputniknews.lt":     {},
 	"https://lv.sputniknews.ru": {},
 	"https://www.viada.lt": {},

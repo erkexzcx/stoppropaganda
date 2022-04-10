@@ -549,4 +549,19 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.okko.tv": {},
 	"https://www.ontvtime.ru": {},
 	"https://wink.ru": {},
+
+    // https://t.me/itarmyofukraine2022/289
+    "https://www.1tv.ru": {},
+    "https://25.1tv.ru": {},
+    "https://admin.kino.1tv.ru": {},
+    "https://api.1tv.ru/v2/special/channels.json": {},
+    "https://cm.1tv.ru": {},
+    "https://kino.1tv.ru": {},
+    "https://api.kino.1tv.ru/1.4/getChannels": {},
+    "https://stage.1tv.ru": {},
+    "https://stream.1tv.ru/api/playlist/1tvch-v1_as_array.json": {},
+    "https://subscr.1tv.ru": {},
+    "https://users.1tv.ru": {},
+	"https://kino-teatr.ru": {},
+	"https://mt.kino-teatr.ru": {},
 }

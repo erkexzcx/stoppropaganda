@@ -17,11 +17,8 @@ var TargetDNSServers = map[string]struct{}{
 	"95.173.148.51:53":   {}, // 95.* => Federal Guard Service of the Russian Federation
 	"95.173.148.50:53":   {},
 	"217.175.155.100:53": {},
-	"217.175.155.12:53":  {},
-	"217.175.140.71:53":  {},
 	"92.53.97.198:53":    {},
 	"195.10.198.37:53":   {},
-	"82.146.56.128:53":   {},
 	"185.170.2.237:53":   {}, // ns01.mirconnect.ru MIR payment system
 	"185.170.3.237:53":   {}, // ns02.mirconnect.ru MIR payment system
 	"195.209.134.8:53":   {}, // ns03.mirconnect.ru MIR payment system

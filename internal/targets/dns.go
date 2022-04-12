@@ -29,8 +29,6 @@ var TargetDNSServers = map[string]struct{}{
 	"195.161.52.77:53":   {}, // ns1.pfrf.ru
 	"195.161.53.77:53":   {}, // ns2.pfrf.ru
 	"94.124.200.34:53":   {}, // ns.hh.ru
-	"91.230.251.64:53":   {}, // ns01.crpt.ru
-	"91.208.238.64:53":   {}, // ns03.crpt.ru
 }
 
 // We need reliable IP addresses

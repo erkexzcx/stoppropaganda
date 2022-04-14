@@ -47,7 +47,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://regnum.ru":                   {},
 	"https://www.rambler.ru":              {},
 	"https://www.rambler.ru/api/v4/personalized": {},
-	"https://id.rambler.ru/login-20/login": {},
+// 	"https://id.rambler.ru/login-20/login": {}, // TODO fix small read buffer
 	"https://mail.rambler.ru": {},
 	"https://news.rambler.ru": {},
 	"https://peroxide.rambler.ru/v1/comments/clusters/": {},
@@ -78,17 +78,32 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.mk.ru":                   {},
 	"https://rg.ru":                       {},
 
+	// https://www.state.gov/russias-pillars-of-disinformation-and-propaganda-report/
+	"http://www.geopolitica.ru": {},
+	"https://www.globalresearch.ca": {},
+	"https://katehon.com": {},
+	"https://news-front.info": {},
+	"https://novorosinform.org": {},
+	"https://www.pravda.ru": {},
+	"https://www.pravda.ru/ajaxed/toolbartabs/": {},
+	"https://russia-insider.com/ru": {},
+	"https://southfront.org": {},
+	"https://www.strategic-culture.org": {},
+	"https://therussophile.org": {},
+	"https://tsargrad.tv": {},
+	"https://www.voltairenet.org": {},
+
 	// Business corporations
 	"https://lukoil.ru":                  {},
 	"https://magnit.ru":                  {},
 	"https://www.evraz.com/ru/":           {},
-	"https://nlmk.com":                   {},
+	"https://nlmk.com/ru/": {},
 	"https://www.sibur.ru":               {},
 	"https://www.severstal.com":          {},
 	"https://www.eurosib.ru":             {},
 	"https://www.wildberries.ru":         {},
 	"https://www.ozon.ru":                {},
-	"https://www.ozon.ru/api/composer-api.bx/page/json/v2": {},  // see server-timing
+	"https://www.ozon.ru/api/composer-api.bx/page/json/v2": {},
 	"https://www.dns-shop.ru":            {},
 	"https://aliexpress.ru":              {},
 	"https://advego.com":                 {},
@@ -127,7 +142,11 @@ var TargetWebsites = map[string]struct{}{
 	"https://api.sberbank.ru/prod/tokens/v2/oauth":                   {},
 	"https://api.sberbank.ru/prod/tokens/v2/oidc":                    {},
 	"https://www.vtb.ru":                                             {},
-	"https://api.vtb.ru":                                             {},
+	"https://cl.vtb.ru": {},
+	"https://ipoteka.vtb.ru/ipoteka/1": {},
+// 	"https://online.vtb.ru/login": {}, // TODO small read buffer
+	"https://school.vtb.ru": {},
+	"https://siteapi.vtb.ru/api/sitepages/component-types": {},
 	"https://www.gazprombank.ru":                                     {},
 	"https://api.gazprombank.ru":                                     {},
 	"https://www.moex.com":                                           {},
@@ -236,7 +255,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://bki-okb.ru":                  {},
 
 	// Exchanges connected to russian banks
-	"https://betatransfer.org":        {},
 	"https://bitokk.biz":              {},
 	"https://www.netex24.net":         {},
 	"https://flashobmen.com":          {},
@@ -279,7 +297,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://parus-s.ru":                 {},
 	"https://www.icentr.ru": {},
 	"https://www.kartoteka.ru":           {},
-	"https://api.kartoteka.ru":           {},
 	"https://etp.kartoteka.ru/index.html": {},
 	"http://rsbis.ru":                    {},
 	"https://www.24ecp.ru": {},
@@ -319,7 +336,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://aaa-srt-cs.lukoil.com/logon/LogonPoint/tmindex.html": {},
 	"https://ar.lukoil.com/login": {},
 	"https://gazprom.ru":                                          {},
-	"https://b2b.sibur.ru":                                        {},
+	"https://b2b.sibur.ru/pages_new_en/faces/index.jspx": {},
 	"https://onlinecontract.ru":                                   {},
 	"https://www.eurochemgroup.com":                               {},
 	"https://uralchem.com":                                        {},
@@ -466,9 +483,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.economy.gov.ru": {},
 	"https://minobrnauki.gov.ru": {},
 
-    // https://t.me/itarmyofukraine2022/216
-	"https://belqi.net": {},
-
     // https://t.me/itarmyofukraine2022/215
 	"https://www.chechnya.online": {},
 	"https://vaynahavia.com":      {},
@@ -498,7 +512,12 @@ var TargetWebsites = map[string]struct{}{
 	"https://p2p.qiwi.com":      {},
 
 	// https://t.me/itarmyofukraine2022/248
-	"https://digital.gov.ru":      {},
+	"https://digital.ac.gov.ru": {},
+	"https://digital.gov.ru": {},
+	"https://lk.digital.gov.ru": {},
+	"https://platform.digital.gov.ru": {},
+	"https://reestr.digital.gov.ru": {},
+	"https://sc.digital.gov.ru/home": {},
 	"https://minenergo.gov.ru":    {},
 	"https://minfin.gov.ru/ru/": {},
 	"https://minjust.gov.ru":      {},
@@ -548,7 +567,6 @@ var TargetWebsites = map[string]struct{}{
     // https://t.me/itarmyofukraine2022/289
     "https://www.1tv.ru": {},
     "https://25.1tv.ru": {},
-    "https://admin.kino.1tv.ru": {},
     "https://api.1tv.ru/v2/special/channels.json": {},
     "https://kino.1tv.ru": {},
     "https://api.kino.1tv.ru/1.4/getChannels": {},

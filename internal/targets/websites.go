@@ -176,7 +176,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://chbrr.crimea.com":                                       {},
 	"https://enter.unicredit.ru/v2/cgi/bsi.dll?T=RT_2Auth.BF":        {},
 	"https://online.vtb.ru":                                          {},
-	"https://online.sberbank.ru/CSAFront/index.do":                   {},
 	"https://online.gpb.ru/login":                                    {},
 	"https://alfabank.ru":                                            {},
 	"https://alfabank.ru/api/v1/geco-ip/": {}, // throws 500. flood their loggers

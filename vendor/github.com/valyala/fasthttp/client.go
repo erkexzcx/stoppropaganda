@@ -618,6 +618,14 @@ type RetryIfFunc func(request *Request) bool
 // TransportFunc wraps every request/response.
 type TransportFunc func(*Request, *Response) error
 
+// ConnPoolStrategyType define strategy of connection pool enqueue/dequeue
+type ConnPoolStrategyType int
+
+const (
+	FIFO ConnPoolStrategyType = iota
+	LIFO
+)
+
 // HostClient balances http requests among hosts listed in Addr.
 //
 // HostClient may be used for balancing load among multiple upstream hosts.
@@ -771,6 +779,9 @@ type HostClient struct {
 
 	// Transport defines a transport-like mechanism that wraps every request/response.
 	Transport TransportFunc
+
+	// Connection pool strategy. Can be either LIFO or FIFO (default).
+	ConnPoolStrategy ConnPoolStrategyType
 
 	clientName  atomic.Value
 	lastUseTime uint32
@@ -1437,12 +1448,12 @@ func (c *HostClient) doNonNilReqResp(req *Request, resp *Response) (bool, error)
 	if err == nil {
 		err = bw.Flush()
 	}
-	if err != nil {
-		c.releaseWriter(bw)
+	c.releaseWriter(bw)
+	isConnRST := isConnectionReset(err)
+	if err != nil && !isConnRST {
 		c.closeConn(cc)
 		return true, err
 	}
-	c.releaseWriter(bw)
 
 	if c.ReadTimeout > 0 {
 		// Set Deadline every time, since golang has fixed the performance issue
@@ -1462,22 +1473,22 @@ func (c *HostClient) doNonNilReqResp(req *Request, resp *Response) (bool, error)
 	}
 
 	br := c.acquireReader(conn)
-	if err = resp.ReadLimitBody(br, c.MaxResponseBodySize); err != nil {
-		c.releaseReader(br)
+	err = resp.ReadLimitBody(br, c.MaxResponseBodySize)
+	c.releaseReader(br)
+	if err != nil {
 		c.closeConn(cc)
 		// Don't retry in case of ErrBodyTooLarge since we will just get the same again.
 		retry := err != ErrBodyTooLarge
 		return retry, err
 	}
-	c.releaseReader(br)
 
-	if resetConnection || req.ConnectionClose() || resp.ConnectionClose() {
+	if resetConnection || req.ConnectionClose() || resp.ConnectionClose() || isConnRST {
 		c.closeConn(cc)
 	} else {
 		c.releaseConn(cc)
 	}
 
-	return false, err
+	return false, nil
 }
 
 var (
@@ -1497,6 +1508,10 @@ var (
 	// to broken server.
 	ErrConnectionClosed = errors.New("the server closed connection before returning the first response byte. " +
 		"Make sure the server returns 'Connection: close' response header before closing the connection")
+
+	// ErrConnPoolStrategyNotImpl is returned when HostClient.ConnPoolStrategy is not implement yet.
+	// If you see this error, then you need to check your HostClient configuration.
+	ErrConnPoolStrategyNotImpl = errors.New("connection pool strategy is not implement")
 )
 
 type timeoutError struct{}
@@ -1544,10 +1559,20 @@ func (c *HostClient) acquireConn(reqTimeout time.Duration, connectionClose bool)
 			}
 		}
 	} else {
-		n--
-		cc = c.conns[n]
-		c.conns[n] = nil
-		c.conns = c.conns[:n]
+		switch c.ConnPoolStrategy {
+		case LIFO:
+			n--
+			cc = c.conns[n]
+			c.conns[n] = nil
+			c.conns = c.conns[:n]
+		case FIFO:
+			cc = c.conns[0]
+			copy(c.conns, c.conns[1:])
+			c.conns[n-1] = nil
+			c.conns = c.conns[:n-1]
+		default:
+			return nil, ErrConnPoolStrategyNotImpl
+		}
 	}
 	c.connsLock.Unlock()
 
@@ -2605,9 +2630,9 @@ func (c *pipelineConnClient) init() {
 			// Keep restarting the worker if it fails (connection errors for example).
 			for {
 				if err := c.worker(); err != nil {
-					c.logger().Printf("error in PipelineClient(%q): %s", c.Addr, err)
-					if netErr, ok := err.(net.Error); ok && netErr.Temporary() {
-						// Throttle client reconnections on temporary errors
+					c.logger().Printf("error in PipelineClient(%q): %v", c.Addr, err)
+					if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
+						// Throttle client reconnections on timeout errors
 						time.Sleep(time.Second)
 					}
 				} else {
@@ -2891,14 +2916,15 @@ func (c *pipelineConnClient) getClientName() []byte {
 
 var errPipelineConnStopped = errors.New("pipeline connection has been stopped")
 
-func acquirePipelineWork(pool *sync.Pool, timeout time.Duration) *pipelineWork {
+func acquirePipelineWork(pool *sync.Pool, timeout time.Duration) (w *pipelineWork) {
 	v := pool.Get()
-	if v == nil {
-		v = &pipelineWork{
+	if v != nil {
+		w = v.(*pipelineWork)
+	} else {
+		w = &pipelineWork{
 			done: make(chan struct{}, 1),
 		}
 	}
-	w := v.(*pipelineWork)
 	if timeout > 0 {
 		if w.t == nil {
 			w.t = time.NewTimer(timeout)

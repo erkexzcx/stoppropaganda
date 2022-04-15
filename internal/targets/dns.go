@@ -17,13 +17,8 @@ var TargetDNSServers = map[string]struct{}{
 	"95.173.148.51:53":   {}, // 95.* => Federal Guard Service of the Russian Federation
 	"95.173.148.50:53":   {},
 	"217.175.155.100:53": {},
-	"217.175.155.12:53":  {},
-	"217.175.140.71:53":  {},
 	"92.53.97.198:53":    {},
-	"195.10.198.35:53":   {},
 	"195.10.198.37:53":   {},
-	"195.10.198.242:53":  {},
-	"82.146.56.128:53":   {},
 	"185.170.2.237:53":   {}, // ns01.mirconnect.ru MIR payment system
 	"185.170.3.237:53":   {}, // ns02.mirconnect.ru MIR payment system
 	"195.209.134.8:53":   {}, // ns03.mirconnect.ru MIR payment system
@@ -34,6 +29,19 @@ var TargetDNSServers = map[string]struct{}{
 	"195.161.52.77:53":   {}, // ns1.pfrf.ru
 	"195.161.53.77:53":   {}, // ns2.pfrf.ru
 	"94.124.200.34:53":   {}, // ns.hh.ru
+	"46.22.48.162:53":    {}, // dns.ecco.ru
+	"185.12.92.62:53":    {}, // ns1.journal-neo.org
+	"74.119.194.66:53":   {}, // ns2.journal-neo.org
+	"81.19.73.8:53":      {}, // ns2.rambler.ru
+	"81.19.83.8:53":      {}, // ns3.rambler.ru
+	"81.19.73.9:53":      {}, // ns4.rambler.ru
+	"81.19.83.9:53":      {}, // ns5.rambler.ru
+	"195.93.247.59:53":   {}, // ns7.sputniknews.ru
+	"195.93.247.60:53":   {}, // ns8.sputniknews.ru
+	"178.248.236.20:53":  {}, // ns9.sputniknews.ru
+	"178.248.233.32:53":  {}, // ns10.sputniknews.ru
+	"77.238.100.195:53":  {}, // ns1.tsargrad.tv
+	"188.64.160.163:53":  {}, // ns2.tsargrad.tv
 }
 
 // We need reliable IP addresses
@@ -42,4 +50,9 @@ var ReferenceDNSServersForHTTP = []string{
 	// https://dns.yandex.com/
 	"77.88.8.8:53",
 	"77.88.8.1:53",
+	"77.88.8.2:53",
+	"77.88.8.3:53",
+	"77.88.8.7:53",
+	"77.88.8.8:53",
+	"77.88.8.88:53",
 }

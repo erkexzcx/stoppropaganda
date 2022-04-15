@@ -1,6 +1,9 @@
 version: '3'
 services:
   stoppropaganda-tor:
+    build:
+      context: .
+      dockerfile: Dockerfile
     image: erikmnkl/stoppropaganda
     container_name: stoppropaganda-tor
     restart: unless-stopped

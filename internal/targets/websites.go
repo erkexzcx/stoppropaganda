@@ -368,7 +368,8 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.mirage.ru":     {},
 
 	// Others
-	"http://217.12.104.100": {},
+	"http://217.12.104.100":  {},
+	"https://toxic-repos.ru": {},
 
 	// Various websites by ip
 	"https://91.213.144.193": {},

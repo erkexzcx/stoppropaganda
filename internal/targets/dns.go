@@ -42,10 +42,10 @@ var TargetDNSServers = map[string]struct{}{
 	"178.248.233.32:53":  {}, // ns10.sputniknews.ru
 	"77.238.100.195:53":  {}, // ns1.tsargrad.tv
 	"188.64.160.163:53":  {}, // ns2.tsargrad.tv
-	"81.23.146.10":       {}, // ns2.akbars.ru
-	"178.207.91.10":      {}, // ns3.akbars.ru
-	"217.198.14.1":       {}, // ns4.akbars.ru
-	"217.198.15.10":      {}, // ns5.akbars.ru
+	"81.23.146.10:53":       {}, // ns2.akbars.ru
+	"178.207.91.10:53":      {}, // ns3.akbars.ru
+	"217.198.14.1:53":       {}, // ns4.akbars.ru
+	"217.198.15.10:53":      {}, // ns5.akbars.ru
 }
 
 // We need reliable IP addresses

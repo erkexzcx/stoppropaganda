@@ -18,35 +18,22 @@ var TargetWebsites = map[string]struct{}{
 	/* Russia */
 
 	// Propaganda
-	"https://lenta.ru":                           {},
-	"https://ria.ru":                             {},
-	"https://www.rbc.ru":                         {},
-	"https://smotrim.ru":                         {},
-	"https://api.smotrim.ru":                     {},
-	"https://tass.ru":                            {},
-	"https://tass.ru/userApi/getNewsFeed":        {},
-	"https://tvzvezda.ru":                        {},
-	"https://www.vesti.ru":                       {},
-	"https://zakupki.gov.ru":                     {},
-	"https://er.ru":                              {},
-	"https://www.rzd.ru":                         {},
-	"https://rzdlog.ru":                          {},
-	"https://vgtrk.ru":                           {},
-	"https://www.interfax.ru":                    {},
-	"https://vz.ru":                              {},
-	"https://sputniknews.ru":                     {},
-	"https://www.gazeta.ru":                      {},
-	"https://www.kp.ru":                          {},
-	"https://riafan.ru":                          {},
+	"https://lenta.ru":                    {},
+	"https://tass.ru":                     {},
+	"https://tass.ru/userApi/getNewsFeed": {},
+	"https://zakupki.gov.ru":              {},
+	"https://www.rzd.ru":                  {},
+	"https://rzdlog.ru":                   {},
+	"https://www.interfax.ru":             {},
+	"https://vz.ru":                       {},
+	"https://sputniknews.ru":              {},
+	"https://www.gazeta.ru":               {},
+	"https://identity.kp.house/identity/api/2/auth/token.json": {},
 	"https://api.riafan.ru":                      {},
 	"https://pikabu.ru":                          {},
 	"https://api.pikabu.ru":                      {},
-	"https://www.kommersant.ru":                  {},
 	"https://i.kommersant.ru":                    {},
-	"https://omk.ru":                             {},
 	"https://omk-job.ru":                         {},
-	"https://omksteel.com":                       {},
-	"https://regnum.ru":                          {},
 	"https://www.rambler.ru":                     {},
 	"https://www.rambler.ru/api/v4/personalized": {},
 	// 	"https://id.rambler.ru/login-20/login": {}, // TODO fix small read buffer
@@ -61,7 +48,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://adm.astrobl.ru":                            {},
 	"https://www.volgograd.ru":                          {},
 	"https://www.admoblkaluga.ru":                       {},
-	"https://apparat.lenobl.ru":                         {},
 	"https://mosreg.ru":                                 {},
 	"https://easuz.mosreg.ru":                           {},
 	"https://login.school.mosreg.ru":                    {},
@@ -83,6 +69,8 @@ var TargetWebsites = map[string]struct{}{
 	"https://eadaily.com/ru/dossier":                    {},
 	"https://eadaily.com/ru/rss/index.xml":              {},
 	"https://lug-info.com":                              {},
+	"https://kuban24.tv":                                {},
+	"https://newdaynews.ru":                             {},
 
 	// https://www.state.gov/russias-pillars-of-disinformation-and-propaganda-report/
 	"http://www.geopolitika.ru":                 {},
@@ -104,7 +92,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://magnit.ru":                                    {},
 	"https://www.evraz.com/ru/":                            {},
 	"https://nlmk.com/ru/":                                 {},
-	"https://www.sibur.ru":                                 {},
 	"https://www.severstal.com":                            {},
 	"https://www.eurosib.ru":                               {},
 	"https://www.wildberries.ru":                           {},
@@ -116,7 +103,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://freelance.ru":                                 {},
 	"https://www.turbotext.ru":                             {},
 	"https://sberfn.ru":                                    {},
-	"https://sber-am.ru":                                   {},
 	"https://www.vtbcapital-pr.ru":                         {},
 	"https://region-am.ru":                                 {},
 	"https://www.ingosinvest.ru":                           {},
@@ -129,8 +115,6 @@ var TargetWebsites = map[string]struct{}{
 	"http://217.20.155.13":                                 {},
 	"http://217.20.147.1":                                  {},
 	"http://www.yemelya.ru":                                {},
-	"https://www.nornickel.com":                            {},
-	"https://rostec.ru":                                    {},
 	"https://scloud.rostec.ru/login":                       {},
 	"https://vcs.rostec.ru":                                {},
 	"https://lk.rostec.ru/Account/LogIn":                   {},
@@ -152,7 +136,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://api.sberbank.ru/prod/tokens/v2/oauth":     {},
 	"https://api.sberbank.ru/prod/tokens/v2/oidc":      {},
 	"https://online.sberbank.ru/CSAFront/index.do":     {},
-	"https://osago.sberbank.ru":                        {},
 	"https://www.vtb.ru":                               {},
 	"https://cl.vtb.ru":                                {},
 	"https://ipoteka.vtb.ru/ipoteka/1":                 {},
@@ -185,7 +168,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://alfabank.ru/api/v1/geco-ip/":                            {},
 	"https://www.rshb.ru":                                            {},
 	"https://online.rshb.ru/b1/ib6/wf2/retail/ib/loginretaildefault": {},
-	"https://online.sovcombank.ru":                                   {},
 	"https://online.mkb.ru":                                          {},
 	"https://www.tinkoff.ru":                                         {},
 	"https://www.tinkoff.ru/api/common/v1/webuser":                   {},
@@ -251,7 +233,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.glonass-iac.ru": {},
 	"https://dme.ru":             {},
 	"https://market.dme.ru":      {},
-	"https://rabota.dme.ru":      {},
 	"https://www.tickets.dme.ru": {},
 
 	// Payments
@@ -266,10 +247,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://wats.mirconnect.ru":          {},
 	"https://ds.vendorcert.mirconnect.ru": {},
 	"https://privetmir.ru":                {},
-	"https://mironline.ru":                {},
 	"https://sbp.nspk.ru":                 {},
-	"https://www.nspk.ru":                 {},
-	"https://nspk.com":                    {},
 	"https://sip.nspk.ru":                 {},
 	"https://koronapay.com":               {},
 	"https://api.koronapay.com":           {},
@@ -329,8 +307,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://api.e-portal.ru":             {},
 	"https://parus-s.ru":                  {},
 	"https://www.icentr.ru":               {},
-	"https://www.kartoteka.ru":            {},
-	"https://api.kartoteka.ru":            {},
 	"https://etp.kartoteka.ru/index.html": {},
 	"http://rsbis.ru":                     {},
 	"https://www.24ecp.ru":                {},
@@ -339,7 +315,6 @@ var TargetWebsites = map[string]struct{}{
 	"http://www.y-center.ru":              {},
 	"http://www.rcarus.ru":                {},
 	"https://squaretrade.ru":              {},
-	"http://ca.gisca.ru":                  {},
 	"http://www.otchet-online.ru":         {},
 	"http://udcs.ru":                      {},
 	"https://www.cit-ufa.ru":              {},
@@ -373,9 +348,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://b2b.sibur.ru/pages_new_en/faces/index.jspx":          {},
 	"https://onlinecontract.ru":                                   {},
 	"https://www.eurochemgroup.com":                               {},
-	"https://uralchem.com":                                        {},
 	"https://tatneft.ru":                                          {},
-	"https://acron.ru":                                            {},
 
 	// Food delivery services
 	"https://www.delivery-club.ru":                    {},
@@ -390,7 +363,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://cinemastar.ru":     {},
 	"https://kinoteatr.ru":      {},
 	"https://karofilm.ru":       {},
-	"https://kinomax.ru":        {},
 	"https://romanov-cinema.ru": {},
 	"https://www.mirage.ru":     {},
 
@@ -424,6 +396,18 @@ var TargetWebsites = map[string]struct{}{
 	"https://id.tutu.ru/sdk_api/session":                                          {},
 	"https://story-proxy.tutu.ru/main_page_posts/":                                {},
 
+	// Belgorod
+	"https://bel.ru": {},
+	"https://bel.ru/api/v1/platform/main_page":                 {},
+	"https://belgorod.igooods.ru/api/v8/cities/identify_by_ip": {},
+	"https://belgorod.farfor.ru":                               {},
+	"https://belsbyt.ru":                                       {},
+	"https://lk.belsbyt.ru/fiz/login":                          {},
+	"http://82.151.107.106:3509":                               {},
+	"https://www.go31.ru":                                      {},
+	"https://www.go31.ru/api3/auth/check-login":                {},
+	"https://perevozki31.ru":                                   {},
+
 	// Others
 	"http://217.12.104.100":  {},
 	"https://toxic-repos.ru": {},
@@ -431,7 +415,6 @@ var TargetWebsites = map[string]struct{}{
 	// Various websites by ip
 	"https://91.213.144.193": {},
 	"https://91.213.144.237": {},
-	"https://178.248.238.24": {},
 	"https://212.24.38.190":  {},
 	"https://78.47.115.99":   {},
 	"https://81.19.72.39":    {},
@@ -521,7 +504,6 @@ var TargetWebsites = map[string]struct{}{
 	// Still operating in Russia
 	// https://yale.box.com/s/11lqy1d3yn1kf9xa3r96k9sb6w5m4qea
 	"https://www.albane.ru":                                         {},
-	"https://www.auchan.ru":                                         {},
 	"https://www.blablacar.ru":                                      {},
 	"https://auth.blablacar.ru":                                     {},
 	"https://edge.blablacar.ru/location/suggestions":                {},
@@ -532,7 +514,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://sd.burgerking.ru/HEAT/SaaSExternalSessionRenew.aspx":   {},
 	"https://www.decathlon.ru":                                      {},
 	"https://ecco.ru":                                               {},
-	"https://leroymerlin.ru":                                        {},
 	"https://lladro.ru":                                             {},
 	"https://mega.ru":                                               {}, // Ingka
 	"https://modshairrussia.ru":                                     {},
@@ -597,14 +578,10 @@ var TargetWebsites = map[string]struct{}{
 	// https://t.me/itarmyofukraine2022/253
 	"https://www.superjob.ru": {},
 	"https://rabota.vk.com":   {},
-	"https://www.avito.ru":    {},
-	"https://m.avito.ru":      {},
 
 	// https://t.me/itarmyofukraine2022/269
-	"https://cdek.by/ru/":           {},
-	"https://id.ds.cdek.ru":         {},
-	"https://lk.cdek.ru/user/login": {},
-	"https://www.cdek.ru/graphql":   {},
+	"https://cdek.by/ru/":         {},
+	"https://www.cdek.ru/graphql": {},
 
 	// https://t.me/itarmyofukraine2022/273
 	"https://www.doski.ru":                           {},
@@ -630,13 +607,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://wink.ru":           {},
 
 	// https://t.me/itarmyofukraine2022/289
-	"https://www.1tv.ru":                                        {},
-	"https://25.1tv.ru":                                         {},
-	"https://api.1tv.ru/v2/special/channels.json":               {},
-	"https://kino.1tv.ru":                                       {},
-	"https://api.kino.1tv.ru/1.4/getChannels":                   {},
 	"https://stream.1tv.ru/api/playlist/1tvch-v1_as_array.json": {},
-	"https://users.1tv.ru":                                      {},
 	"https://mt.kino-teatr.ru":                                  {},
 
 	// https://t.me/itarmyofukraine2022/290
@@ -652,4 +623,12 @@ var TargetWebsites = map[string]struct{}{
 	"https://zakupki.kontur.ru":                    {},
 	"https://www.b-kontur.ru":                      {},
 	"https://www.kontur-extern.ru":                 {},
+
+	// https://t.me/itarmyofukraine2022/298
+	"https://www.tvigle.ru":          {},
+	"https://admin.tvigle.ru":        {},
+	"https://cloud.tvigle.ru":        {},
+	"https://downloader.tvigle.ru":   {},
+	"http://gr.tvigle.ru":            {},
+	"https://vendor.tvigle.ru/login": {},
 }

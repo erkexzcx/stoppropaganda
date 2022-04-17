@@ -19,19 +19,39 @@ var TargetDNSServers = map[string]struct{}{
 	"217.175.155.100:53": {},
 	"92.53.97.198:53":    {},
 	"195.10.198.37:53":   {},
+	"178.248.238.77:53":  {}, // ns.131.ru
+	"81.23.146.10:53":    {}, // ns2.akbars.ru
+	"178.207.91.10:53":   {}, // ns3.akbars.ru
+	"217.198.14.1:53":    {}, // ns4.akbars.ru
+	"217.198.15.10:53":   {}, // ns5.akbars.ru
+	"217.12.96.15:53":    {}, // ns1.alfadirect.net
+	"217.12.97.15:53":    {}, // ns2.alfadirect.net
+	"217.12.102.15:53":   {}, // ns1.beta-bank.ru
+	"217.12.102.16:53":   {}, // ns2.beta-bank.ru
+	"94.126.153.33:53":   {}, // ns1.aresbank.ru
+	"212.109.207.140:53": {}, // ns1.bank-hlynov.ru
+	"168.63.61.187:53":   {}, // ns2.bank-hlynov.ru
+	"54.229.95.34:53":    {}, // ns1.banki.ru
+	"212.24.61.92:53":    {}, // ns2.banki.ru
+	"178.154.235.238:53": {}, // ns3.banki.ru
+	"46.22.48.162:53":    {}, // dns.ecco.ru
+	"193.148.44.179:53":  {}, // ns.fss.ru
+	"193.148.44.180:53":  {}, // ns2.fss.ru
+	"95.173.128.77:53":   {}, // ns.gov.ru
+	"95.173.130.4:53":    {}, // ns1.duma.gov.ru
+	"95.173.130.5:53":    {}, // ns2.duma.gov.ru
+	"194.85.126.34:53":   {}, // ns1.ftc.ru faktura
+	"194.85.126.40:53":   {}, // ns2.ftc.ru faktura
+	"89.111.38.147:53":   {}, // ns3.ftc.ru faktura
+	"94.124.200.34:53":   {}, // ns.hh.ru
+	"185.12.92.62:53":    {}, // ns1.journal-neo.org
+	"74.119.194.66:53":   {}, // ns2.journal-neo.org
 	"185.170.2.237:53":   {}, // ns01.mirconnect.ru MIR payment system
 	"185.170.3.237:53":   {}, // ns02.mirconnect.ru MIR payment system
 	"195.209.134.8:53":   {}, // ns03.mirconnect.ru MIR payment system
 	"195.209.181.8:53":   {}, // ns04.mirconnect.ru MIR payment system
-	"193.148.44.179:53":  {}, // ns.fss.ru
-	"193.148.44.180:53":  {}, // ns2.fss.ru
-	"95.173.128.77:53":   {}, // ns.gov.ru
 	"195.161.52.77:53":   {}, // ns1.pfrf.ru
 	"195.161.53.77:53":   {}, // ns2.pfrf.ru
-	"94.124.200.34:53":   {}, // ns.hh.ru
-	"46.22.48.162:53":    {}, // dns.ecco.ru
-	"185.12.92.62:53":    {}, // ns1.journal-neo.org
-	"74.119.194.66:53":   {}, // ns2.journal-neo.org
 	"81.19.73.8:53":      {}, // ns2.rambler.ru
 	"81.19.83.8:53":      {}, // ns3.rambler.ru
 	"81.19.73.9:53":      {}, // ns4.rambler.ru
@@ -42,10 +62,6 @@ var TargetDNSServers = map[string]struct{}{
 	"178.248.233.32:53":  {}, // ns10.sputniknews.ru
 	"77.238.100.195:53":  {}, // ns1.tsargrad.tv
 	"188.64.160.163:53":  {}, // ns2.tsargrad.tv
-	"81.23.146.10:53":    {}, // ns2.akbars.ru
-	"178.207.91.10:53":   {}, // ns3.akbars.ru
-	"217.198.14.1:53":    {}, // ns4.akbars.ru
-	"217.198.15.10:53":   {}, // ns5.akbars.ru
 }
 
 // We need reliable IP addresses

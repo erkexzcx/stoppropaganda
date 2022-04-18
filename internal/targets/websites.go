@@ -562,7 +562,6 @@ var TargetWebsites = map[string]struct{}{
 
 	// https://t.me/itarmyofukraine2022/248
 	"https://digital.ac.gov.ru":       {},
-	"https://digital.gov.ru":          {},
 	"https://lk.digital.gov.ru":       {},
 	"https://platform.digital.gov.ru": {},
 	"https://reestr.digital.gov.ru":   {},

@@ -19,7 +19,6 @@ var TargetDNSServers = map[string]struct{}{
 	"217.175.155.100:53": {},
 	"92.53.97.198:53":    {},
 	"195.10.198.37:53":   {},
-	"178.248.238.77:53":  {}, // ns.131.ru
 	"81.23.146.10:53":    {}, // ns2.akbars.ru
 	"178.207.91.10:53":   {}, // ns3.akbars.ru
 	"217.198.14.1:53":    {}, // ns4.akbars.ru
@@ -52,6 +51,10 @@ var TargetDNSServers = map[string]struct{}{
 	"195.209.181.8:53":   {}, // ns04.mirconnect.ru MIR payment system
 	"195.161.52.77:53":   {}, // ns1.pfrf.ru
 	"195.161.53.77:53":   {}, // ns2.pfrf.ru
+	"79.142.16.28:53":    {}, // ns2.qiwi.com
+	"79.142.17.8:53":     {}, // ns3.qiwi.com
+	"79.142.17.28:53":    {}, // ns4.qiwi.com
+	"79.142.16.8:53":     {}, // ns5.qiwi.com
 	"81.19.73.8:53":      {}, // ns2.rambler.ru
 	"81.19.83.8:53":      {}, // ns3.rambler.ru
 	"81.19.73.9:53":      {}, // ns4.rambler.ru

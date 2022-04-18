@@ -80,7 +80,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://nnews.nnov.ru":                             {},
 	"https://www.readmetro.com":                         {},
 	"https://newdaynews.ru":                             {},
-	"https://www.trud.ru":                               {},
 	"https://utro.ru":                                   {},
 	"https://vm.ru":                                     {},
 	"https://zanamipravda.ru":                           {},
@@ -174,7 +173,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://acs8.sbrf.ru":                                           {},
 	"https://my.bank-hlynov.ru/login/":                               {},
 	"https://chbrr.crimea.com":                                       {},
-	"https://enter.unicredit.ru/v2/cgi/bsi.dll?T=RT_2Auth.BF":        {},
 	"https://online.vtb.ru":                                          {},
 	"https://online.gpb.ru/login":                                    {},
 	"https://alfabank.ru":                                            {},
@@ -189,10 +187,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://91.194.226.50":                                          {},
 	"https://auth.tcsbank.ru":                                        {},
 	"https://91.194.226.32":                                          {},
-	"https://131.ru":                                                 {},
-	"https://developer.131.ru":                                       {},
-	"https://online.131.ru":                                          {},
-	"https://online.131.ru/json/auth/login":                          {},
 	"https://www.akbars.ru":                                          {},
 	"https://bankok.akbars.ru/AkbarsOnlineAuth/SavedLoginInfo":       {},
 	"https://invest.akbars.ru":                                       {},
@@ -399,18 +393,16 @@ var TargetWebsites = map[string]struct{}{
 	"https://azlog.ru":                                                            {},
 	"https://bilet.aero":                                                          {},
 	"https://avia.bilet.aero/api/guide/airports/MOW":                              {},
-	"https://busnovoyas.ru":                                                       {},
 	"https://www.dellin.ru":                                                       {},
 	"https://www.dellin.ru/api/calculation/v1/products":                           {},
 	"https://kogda.by":                                                            {},
-	"https://www.tutu.ru":                                                         {},
-	"https://bus.tutu.ru/api/v1/geo/suggest":                                      {},
 	"https://id.tutu.ru/sdk_api/session":                                          {},
 	"https://story-proxy.tutu.ru/main_page_posts/":                                {},
 
 	// Belgorod
 	"https://bel.ru": {},
 	"https://bel.ru/api/v1/platform/main_page":                 {},
+	"https://belgorod.igooods.ru":                              {},
 	"https://belgorod.igooods.ru/api/v8/cities/identify_by_ip": {},
 	"https://belgorod.farfor.ru":                               {},
 	"https://belsbyt.ru":                                       {},
@@ -426,7 +418,6 @@ var TargetWebsites = map[string]struct{}{
 	// Various websites by ip
 	"https://91.213.144.193": {},
 	"https://91.213.144.237": {},
-	"https://212.24.38.190":  {},
 	"https://78.47.115.99":   {},
 	"https://81.19.72.39":    {},
 	"https://81.19.72.3":     {},
@@ -524,6 +515,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://mic.burgerking.ru/mifs/user/login.jsp":                 {},
 	"https://sd.burgerking.ru/HEAT/SaaSExternalSessionRenew.aspx":   {},
 	"https://www.decathlon.ru":                                      {},
+	"https://blog.decathlon.ru":                                     {},
 	"https://ecco.ru":                                               {},
 	"https://lladro.ru":                                             {},
 	"https://mega.ru":                                               {}, // Ingka
@@ -563,11 +555,10 @@ var TargetWebsites = map[string]struct{}{
 	"https://rosleshoz.gov.ru": {},
 
 	// https://t.me/itarmyofukraine2022/247
-	"https://qiwi.com":          {},
-	"https://checkout.qiwi.com": {},
-	"https://my.qiwi.com":       {},
-	"https://oplata.qiwi.com":   {},
-	"https://p2p.qiwi.com":      {},
+	"https://qiwi.com":        {},
+	"https://my.qiwi.com":     {},
+	"https://oplata.qiwi.com": {},
+	"https://p2p.qiwi.com":    {},
 
 	// https://t.me/itarmyofukraine2022/248
 	"https://digital.ac.gov.ru":       {},

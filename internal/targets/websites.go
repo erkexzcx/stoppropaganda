@@ -108,7 +108,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://rsnnews.ru":                                 {},
 	"http://ru-an.info":                                  {},
 	"https://rusonline.org":                              {},
-	"https://russtrat.ru":                                {},
+// 	"https://russtrat.ru":                                {}, // cf feeding us 400s
 	"https://svpressa.ru":                                {},
 	"https://taurica.net":                                {},
 	"https://tehnowar.ru":                                {},
@@ -120,13 +120,12 @@ var TargetWebsites = map[string]struct{}{
 	"https://vesti-k.ru":                                 {},
 	"https://vm.ru":                                      {},
 	"http://webnovosti.info":                             {},
-	"https://wpristav.ru":                                 {},
-	"https://x-true.info":                                {},
+	"https://wpristav.ru":                                {},
+	"https://x-true.info":                                {}, // cf
 	"https://zanamipravda.ru":                            {},
 
 	// https://www.state.gov/russias-pillars-of-disinformation-and-propaganda-report/
 	"http://www.geopolitika.ru":                 {},
-	"https://www.globalresearch.ca":             {},
 	"https://katehon.com":                       {},
 	"https://novorosinform.org":                 {},
 	"https://www.pravda.ru":                     {},
@@ -136,7 +135,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.strategic-culture.org":         {},
 	"https://therussophile.org":                 {},
 	"https://tsargrad.tv":                       {},
-	"https://www.voltairenet.org":               {},
+	"https://www.voltairenet.org":               {}, // cf
 
 	// Business corporations
 	"https://lukoil.ru":                                    {},
@@ -166,7 +165,6 @@ var TargetWebsites = map[string]struct{}{
 	"http://217.20.155.13":                                 {},
 	"http://217.20.147.1":                                  {},
 	"http://www.yemelya.ru":                                {},
-	"https://scloud.rostec.ru/login":                       {},
 	"https://vcs.rostec.ru":                                {},
 	"https://lk.rostec.ru/Account/LogIn":                   {},
 	"http://ias.rostec.ru":                                 {},
@@ -182,7 +180,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://sberprime.sber.ru":                        {},
 	"https://www.sberbank.com/ru":                      {},
 	"https://www.sberbank.ru":                          {},
-	"https://online.sberbank.ru":                       {},
+	"https://online.sberbank.ru/CSAFront/index.do":     {},
 	"https://api.sberbank.ru/prod/tokens/v2":           {},
 	"https://api.sberbank.ru/prod/tokens/v2/oauth":     {},
 	"https://api.sberbank.ru/prod/tokens/v2/oidc":      {},
@@ -238,7 +236,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://www.nalog.gov.ru":                    {},
 	"https://customs.gov.ru":                      {},
 	"https://pfr.gov.ru":                          {},
-	"https://rkn.gov.ru":                          {},
 	"https://gosuslugi41.ru":                      {},
 	"https://uslugi27.ru":                         {},
 	"https://gosuslugi29.ru":                      {},
@@ -298,7 +295,7 @@ var TargetWebsites = map[string]struct{}{
 
 	// Exchanges connected to russian banks
 	"https://bitokk.biz":              {},
-	"https://www.netex24.net":         {},
+	"https://www.netex24.net":         {}, // requires cookie through redirect to fully load
 	"https://flashobmen.com":          {},
 	"https://yoomoney.ru":             {},
 	"https://yookassa.ru":             {},
@@ -550,12 +547,6 @@ var TargetWebsites = map[string]struct{}{
 	// https://t.me/itarmyofukraine2022/246
 	"https://rosleshoz.gov.ru": {},
 
-	// https://t.me/itarmyofukraine2022/247
-	"https://qiwi.com":        {},
-	"https://my.qiwi.com":     {},
-	"https://oplata.qiwi.com": {},
-	"https://p2p.qiwi.com":    {},
-
 	// https://t.me/itarmyofukraine2022/248
 	"https://digital.ac.gov.ru":       {},
 	"https://lk.digital.gov.ru":       {},
@@ -563,7 +554,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://reestr.digital.gov.ru":   {},
 	"https://sc.digital.gov.ru/home":  {},
 	"https://minenergo.gov.ru":        {},
-	"https://minfin.gov.ru/ru/":       {},
 	"https://minjust.gov.ru":          {},
 	"https://www.minsport.gov.ru":     {},
 	"https://minstroyrf.gov.ru":       {},
@@ -573,7 +563,7 @@ var TargetWebsites = map[string]struct{}{
 	"https://payanyway.ru/info/w/ru/public/welcome.htm": {},
 
 	// https://t.me/itarmyofukraine2022/253
-	"https://www.superjob.ru": {},
+	"https://www.superjob.ru": {}, // requires cookie through redirect to fully load
 	"https://rabota.vk.com":   {},
 
 	// https://t.me/itarmyofukraine2022/269

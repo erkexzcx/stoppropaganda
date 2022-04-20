@@ -4,7 +4,7 @@ metadata:
   labels:
     app: stoppropaganda
   name: stoppropaganda
-  namespace: stoppropaganda 
+  namespace: stoppropaganda
 spec:
   replicas: 3
 # set required number of pod replicas, affinity rule place only single intance on k8s worker. Preferably put number of workers here.
@@ -42,4 +42,4 @@ spec:
         - name: SP_DNSTIMEOUT
           value: "1s"
         - name: SP_USERAGENT
-          value: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36"
+          value: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4896.127 Safari/537.36"

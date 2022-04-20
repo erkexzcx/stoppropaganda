@@ -180,7 +180,6 @@ var TargetWebsites = map[string]struct{}{
 	"https://sberprime.sber.ru":                        {},
 	"https://www.sberbank.com/ru":                      {},
 	"https://www.sberbank.ru":                          {},
-	"https://online.sberbank.ru/CSAFront/index.do":     {},
 	"https://api.sberbank.ru/prod/tokens/v2":           {},
 	"https://api.sberbank.ru/prod/tokens/v2/oauth":     {},
 	"https://api.sberbank.ru/prod/tokens/v2/oidc":      {},

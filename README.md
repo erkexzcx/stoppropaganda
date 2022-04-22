@@ -228,7 +228,7 @@ Default value of `10s` means that worker will wait for a website response for `1
 
 Configuration via command line argument `-useragent "..."` or via environment variable `SP_USERAGENT="..."`.
 
-Default value is `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36`. User agent is sent with HTTP requests to defined websites.
+Default value is `Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4896.127 Safari/537.36`. User agent is sent with HTTP requests to defined websites.
 
 ## workers
 

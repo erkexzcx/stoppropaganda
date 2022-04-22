@@ -9,10 +9,6 @@ import (
 func TestWebsitesLinks(t *testing.T) {
 	for k := range TargetWebsites {
 
-		if strings.HasSuffix(k, "/") {
-			t.Errorf("Invalid website '%s': ends with slash", k)
-		}
-
 		parsedURL, err := url.ParseRequestURI(k)
 
 		if err != nil {

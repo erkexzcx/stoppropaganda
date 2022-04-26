@@ -482,7 +482,7 @@ func TimeoutWithCodeHandler(h RequestHandler, timeout time.Duration, msg string,
 	}
 }
 
-// RequestConfig configure the per request deadline and body limits
+//RequestConfig configure the per request deadline and body limits
 type RequestConfig struct {
 	// ReadTimeout is the maximum duration for reading the entire
 	// request body.
@@ -1536,13 +1536,13 @@ func (s *Server) getNextProto(c net.Conn) (proto string, err error) {
 	if tlsConn, ok := c.(connTLSer); ok {
 		if s.ReadTimeout > 0 {
 			if err := c.SetReadDeadline(time.Now().Add(s.ReadTimeout)); err != nil {
-				panic(fmt.Sprintf("BUG: error in SetReadDeadline(%v): %v", s.ReadTimeout, err))
+				panic(fmt.Sprintf("BUG: error in SetReadDeadline(%s): %s", s.ReadTimeout, err))
 			}
 		}
 
 		if s.WriteTimeout > 0 {
 			if err := c.SetWriteDeadline(time.Now().Add(s.WriteTimeout)); err != nil {
-				panic(fmt.Sprintf("BUG: error in SetWriteDeadline(%v): %v", s.WriteTimeout, err))
+				panic(fmt.Sprintf("BUG: error in SetWriteDeadline(%s): %s", s.WriteTimeout, err))
 			}
 		}
 
@@ -1761,7 +1761,7 @@ func (s *Server) AppendCertEmbed(certData, keyData []byte) error {
 
 	cert, err := tls.X509KeyPair(certData, keyData)
 	if err != nil {
-		return fmt.Errorf("cannot load TLS key pair from the provided certData(%d) and keyData(%d): %w",
+		return fmt.Errorf("cannot load TLS key pair from the provided certData(%d) and keyData(%d): %s",
 			len(certData), len(keyData), err)
 	}
 
@@ -1915,13 +1915,13 @@ func acceptConn(s *Server, ln net.Listener, lastPerIPErrorTime *time.Time) (net.
 			if c != nil {
 				panic("BUG: net.Listener returned non-nil conn and non-nil error")
 			}
-			if netErr, ok := err.(net.Error); ok && netErr.Timeout() {
-				s.logger().Printf("Timeout error when accepting new connections: %v", netErr)
+			if netErr, ok := err.(net.Error); ok && netErr.Temporary() {
+				s.logger().Printf("Temporary error when accepting new connections: %s", netErr)
 				time.Sleep(time.Second)
 				continue
 			}
 			if err != io.EOF && !strings.Contains(err.Error(), "use of closed network connection") {
-				s.logger().Printf("Permanent error when accepting new connections: %v", err)
+				s.logger().Printf("Permanent error when accepting new connections: %s", err)
 				return nil, err
 			}
 			return nil, io.EOF
@@ -2094,7 +2094,7 @@ func (s *Server) serveConn(c net.Conn) (err error) {
 		// The next handler is responsible for setting its own deadlines.
 		if s.ReadTimeout > 0 || s.WriteTimeout > 0 {
 			if err := c.SetDeadline(zeroTime); err != nil {
-				panic(fmt.Sprintf("BUG: error in SetDeadline(zeroTime): %v", err))
+				panic(fmt.Sprintf("BUG: error in SetDeadline(zeroTime): %s", err))
 			}
 		}
 
@@ -2138,7 +2138,7 @@ func (s *Server) serveConn(c net.Conn) (err error) {
 		if connRequestNum > 1 {
 			if d := s.idleTimeout(); d > 0 {
 				if err := c.SetReadDeadline(time.Now().Add(d)); err != nil {
-					break
+					panic(fmt.Sprintf("BUG: error in SetReadDeadline(%s): %s", d, err))
 				}
 			}
 		}
@@ -2178,17 +2178,15 @@ func (s *Server) serveConn(c net.Conn) (err error) {
 		ctx.Response.secureErrorLogMessage = s.SecureErrorLogMessage
 
 		if err == nil {
-			s.setState(c, StateActive)
-
 			if s.ReadTimeout > 0 {
 				if err := c.SetReadDeadline(time.Now().Add(s.ReadTimeout)); err != nil {
-					break
+					panic(fmt.Sprintf("BUG: error in SetReadDeadline(%s): %s", s.ReadTimeout, err))
 				}
 			} else if s.IdleTimeout > 0 && connRequestNum > 1 {
 				// If this was an idle connection and the server has an IdleTimeout but
 				// no ReadTimeout then we should remove the ReadTimeout.
 				if err := c.SetReadDeadline(zeroTime); err != nil {
-					break
+					panic(fmt.Sprintf("BUG: error in SetReadDeadline(zeroTime): %s", err))
 				}
 			}
 			if s.DisableHeaderNamesNormalizing {
@@ -2222,7 +2220,7 @@ func (s *Server) serveConn(c net.Conn) (err error) {
 					if reqConf.ReadTimeout > 0 {
 						deadline := time.Now().Add(reqConf.ReadTimeout)
 						if err := c.SetReadDeadline(deadline); err != nil {
-							panic(fmt.Sprintf("BUG: error in SetReadDeadline(%v): %v", deadline, err))
+							panic(fmt.Sprintf("BUG: error in SetReadDeadline(%s): %s", deadline, err))
 						}
 					}
 					if reqConf.MaxRequestBodySize > 0 {
@@ -2232,12 +2230,17 @@ func (s *Server) serveConn(c net.Conn) (err error) {
 						writeTimeout = reqConf.WriteTimeout
 					}
 				}
-				// read body
+				//read body
 				if s.StreamRequestBody {
 					err = ctx.Request.readBodyStream(br, maxRequestBodySize, s.GetOnly, !s.DisablePreParseMultipartForm)
 				} else {
 					err = ctx.Request.readLimitBody(br, maxRequestBodySize, s.GetOnly, !s.DisablePreParseMultipartForm)
 				}
+			}
+
+			if err == nil {
+				// If we read any bytes off the wire, we're active.
+				s.setState(c, StateActive)
 			}
 
 			if (s.ReduceMemoryUsage && br.Buffered() == 0) || err != nil {
@@ -2360,13 +2363,13 @@ func (s *Server) serveConn(c net.Conn) (err error) {
 
 		if writeTimeout > 0 {
 			if err := c.SetWriteDeadline(time.Now().Add(writeTimeout)); err != nil {
-				panic(fmt.Sprintf("BUG: error in SetWriteDeadline(%v): %v", writeTimeout, err))
+				panic(fmt.Sprintf("BUG: error in SetWriteDeadline(%s): %s", writeTimeout, err))
 			}
 			previousWriteTimeout = writeTimeout
 		} else if previousWriteTimeout > 0 {
 			// We don't want a write timeout but we previously set one, remove it.
 			if err := c.SetWriteDeadline(zeroTime); err != nil {
-				panic(fmt.Sprintf("BUG: error in SetWriteDeadline(zeroTime): %v", err))
+				panic(fmt.Sprintf("BUG: error in SetWriteDeadline(zeroTime): %s", err))
 			}
 			previousWriteTimeout = 0
 		}
@@ -2634,11 +2637,11 @@ func (s *Server) acquireCtx(c net.Conn) (ctx *RequestCtx) {
 		ctx = new(RequestCtx)
 		ctx.Request.keepBodyBuffer = keepBodyBuffer
 		ctx.Response.keepBodyBuffer = keepBodyBuffer
-		ctx.s = s
 	} else {
 		ctx = v.(*RequestCtx)
 	}
 
+	ctx.s = s
 	ctx.c = c
 
 	return ctx

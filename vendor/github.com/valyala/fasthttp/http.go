@@ -940,7 +940,7 @@ func WriteMultipartForm(w io.Writer, f *multipart.Form, boundary string) error {
 			}
 			fh, err := fv.Open()
 			if err != nil {
-				return fmt.Errorf("cannot open form file %q (%q): %w", k, fv.Filename, err)
+				return fmt.Errorf("cannot open form file %q (%q): %s", k, fv.Filename, err)
 			}
 			if _, err = copyZeroAlloc(vw, fh); err != nil {
 				return fmt.Errorf("error when copying form file %q (%q): %w", k, fv.Filename, err)
@@ -1299,9 +1299,6 @@ func (resp *Response) ReadLimitBody(r *bufio.Reader, maxBodySize int) error {
 	if !resp.mustSkipBody() {
 		err = resp.ReadBody(r, maxBodySize)
 		if err != nil {
-			if isConnectionReset(err) {
-				return nil
-			}
 			return err
 		}
 	}
@@ -1309,9 +1306,6 @@ func (resp *Response) ReadLimitBody(r *bufio.Reader, maxBodySize int) error {
 	if resp.Header.ContentLength() == -1 {
 		err = resp.Header.ReadTrailer(r)
 		if err != nil && err != io.EOF {
-			if isConnectionReset(err) {
-				return nil
-			}
 			return err
 		}
 	}
@@ -2299,7 +2293,7 @@ func parseChunkSize(r *bufio.Reader) (int, error) {
 		c, err := r.ReadByte()
 		if err != nil {
 			return -1, ErrBrokenChunk{
-				error: fmt.Errorf("cannot read '\r' char at the end of chunk size: %w", err),
+				error: fmt.Errorf("cannot read '\r' char at the end of chunk size: %s", err),
 			}
 		}
 		// Skip chunk extension after chunk size.

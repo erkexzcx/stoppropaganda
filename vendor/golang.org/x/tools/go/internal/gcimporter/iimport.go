@@ -100,9 +100,7 @@ func iimportCommon(fset *token.FileSet, imports map[string]*types.Package, data 
 	if !debug {
 		defer func() {
 			if e := recover(); e != nil {
-				if bundle {
-					err = fmt.Errorf("%v", e)
-				} else if version > currentVersion {
+				if version > currentVersion {
 					err = fmt.Errorf("cannot import %q (%v), export data is newer version - update tool", path, e)
 				} else {
 					err = fmt.Errorf("cannot import %q (%v), possibly version skew - reinstall package", path, e)

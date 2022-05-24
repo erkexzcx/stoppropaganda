@@ -308,7 +308,7 @@ Reason 2: Work in progress. Always check if (a) Russians are still invading Ukra
 Some anti-virus applications detect this application as virus. This application is not a virus and it has no malicious code in it. In fact, this application is open source and by the nature - everyone is free to inspect the code, improve it and build their own binaries by themselves (if you don't trust my binaries).
 
 There are several reasons why this application might be tagged as virus:
-* Putin wants this application to be treated as virus. [Haters do exist](https://github.com/erkexzcx/stoppropaganda/issues?q=label%3AAsshole).
+* Putin wants this application to be treated as virus. [Haters do exist](https://github.com/erkexzcx/stoppropaganda/issues?q=label%3AAsshole). **EDIT**: I've disabled `Issues` tab since [some russian users](https://github.com/cpueasy) decided to scare me by spamming issues, spamming emails using haveibeenpwned websites via "forgot password" mechanism and d0xxing.
 * This application has hardcoded Yandex DNS servers (helps with some russian websites "geoblocking") that ignores your network settings.
 * At the moment this application has ~400 hardcoded targets, which is not common in regular applications.
 * Malware that is used to DDOS targets is usually working in pretty much the same manner as this application, so this application might be treated as such.
